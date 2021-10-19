@@ -1,0 +1,2 @@
+﻿44171
+/home/rudovc/.local/bin/godot-mono
