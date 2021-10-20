@@ -1,0 +1,6 @@
+.import/
+.mono/
+.vscode/
+dev_resources/
+*.translation
+export_presets.cfg
