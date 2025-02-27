@@ -1,3 +1,7 @@
 [gd_scene format=3 uid="uid://c3rygwqgs4mp4"]
 
 [node name="Board" type="Node2D"]
+
+[node name="Treasure" type="Treasure" parent="."]
+initial_treasure = "water"
+offset = Vector2(200, 200)

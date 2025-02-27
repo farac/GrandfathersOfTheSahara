@@ -1,0 +1,4 @@
+[gd_scene format=3 uid="uid://bu0klrch6r5ly"]
+
+[node name="Treasure" type="Treasure"]
+scale = Vector2(150, 150)

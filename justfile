@@ -29,3 +29,12 @@ dev *SCENE:
 
 export:
     godot --headless --path . --export-release release GrandfathersOfTheSahara
+
+build *FLAG:
+    cd rust && bacon build {{FLAG}}
+
+check:
+    cd rust && bacon check
+
+test:
+    cd rust && bacon test

@@ -48,16 +48,16 @@ theme_override_constants/margin_bottom = 50
 layout_mode = 2
 
 [node name="SceneChangeButton" type="SceneChangeButton" parent="MarginContainer/VSplitContainer/MarginContainer/VBoxContainer"]
+scene_on_click = "res://game/screens/board/board.tscn"
 layout_mode = 2
 size_flags_vertical = 3
 text = "New Game"
-scene_on_click = "res://game/screens/board/board.tscn"
 
 [node name="SceneChangeButton2" type="SceneChangeButton" parent="MarginContainer/VSplitContainer/MarginContainer/VBoxContainer"]
+scene_on_click = "res://menus/settings.tscn"
 layout_mode = 2
 size_flags_vertical = 3
 text = "Settings"
-scene_on_click = "res://menus/settings.tscn"
 
 [node name="QuitButton" type="QuitButton" parent="MarginContainer/VSplitContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
