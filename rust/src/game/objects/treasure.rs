@@ -15,7 +15,7 @@ pub enum TreasureKindParseError {
     ParseGoods(String),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum Good {
     Incense,
     Myrrh,
@@ -23,8 +23,8 @@ enum Good {
     Gems,
 }
 
-#[derive(Debug)]
-enum TreasureKind {
+#[derive(Clone, Debug)]
+pub enum TreasureKind {
     Water,
     Goods(Good),
     Camels,
@@ -33,7 +33,7 @@ enum TreasureKind {
 }
 
 impl TreasureKind {
-    fn icon_texure(&self) -> Result<Gd<ImageTexture>, ErrorKind> {
+    fn icon_texture(&self) -> Result<Gd<ImageTexture>, ErrorKind> {
         let treasure = self;
 
         let icon_name: &str = treasure.into();
@@ -59,7 +59,7 @@ impl From<&TreasureKind> for &str {
             TreasureKind::Goods(_) => {
                 todo!();
             }
-            TreasureKind::None => "",
+            TreasureKind::None => "none",
         }
     }
 }
@@ -77,6 +77,14 @@ impl FromStr for TreasureKind {
             }
             _ => Err(TreasureKindParseError::ParseTreasure(value.to_owned())),
         }
+    }
+}
+
+impl TryFrom<&str> for TreasureKind {
+    type Error = TreasureKindParseError;
+
+    fn try_from(value: &str) -> Result<Self, TreasureKindParseError> {
+        Self::from_str(value)
     }
 }
 
@@ -126,53 +134,54 @@ impl TryFrom<&GString> for TreasureKind {
     }
 }
 
-#[derive(GodotClass)]
-#[class(init, base=Sprite2D)]
+#[derive(GodotClass, Debug)]
+#[class(init, base=Node2D)]
 pub struct Treasure {
-    base: Base<Sprite2D>,
-
+    base: Base<Node2D>,
     #[export]
     initial_treasure: GString,
+    pub kind: Option<TreasureKind>,
+}
 
-    kind: Option<TreasureKind>,
+impl Treasure {
+    pub fn get_sprite(&self) -> Gd<Sprite2D> {
+        self.to_gd()
+            .get_node_as::<Sprite2D>("./Control/SpriteContainer/TreasureSprite")
+    }
 }
 
 #[godot_api]
-impl ISprite2D for Treasure {
+impl INode2D for Treasure {
     fn ready(&mut self) {
-        let mut this_sprite = self.base().clone();
-
-        dbg!(&this_sprite);
-
         if self.initial_treasure.is_empty() {
             return;
         }
 
-        dbg!(&self.initial_treasure);
-
         let parse_result = TreasureKind::try_from(&self.initial_treasure);
 
-        dbg!(&parse_result);
-
-        if let Ok(kind) = parse_result {
-            self.kind = Some(kind);
-        } else {
-            let error = parse_result.expect_err("Expected parse result to be an error.");
+        if parse_result.is_err() {
+            let error = parse_result
+                .as_ref()
+                .expect_err("Expected parse result to be an error.");
             godot_error!("{error}",);
-        };
+        }
 
-        if this_sprite.get_texture().is_none() {
-            match self.kind {
+        let parsed_kind = parse_result.ok();
+
+        let mut sprite = self.get_sprite();
+
+        self.kind = parsed_kind.clone();
+
+        if sprite.get_texture().is_none() {
+            match parsed_kind {
                 Some(TreasureKind::Water) => {
-                    let texture_image = self.kind.as_ref().unwrap().icon_texure().unwrap();
-                    dbg!(&texture_image);
+                    let texture = parsed_kind.unwrap().icon_texture().unwrap();
 
-                    this_sprite.set_texture(&texture_image)
+                    sprite.set_texture(&texture);
                 }
                 _ => {
                     todo!();
                 }
-                None => {}
             }
         }
     }

@@ -1,17 +1,17 @@
 edit *SCENE:
-    cd godot && godot {{SCENE}}
+    cd godot && godot {{ SCENE }}
 
 run *SCENE:
-    cd godot && godot {{SCENE}}
+    cd godot && godot {{ SCENE }}
 
 debug *SCENE:
-    cd godot && godot -d {{SCENE}}
+    cd godot && godot -d {{ SCENE }}
 
 dev *SCENE:
     #!/bin/bash
-    
+
     cd godot
-    godot -d {{SCENE}}&
+    godot -d {{ SCENE }}&
     godot_pid=$!
     cd ..
 
@@ -22,19 +22,19 @@ dev *SCENE:
             kill -9 $godot_pid >> /dev/null
         fi
         cd godot
-        godot -d {{SCENE}}&
+        godot -d {{ SCENE }}&
         godot_pid=$!
         cd ..
     done
 
-export:
-    godot --headless --path . --export-release release GrandfathersOfTheSahara
-
 build *FLAG:
-    cd rust && bacon build {{FLAG}}
+    cd rust && bacon build {{ FLAG }}
 
 check:
     cd rust && bacon check
 
 test:
     cd rust && bacon test
+
+release:
+    godot --headless --path . --export-release release GrandfathersOfTheSahara

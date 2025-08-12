@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://c3rygwqgs4mp4"]
+[gd_scene load_steps=2 format=3 uid="uid://c3rygwqgs4mp4"]
+
+[ext_resource type="PackedScene" uid="uid://df0tleqk37ngc" path="res://game/objects/tile.tscn" id="1_rek28"]
 
 [node name="Board" type="Node2D"]
 
-[node name="Treasure" type="Treasure" parent="."]
-initial_treasure = "water"
-offset = Vector2(200, 200)
+[node name="Tile" parent="." instance=ExtResource("1_rek28")]
