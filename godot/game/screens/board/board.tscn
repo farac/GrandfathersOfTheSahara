@@ -4,4 +4,8 @@
 
 [node name="Board" type="Node2D"]
 
-[node name="Tile" parent="." instance=ExtResource("1_rek28")]
+[node name="Tile6" parent="." instance=ExtResource("1_rek28")]
+oasis_layout = Array[bool]([true, true, false, true])
+treasure_layout = Array[String](["water", "", "", "camels"])
+position = Vector2(600, 280)
+scale = Vector2(0.2, 0.2)

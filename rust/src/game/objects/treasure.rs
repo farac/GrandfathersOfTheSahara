@@ -1,9 +1,11 @@
 use std::{io::ErrorKind, str::FromStr};
 
-use godot::classes::{ISprite2D, Image, ImageTexture, Sprite2D};
+use godot::classes::{Image, ImageTexture, Sprite2D};
 use godot::prelude::*;
 
 use thiserror::Error;
+
+use crate::godot_dbg;
 
 #[derive(Error, Debug)]
 pub enum TreasureKindParseError {
@@ -15,39 +17,21 @@ pub enum TreasureKindParseError {
     ParseGoods(String),
 }
 
-#[derive(Clone, Debug)]
-enum Good {
+#[derive(Clone, Debug, PartialEq)]
+pub enum Good {
     Incense,
     Myrrh,
     Salt,
     Gems,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TreasureKind {
     Water,
     Goods(Good),
     Camels,
     Rumors,
     None,
-}
-
-impl TreasureKind {
-    fn icon_texture(&self) -> Result<Gd<ImageTexture>, ErrorKind> {
-        let treasure = self;
-
-        let icon_name: &str = treasure.into();
-
-        let path = format!("res://assets/icons/treasure/{icon_name}.png");
-
-        let image = Image::load_from_file(&path);
-
-        if let Some(image) = image {
-            ImageTexture::create_from_image(&image).ok_or(ErrorKind::NotFound)
-        } else {
-            Err(ErrorKind::NotFound)
-        }
-    }
 }
 
 impl From<&TreasureKind> for &str {
@@ -64,6 +48,14 @@ impl From<&TreasureKind> for &str {
     }
 }
 
+impl From<&TreasureKind> for GString {
+    fn from(value: &TreasureKind) -> GString {
+        let kind_string: &str = value.into();
+
+        GString::from(kind_string)
+    }
+}
+
 impl FromStr for TreasureKind {
     type Err = TreasureKindParseError;
 
@@ -75,31 +67,17 @@ impl FromStr for TreasureKind {
             "goods" => {
                 todo!();
             }
+            "none" => Ok(TreasureKind::None),
+            "" => Ok(TreasureKind::None),
             _ => Err(TreasureKindParseError::ParseTreasure(value.to_owned())),
         }
     }
 }
 
-impl TryFrom<&str> for TreasureKind {
+impl TryFrom<&String> for TreasureKind {
     type Error = TreasureKindParseError;
 
-    fn try_from(value: &str) -> Result<Self, TreasureKindParseError> {
-        Self::from_str(value)
-    }
-}
-
-impl TryFrom<String> for TreasureKind {
-    type Error = TreasureKindParseError;
-
-    fn try_from(value: String) -> Result<Self, TreasureKindParseError> {
-        Self::from_str(&value)
-    }
-}
-
-impl TryFrom<&GString> for TreasureKind {
-    type Error = TreasureKindParseError;
-
-    fn try_from(value: &GString) -> Result<Self, TreasureKindParseError> {
+    fn try_from(value: &String) -> Result<Self, TreasureKindParseError> {
         let value: String = value.to_string();
         let substrings: Vec<String> = value
             .split(',')
@@ -124,6 +102,8 @@ impl TryFrom<&GString> for TreasureKind {
             }
             "camels" => Ok(TreasureKind::Camels),
             "rumors" => Ok(TreasureKind::Rumors),
+            "none" => Ok(TreasureKind::None),
+            "" => Ok(TreasureKind::None),
             _ => Err(TreasureKindParseError::ParseTreasure(
                 substrings
                     .into_iter()
@@ -131,6 +111,66 @@ impl TryFrom<&GString> for TreasureKind {
                     .expect("Substrings should have length greater than 0."),
             )),
         }
+    }
+}
+
+impl TryFrom<String> for TreasureKind {
+    type Error = TreasureKindParseError;
+
+    fn try_from(value: String) -> Result<Self, TreasureKindParseError> {
+        TreasureKind::try_from(&value)
+    }
+}
+
+impl TryFrom<GString> for TreasureKind {
+    type Error = TreasureKindParseError;
+
+    fn try_from(value: GString) -> Result<Self, TreasureKindParseError> {
+        TreasureKind::try_from(value.to_string())
+    }
+}
+
+impl TryFrom<&GString> for TreasureKind {
+    type Error = TreasureKindParseError;
+
+    fn try_from(value: &GString) -> Result<Self, TreasureKindParseError> {
+        TreasureKind::try_from(value.to_string())
+    }
+}
+
+impl TryFrom<&TreasureKind> for Option<Gd<ImageTexture>> {
+    type Error = ErrorKind;
+
+    fn try_from(kind: &TreasureKind) -> Result<Option<Gd<ImageTexture>>, ErrorKind> {
+        if *kind == TreasureKind::None {
+            return Ok(None);
+        }
+
+        let icon_name: &str = kind.into();
+
+        let path = format!("res://assets/icons/treasure/{icon_name}.png");
+
+        let image = Image::load_from_file(&path);
+
+        if let Some(image) = image {
+            let texture = ImageTexture::create_from_image(&image);
+
+            Ok(texture)
+        } else {
+            godot_dbg!(path);
+
+            Err(ErrorKind::NotFound)
+        }
+    }
+}
+
+impl TryFrom<TreasureKind> for Option<Gd<ImageTexture>> {
+    type Error = ErrorKind;
+
+    fn try_from(kind: TreasureKind) -> Result<Option<Gd<ImageTexture>>, ErrorKind> {
+        let image_texture: Option<Gd<ImageTexture>> = (&kind).try_into()?;
+
+        Ok(image_texture)
     }
 }
 
@@ -148,12 +188,34 @@ impl Treasure {
         self.to_gd()
             .get_node_as::<Sprite2D>("./Control/SpriteContainer/TreasureSprite")
     }
+    fn set_icon_hidden(&self) {
+        self.get_sprite().set_visible(false);
+    }
+    pub fn set_kind(&mut self, kind: TreasureKind) {
+        let mut sprite = self.get_sprite();
+
+        if kind == TreasureKind::None {
+            self.kind = Some(kind.clone());
+
+            return self.set_icon_hidden();
+        }
+
+        let texture: Option<Gd<ImageTexture>> = (&kind)
+            .try_into()
+            .expect("Provided invalid TreasureKind to Treasure.ready()");
+
+        if let Some(texture) = texture {
+            sprite.set_texture(&texture);
+        }
+
+        self.kind = Some(kind);
+    }
 }
 
 #[godot_api]
 impl INode2D for Treasure {
     fn ready(&mut self) {
-        if self.initial_treasure.is_empty() {
+        if self.kind.is_none() {
             return;
         }
 
@@ -168,21 +230,10 @@ impl INode2D for Treasure {
 
         let parsed_kind = parse_result.ok();
 
-        let mut sprite = self.get_sprite();
-
-        self.kind = parsed_kind.clone();
-
-        if sprite.get_texture().is_none() {
-            match parsed_kind {
-                Some(TreasureKind::Water) => {
-                    let texture = parsed_kind.unwrap().icon_texture().unwrap();
-
-                    sprite.set_texture(&texture);
-                }
-                _ => {
-                    todo!();
-                }
-            }
+        if parsed_kind.is_none() {
+            return;
         }
+
+        self.set_kind(parsed_kind.unwrap_or(TreasureKind::None));
     }
 }

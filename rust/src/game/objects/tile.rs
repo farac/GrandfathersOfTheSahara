@@ -1,16 +1,8 @@
-use std::io::ErrorKind;
-
-use crate::array;
-use crate::game::objects::treasure;
 use crate::game::objects::treasure::Treasure;
 use crate::game::objects::treasure::TreasureKind;
+use crate::godot_dbg;
 use godot::builtin::GString;
 use godot::classes::INode2D;
-use godot::classes::Image;
-use godot::classes::ImageTexture;
-
-static OASIS_ICON_PATH: &str = "res://assets/icons/tile/oasis.png";
-// static DESERT_ICON_PATH: &str = "res://assets/icons/tile/desert.png";
 
 use godot::classes::Node2D;
 use godot::global::godot_print;
@@ -18,17 +10,17 @@ use godot::obj::Gd;
 use godot::obj::WithBaseField;
 use godot::{
     builtin::Array,
-    classes::{ISprite2D, Sprite2D},
+    classes::Sprite2D,
     obj::Base,
     prelude::{godot_api, GodotClass},
 };
 
 #[derive(Debug, Clone)]
 pub enum CardinalDirection {
-    N = 1,
-    E = 2,
-    S = 3,
-    W = 4,
+    N,
+    E,
+    S,
+    W,
 }
 
 impl TryFrom<usize> for CardinalDirection {
@@ -36,10 +28,10 @@ impl TryFrom<usize> for CardinalDirection {
 
     fn try_from(value: usize) -> Result<Self, Self::Error> {
         match value {
-            1 => Ok(CardinalDirection::N),
-            2 => Ok(CardinalDirection::E),
-            3 => Ok(CardinalDirection::S),
-            4 => Ok(CardinalDirection::W),
+            0 => Ok(CardinalDirection::N),
+            1 => Ok(CardinalDirection::E),
+            2 => Ok(CardinalDirection::S),
+            3 => Ok(CardinalDirection::W),
             _ => Err("Cardinal direction enum is out of range (1, 2, 3, 4)"),
         }
     }
@@ -68,30 +60,55 @@ pub struct Tile {
 }
 
 impl Tile {
+    // fn get_layout_node(&self) -> Gd<Control> {
+    //     self.to_gd().get_node_as::<Control>("./Layout")
+    // }
     fn get_treasure_at_direction(&self, direction: &CardinalDirection) -> Gd<Treasure> {
         let direction: &str = direction.into();
 
         self.to_gd()
             .get_node_as::<Treasure>(&format!("./Layout/{}/Treasure", direction))
     }
+    fn set_desert(&self, is_desert: bool) {
+        self.to_gd()
+            .get_node_as::<Sprite2D>("./Layout/C/Desert")
+            .set_visible(is_desert);
+    }
 }
 
 #[godot_api]
 impl INode2D for Tile {
     fn ready(&mut self) {
-        for (idx, _oasis) in self.oasis_layout.iter_shared().enumerate() {
-            let direction = CardinalDirection::try_from(idx + 1).expect("Error in Tile.ready");
-            // Add 1 because the cardinal direction is 1-indexed
-            let gd_treasure = self.get_treasure_at_direction(&direction);
-            let treasure = gd_treasure.bind();
+        self.set_desert(true);
 
-            godot_print!("{:?} {:?}", &direction, &treasure.kind);
+        godot_dbg!(self);
 
-            if treasure.kind.is_none() {
-                let mut treasure_sprite = treasure.get_sprite();
+        for (idx, oasis) in self.oasis_layout.iter_shared().enumerate() {
+            let direction = CardinalDirection::try_from(idx).expect("Error in Tile.ready");
+            let mut gd_treasure = self.get_treasure_at_direction(&direction);
 
-                treasure_sprite.set_visible(false);
+            if !oasis {
+                gd_treasure.set_visible(false);
+
+                continue;
             }
+            let mut treasure = gd_treasure.bind_mut();
+
+            if oasis {
+                self.set_desert(false);
+            }
+
+            let treasure_at_idx = self.treasure_layout.get(idx).unwrap_or(GString::from(""));
+
+            let treasure_kind: TreasureKind = treasure_at_idx
+                .try_into()
+                .expect("Couldn't parse treasure_layout into");
+
+            if treasure_kind != TreasureKind::None {
+                self.set_desert(false);
+            }
+
+            treasure.set_kind(treasure_kind);
         }
     }
 }

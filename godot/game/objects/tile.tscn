@@ -22,7 +22,6 @@ size_flags_horizontal = 4
 size_flags_vertical = 2
 
 [node name="Treasure" parent="Layout/N" instance=ExtResource("1_55kvv")]
-initial_treasure = "water"
 position = Vector2(0, 40)
 
 [node name="W" type="CenterContainer" parent="Layout"]
@@ -48,7 +47,6 @@ size_flags_horizontal = 10
 size_flags_vertical = 4
 
 [node name="Treasure" parent="Layout/E" instance=ExtResource("1_55kvv")]
-initial_treasure = "water"
 position = Vector2(-40, 0)
 
 [node name="S" type="CenterContainer" parent="Layout"]
