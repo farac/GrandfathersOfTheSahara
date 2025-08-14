@@ -4,61 +4,156 @@
 
 [node name="Board" type="Node2D"]
 
-[node name="N5" parent="." instance=ExtResource("1_rek28")]
+[node name="Cross" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 300.0
+offset_top = 300.0
+offset_right = 350.0
+offset_bottom = 350.0
+
+[node name="Center" parent="Cross" instance=ExtResource("1_rek28")]
 is_cross = true
-position = Vector2(640, 39)
 scale = Vector2(0.2, 0.2)
 
-[node name="N4" parent="." instance=ExtResource("1_rek28")]
+[node name="N" type="Control" parent="Cross"]
+layout_mode = 3
+anchors_preset = 0
+offset_top = -51.0
+offset_right = 50.0
+offset_bottom = -1.0
+
+[node name="N1" parent="Cross/N" instance=ExtResource("1_rek28")]
 is_cross = true
-position = Vector2(640, 90)
 scale = Vector2(0.2, 0.2)
 
-[node name="N3" parent="." instance=ExtResource("1_rek28")]
+[node name="N2" parent="Cross/N" instance=ExtResource("1_rek28")]
+is_cross = true
+position = Vector2(0, -51)
+scale = Vector2(0.2, 0.2)
+
+[node name="N3" parent="Cross/N" instance=ExtResource("1_rek28")]
 is_cross = true
 oasis_layout = Array[bool]([false, true, false, true])
-position = Vector2(640, 141)
+position = Vector2(0, -102)
 scale = Vector2(0.2, 0.2)
 
-[node name="N2" parent="." instance=ExtResource("1_rek28")]
+[node name="N4" parent="Cross/N" instance=ExtResource("1_rek28")]
 is_cross = true
-position = Vector2(640, 192)
+position = Vector2(0, -153)
 scale = Vector2(0.2, 0.2)
 
-[node name="N1" parent="." instance=ExtResource("1_rek28")]
+[node name="N5" parent="Cross/N" instance=ExtResource("1_rek28")]
 is_cross = true
-position = Vector2(640, 243)
+position = Vector2(0, -204)
 scale = Vector2(0.2, 0.2)
 
-[node name="Center" parent="." instance=ExtResource("1_rek28")]
+[node name="E" type="Control" parent="Cross"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 51.0001
+offset_top = 3.05176e-05
+offset_right = 101.0
+offset_bottom = 50.0
+
+[node name="E1" parent="Cross/E" instance=ExtResource("1_rek28")]
 is_cross = true
-position = Vector2(640, 294)
+oasis_layout = Array[bool]([true, false, false, false])
 scale = Vector2(0.2, 0.2)
 
-[node name="S1" parent="." instance=ExtResource("1_rek28")]
+[node name="E2" parent="Cross/E" instance=ExtResource("1_rek28")]
 is_cross = true
-position = Vector2(640, 345)
+oasis_layout = Array[bool]([false, false, true, false])
+position = Vector2(50.9999, -3.05176e-05)
 scale = Vector2(0.2, 0.2)
 
-[node name="S2" parent="." instance=ExtResource("1_rek28")]
+[node name="E3" parent="Cross/E" instance=ExtResource("1_rek28")]
+is_cross = true
+oasis_layout = Array[bool]([true, false, false, false])
+position = Vector2(102, 0)
+scale = Vector2(0.2, 0.2)
+
+[node name="E4" parent="Cross/E" instance=ExtResource("1_rek28")]
+is_cross = true
+oasis_layout = Array[bool]([false, false, true, false])
+position = Vector2(153, 0)
+scale = Vector2(0.2, 0.2)
+
+[node name="E5" parent="Cross/E" instance=ExtResource("1_rek28")]
+is_cross = true
+position = Vector2(204, 0)
+scale = Vector2(0.2, 0.2)
+
+[node name="S" type="Control" parent="Cross"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = 26.0
+offset_right = 25.0
+offset_bottom = 76.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="S1" parent="Cross/S" instance=ExtResource("1_rek28")]
+is_cross = true
+scale = Vector2(0.2, 0.2)
+
+[node name="S2" parent="Cross/S" instance=ExtResource("1_rek28")]
 is_cross = true
 oasis_layout = Array[bool]([false, true, false, false])
-position = Vector2(640, 396)
+position = Vector2(0, 51)
 scale = Vector2(0.2, 0.2)
 
-[node name="S3" parent="." instance=ExtResource("1_rek28")]
+[node name="S3" parent="Cross/S" instance=ExtResource("1_rek28")]
 is_cross = true
 oasis_layout = Array[bool]([false, false, false, true])
-position = Vector2(640, 447)
+position = Vector2(0, 102)
 scale = Vector2(0.2, 0.2)
 
-[node name="S4" parent="." instance=ExtResource("1_rek28")]
+[node name="S4" parent="Cross/S" instance=ExtResource("1_rek28")]
 is_cross = true
 oasis_layout = Array[bool]([false, true, false, false])
-position = Vector2(640, 498)
+position = Vector2(0, 153)
 scale = Vector2(0.2, 0.2)
 
-[node name="S5" parent="." instance=ExtResource("1_rek28")]
+[node name="S5" parent="Cross/S" instance=ExtResource("1_rek28")]
 is_cross = true
-position = Vector2(640, 549)
+position = Vector2(0, 204)
+scale = Vector2(0.2, 0.2)
+
+[node name="W" type="Control" parent="Cross"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -51.0
+offset_right = -1.0
+offset_bottom = 50.0
+
+[node name="W1" parent="Cross/W" instance=ExtResource("1_rek28")]
+is_cross = true
+scale = Vector2(0.2, 0.2)
+
+[node name="W2" parent="Cross/W" instance=ExtResource("1_rek28")]
+is_cross = true
+oasis_layout = Array[bool]([true, false, true, false])
+position = Vector2(-51, 0)
+scale = Vector2(0.2, 0.2)
+
+[node name="W3" parent="Cross/W" instance=ExtResource("1_rek28")]
+is_cross = true
+position = Vector2(-102, 0)
+scale = Vector2(0.2, 0.2)
+
+[node name="W4" parent="Cross/W" instance=ExtResource("1_rek28")]
+is_cross = true
+oasis_layout = Array[bool]([true, false, true, false])
+position = Vector2(-153, 0)
+scale = Vector2(0.2, 0.2)
+
+[node name="W5" parent="Cross/W" instance=ExtResource("1_rek28")]
+is_cross = true
+position = Vector2(-204, 0)
 scale = Vector2(0.2, 0.2)
