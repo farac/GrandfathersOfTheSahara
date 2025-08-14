@@ -1,11 +1,11 @@
 use crate::game::objects::treasure::Treasure;
 use crate::game::objects::treasure::TreasureKind;
-use crate::godot_dbg;
+use godot::builtin::Color;
 use godot::builtin::GString;
 use godot::classes::INode2D;
 
+use godot::classes::Line2D;
 use godot::classes::Node2D;
-use godot::global::godot_print;
 use godot::obj::Gd;
 use godot::obj::WithBaseField;
 use godot::{
@@ -49,10 +49,12 @@ impl From<&CardinalDirection> for &'static str {
 }
 
 #[derive(GodotClass, Debug)]
-#[class(init, base=Node2D)]
+#[class(base=Node2D)]
 pub struct Tile {
     base: Base<Node2D>,
 
+    #[export]
+    is_cross: bool,
     #[export]
     oasis_layout: Array<bool>,
     #[export]
@@ -69,19 +71,31 @@ impl Tile {
         self.to_gd()
             .get_node_as::<Treasure>(&format!("./Layout/{}/Treasure", direction))
     }
+    fn get_path_at_direction(&self, direction: &CardinalDirection) -> Gd<Line2D> {
+        let direction: &str = direction.into();
+
+        self.to_gd()
+            .get_node_as::<Line2D>(&format!("./Paths/{}", direction))
+    }
     fn set_desert(&self, is_desert: bool) {
         self.to_gd()
             .get_node_as::<Sprite2D>("./Layout/C/Desert")
-            .set_visible(is_desert);
+            .set_visible(is_desert && !self.is_cross);
     }
 }
 
 #[godot_api]
 impl INode2D for Tile {
+    fn init(base: Base<Node2D>) -> Self {
+        Self {
+            base,
+            is_cross: false,
+            treasure_layout: godot::builtin::array!["", "", "", ""],
+            oasis_layout: godot::builtin::array![false, false, false, false],
+        }
+    }
     fn ready(&mut self) {
         self.set_desert(true);
-
-        godot_dbg!(self);
 
         for (idx, oasis) in self.oasis_layout.iter_shared().enumerate() {
             let direction = CardinalDirection::try_from(idx).expect("Error in Tile.ready");
@@ -89,6 +103,9 @@ impl INode2D for Tile {
 
             if !oasis {
                 gd_treasure.set_visible(false);
+                let mut gd_path = self.get_path_at_direction(&direction);
+
+                gd_path.set_default_color(Color::from_rgb(255., 255., 255.));
 
                 continue;
             }

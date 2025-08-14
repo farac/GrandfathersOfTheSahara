@@ -5,8 +5,6 @@ use godot::prelude::*;
 
 use thiserror::Error;
 
-use crate::godot_dbg;
-
 #[derive(Error, Debug)]
 pub enum TreasureKindParseError {
     #[error("TreasureKind expected {0} arguments, received {1}")]
@@ -157,8 +155,6 @@ impl TryFrom<&TreasureKind> for Option<Gd<ImageTexture>> {
 
             Ok(texture)
         } else {
-            godot_dbg!(path);
-
             Err(ErrorKind::NotFound)
         }
     }
