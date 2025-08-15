@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use godot::classes::{CompressedTexture2D, Sprite2D};
 use godot::prelude::*;
 
@@ -8,7 +6,7 @@ use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum TreasureKindParseError {
     #[error("TreasureKind expected {0} arguments, received {1}")]
-    ArgumentCount(&'static str, usize),
+    ArgumentCount(String, usize),
     #[error("TreasureKind expected one of water, goods, camels, rumors, received {0}")]
     ParseTreasure(String),
     #[error("TreasureKinds expected goods to be one of , received {0}")]
@@ -54,29 +52,10 @@ impl From<&TreasureKind> for GString {
     }
 }
 
-impl FromStr for TreasureKind {
-    type Err = TreasureKindParseError;
-
-    fn from_str(value: &str) -> Result<Self, TreasureKindParseError> {
-        match value {
-            "water" => Ok(TreasureKind::Water),
-            "camels" => Ok(TreasureKind::Camels),
-            "rumors" => Ok(TreasureKind::Rumors),
-            "goods" => {
-                todo!();
-            }
-            "none" => Ok(TreasureKind::None),
-            "" => Ok(TreasureKind::None),
-            _ => Err(TreasureKindParseError::ParseTreasure(value.to_owned())),
-        }
-    }
-}
-
-impl TryFrom<&String> for TreasureKind {
+impl TryFrom<&str> for TreasureKind {
     type Error = TreasureKindParseError;
 
-    fn try_from(value: &String) -> Result<Self, TreasureKindParseError> {
-        let value: String = value.to_string();
+    fn try_from(value: &str) -> Result<Self, TreasureKindParseError> {
         let substrings: Vec<String> = value
             .split(',')
             .map(|substring| substring.to_lowercase())
@@ -84,7 +63,7 @@ impl TryFrom<&String> for TreasureKind {
 
         if substrings.is_empty() || substrings.len() > 3 {
             return Err(TreasureKindParseError::ArgumentCount(
-                "1 to 3",
+                "1 to 3".to_owned(),
                 substrings.len(),
             ));
         }
@@ -93,9 +72,12 @@ impl TryFrom<&String> for TreasureKind {
             "water" => Ok(TreasureKind::Water),
             "goods" => {
                 if substrings.len() != 3 {
-                    Err(TreasureKindParseError::ArgumentCount("3", substrings.len()))
+                    Err(TreasureKindParseError::ArgumentCount(
+                        "3".to_owned(),
+                        substrings.len(),
+                    ))
                 } else {
-                    Ok(TreasureKind::from_str(&substrings[2])?)
+                    Ok(TreasureKind::try_from(substrings[2].to_owned())?)
                 }
             }
             "camels" => Ok(TreasureKind::Camels),
@@ -109,6 +91,14 @@ impl TryFrom<&String> for TreasureKind {
                     .expect("Substrings should have length greater than 0."),
             )),
         }
+    }
+}
+
+impl TryFrom<&String> for TreasureKind {
+    type Error = TreasureKindParseError;
+
+    fn try_from(value: &String) -> Result<Self, TreasureKindParseError> {
+        TreasureKind::try_from(value.as_str())
     }
 }
 
@@ -166,6 +156,7 @@ impl TryFrom<TreasureKind> for Option<Gd<CompressedTexture2D>> {
 #[class(init, base=Node2D)]
 pub struct Treasure {
     base: Base<Node2D>,
+
     #[export]
     initial_treasure: GString,
     pub kind: Option<TreasureKind>,

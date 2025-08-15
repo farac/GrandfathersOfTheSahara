@@ -1,9 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://df0tleqk37ngc"]
+[gd_scene load_steps=5 format=3 uid="uid://df0tleqk37ngc"]
 
 [ext_resource type="PackedScene" uid="uid://bu0klrch6r5ly" path="res://game/objects/treasure.tscn" id="1_55kvv"]
 [ext_resource type="Texture2D" uid="uid://dk5co3ewy0k3j" path="res://assets/icons/tile/desert.png" id="2_t3muj"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t3muj"]
+size = Vector2(250, 250)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6lxl1"]
+size = Vector2(249, 248.5)
+
 [node name="Tile" type="Tile"]
+
+[node name="TileComponent" type="TileComponent" parent="."]
 
 [node name="ColorRect" type="ColorRect" parent="."]
 offset_right = 250.0
@@ -77,3 +85,38 @@ default_color = Color(0.533333, 0.247059, 0.0705882, 1)
 [node name="W" type="Line2D" parent="Paths"]
 points = PackedVector2Array(95, 125, 0, 125)
 default_color = Color(0.533333, 0.247059, 0.0705882, 1)
+
+[node name="C" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="C"]
+position = Vector2(125, 125)
+scale = Vector2(0.95, 0.95)
+shape = SubResource("RectangleShape2D_t3muj")
+
+[node name="N" type="Area2D" parent="."]
+position = Vector2(59, -50)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="N"]
+position = Vector2(66, -75)
+shape = SubResource("RectangleShape2D_6lxl1")
+
+[node name="E" type="Area2D" parent="."]
+position = Vector2(59, -50)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="E"]
+position = Vector2(316.5, 174.25)
+shape = SubResource("RectangleShape2D_6lxl1")
+
+[node name="W" type="Area2D" parent="."]
+position = Vector2(59, -50)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="W"]
+position = Vector2(-184, 174)
+shape = SubResource("RectangleShape2D_6lxl1")
+
+[node name="S" type="Area2D" parent="."]
+position = Vector2(59, -50)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="S"]
+position = Vector2(66, 425)
+shape = SubResource("RectangleShape2D_6lxl1")

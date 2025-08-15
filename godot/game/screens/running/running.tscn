@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dsgvefwbo3x75"]
+[gd_scene load_steps=4 format=3 uid="uid://dsgvefwbo3x75"]
 
 [ext_resource type="PackedScene" uid="uid://c3rygwqgs4mp4" path="res://game/objects/board.tscn" id="1_rcqg7"]
 [ext_resource type="PackedScene" uid="uid://0j5s46m15uqh" path="res://game/screens/running/ui/rumor_board.tscn" id="2_asxfy"]
+[ext_resource type="PackedScene" uid="uid://li3xpkusnj24" path="res://game/objects/tile_deck.tscn" id="3_wgd6x"]
 
 [node name="Running" type="Node2D"]
 
@@ -12,3 +13,23 @@ offset_left = 640.0
 offset_top = 40.0
 offset_right = 640.0
 offset_bottom = 40.0
+
+[node name="TileDeck" parent="." instance=ExtResource("3_wgd6x")]
+position = Vector2(644, 542)
+scale = Vector2(0.3, 0.3)
+
+[node name="TileDeck2" parent="." instance=ExtResource("3_wgd6x")]
+position = Vector2(996, 542)
+scale = Vector2(0.3, 0.3)
+
+[node name="TileDeck3" parent="." instance=ExtResource("3_wgd6x")]
+position = Vector2(908, 542)
+scale = Vector2(0.3, 0.3)
+
+[node name="TileDeck4" parent="." instance=ExtResource("3_wgd6x")]
+position = Vector2(820, 542)
+scale = Vector2(0.3, 0.3)
+
+[node name="TileDeck5" parent="." instance=ExtResource("3_wgd6x")]
+position = Vector2(732, 542)
+scale = Vector2(0.3, 0.3)

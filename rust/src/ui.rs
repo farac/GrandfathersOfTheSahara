@@ -3,6 +3,8 @@ use godot::{
     prelude::*,
 };
 
+use crate::scenes::GameScene;
+
 #[derive(GodotClass)]
 #[class(init, base=Button)]
 pub struct SceneChangeButton {
@@ -18,9 +20,15 @@ impl IButton for SceneChangeButton {
         let scene_tree = self.base().get_tree();
 
         if let Some(mut scene_tree) = scene_tree {
-            let on_click = &self.scene_on_click;
+            let on_click_string = self.scene_on_click.to_string();
 
-            scene_tree.change_scene_to_file(on_click);
+            let target_scene: GameScene = on_click_string.as_str().try_into().expect(
+                "Provided invalid scene name as `scene_on_click` to `SceneChangeButton.pressed()`",
+            );
+
+            let target_scene_path = target_scene.to_path();
+
+            scene_tree.change_scene_to_file(target_scene_path);
         } else {
             godot_error!("Scene tree should exist.");
         }

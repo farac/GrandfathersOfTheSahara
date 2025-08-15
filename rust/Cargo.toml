@@ -7,7 +7,12 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib"]
 
+[profile.dev]
+opt-level = 0
+debug = 2
+
 [dependencies]
+# phf = { version = "0.12.1", features = ["macros"] }
 const_format = "0.2.34"
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
 thiserror = "2.0.11"

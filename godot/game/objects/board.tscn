@@ -33,8 +33,10 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Center" parent="Boundary/Cross/C" instance=ExtResource("1_e3jj5")]
-is_cross = true
 scale = Vector2(0.2, 0.2)
+
+[node name="TileComponent" parent="Boundary/Cross/C/Center" index="0"]
+is_cross = true
 
 [node name="N" type="Control" parent="Boundary/Cross"]
 layout_mode = 1
@@ -51,32 +53,41 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="N1" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
-is_cross = true
-oasis_layout = Array[bool]([false, false, false, true])
 scale = Vector2(0.2, 0.2)
 
-[node name="N2" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/N/N1" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([false, true, false, false])
+oasis_layout = Array[bool]([false, false, false, true])
+
+[node name="N2" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
 position = Vector2(0, -51)
 scale = Vector2(0.2, 0.2)
 
+[node name="TileComponent" parent="Boundary/Cross/N/N2" index="0"]
+oasis_layout = Array[bool]([false, true, false, false])
+
 [node name="N3" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
-is_cross = true
-oasis_layout = Array[bool]([false, false, false, true])
 position = Vector2(0, -102)
 scale = Vector2(0.2, 0.2)
 
-[node name="N4" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/N/N3" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([false, true, false, false])
+oasis_layout = Array[bool]([false, false, false, true])
+
+[node name="N4" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
 position = Vector2(0, -153)
 scale = Vector2(0.2, 0.2)
 
-[node name="N5" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/N/N4" index="0"]
 is_cross = true
+oasis_layout = Array[bool]([false, true, false, false])
+
+[node name="N5" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
 position = Vector2(0, -204)
 scale = Vector2(0.2, 0.2)
+
+[node name="TileComponent" parent="Boundary/Cross/N/N5" index="0"]
+is_cross = true
 
 [node name="E" type="Control" parent="Boundary/Cross"]
 layout_mode = 1
@@ -93,32 +104,41 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="E1" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
-is_cross = true
 scale = Vector2(0.2, 0.2)
 
-[node name="E2" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/E/E1" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([false, false, true, false])
-treasure_layout = Array[String](["", "", "water", ""])
+
+[node name="E2" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
 position = Vector2(50.9999, -3.05176e-05)
 scale = Vector2(0.2, 0.2)
 
-[node name="E3" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/E/E2" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([true, false, false, false])
+oasis_layout = Array[bool]([false, false, true, false])
+
+[node name="E3" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
 position = Vector2(102, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="E4" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/E/E3" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([false, false, true, false])
+oasis_layout = Array[bool]([true, false, false, false])
+
+[node name="E4" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
 position = Vector2(153, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="E5" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/E/E4" index="0"]
 is_cross = true
+oasis_layout = Array[bool]([false, false, true, false])
+
+[node name="E5" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
 position = Vector2(204, 0)
 scale = Vector2(0.2, 0.2)
+
+[node name="TileComponent" parent="Boundary/Cross/E/E5" index="0"]
+is_cross = true
 
 [node name="S" type="Control" parent="Boundary/Cross"]
 layout_mode = 1
@@ -135,29 +155,39 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="S1" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
-is_cross = true
 scale = Vector2(0.2, 0.2)
 
-[node name="S2" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/S/S1" index="0"]
 is_cross = true
+
+[node name="S2" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
 position = Vector2(0, 51)
 scale = Vector2(0.2, 0.2)
 
-[node name="S3" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/S/S2" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([false, true, false, true])
+
+[node name="S3" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
 position = Vector2(0, 102)
 scale = Vector2(0.2, 0.2)
 
-[node name="S4" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/S/S3" index="0"]
 is_cross = true
+oasis_layout = Array[bool]([false, true, false, true])
+
+[node name="S4" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
 position = Vector2(0, 153)
 scale = Vector2(0.2, 0.2)
 
-[node name="S5" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/S/S4" index="0"]
 is_cross = true
+
+[node name="S5" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
 position = Vector2(0, 204)
 scale = Vector2(0.2, 0.2)
+
+[node name="TileComponent" parent="Boundary/Cross/S/S5" index="0"]
+is_cross = true
 
 [node name="W" type="Control" parent="Boundary/Cross"]
 layout_mode = 1
@@ -174,27 +204,59 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="W1" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
-is_cross = true
 scale = Vector2(0.2, 0.2)
 
-[node name="W2" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/W/W1" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([true, false, true, false])
+
+[node name="W2" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
 position = Vector2(-51, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="W3" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/W/W2" index="0"]
 is_cross = true
+oasis_layout = Array[bool]([true, false, true, false])
+
+[node name="W3" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
 position = Vector2(-102, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="W4" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/W/W3" index="0"]
 is_cross = true
-oasis_layout = Array[bool]([true, false, true, false])
+
+[node name="W4" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
 position = Vector2(-153, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="W5" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
+[node name="TileComponent" parent="Boundary/Cross/W/W4" index="0"]
 is_cross = true
+oasis_layout = Array[bool]([true, false, true, false])
+
+[node name="W5" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
 position = Vector2(-204, 0)
 scale = Vector2(0.2, 0.2)
+
+[node name="TileComponent" parent="Boundary/Cross/W/W5" index="0"]
+is_cross = true
+
+[editable path="Boundary/Cross/C/Center"]
+[editable path="Boundary/Cross/N/N1"]
+[editable path="Boundary/Cross/N/N2"]
+[editable path="Boundary/Cross/N/N3"]
+[editable path="Boundary/Cross/N/N4"]
+[editable path="Boundary/Cross/N/N5"]
+[editable path="Boundary/Cross/E/E1"]
+[editable path="Boundary/Cross/E/E2"]
+[editable path="Boundary/Cross/E/E3"]
+[editable path="Boundary/Cross/E/E4"]
+[editable path="Boundary/Cross/E/E5"]
+[editable path="Boundary/Cross/S/S1"]
+[editable path="Boundary/Cross/S/S2"]
+[editable path="Boundary/Cross/S/S3"]
+[editable path="Boundary/Cross/S/S4"]
+[editable path="Boundary/Cross/S/S5"]
+[editable path="Boundary/Cross/W/W1"]
+[editable path="Boundary/Cross/W/W2"]
+[editable path="Boundary/Cross/W/W3"]
+[editable path="Boundary/Cross/W/W4"]
+[editable path="Boundary/Cross/W/W5"]

@@ -1,1 +1,2 @@
-pub mod objects;
+pub mod components;
+pub mod entities;

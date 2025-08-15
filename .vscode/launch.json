@@ -1,26 +1,26 @@
 {
     "configurations": [
         {
-            "name": "Debug Project (Godot 4)",
-            "type": "lldb", // type provided by CodeLLDB extension
+            "name": "Launch and Debug Project (Godot 4)",
+            "type": "codelldb",
             "request": "launch",
             "preLaunchTask": "rust: cargo build",
             "cwd": "${workspaceFolder}",
             "args": [
-                "-e", // run editor (remove this to launch the scene directly)
-                "-w", // windowed mode
+                "-e",
+                "-w",
+                "--path /home/rudovc/git/roko/GrandfathersOfTheSahara/godot"
             ],
-            "linux": {
-                "program": "/usr/bin/godot",
-            },
-            "windows": {
-                "program": "C:\\Program Files\\Godot\\Godot_v4.1.X.exe",
-            },
-            "osx": {
-                // NOTE: on macOS the Godot.app needs to be manually re-signed 
-                // to enable debugging (see below)
-                "program": "/Applications/Godot.app/Contents/MacOS/Godot",
-            }
+            "program": "/usr/bin/godot",
+            "sourceLanguages": ["rust", "cpp"]
+        },
+        {
+            "name": "Attach and Debug Project (Godot 4)",
+            "type": "codelldb",
+            "request": "attach",
+            "cwd": "${workspaceFolder}",
+            "sourceLanguages": ["rust", "cpp"]
         }
     ]
 }
+

@@ -1,8 +1,8 @@
 use godot::prelude::*;
 
-pub mod components;
 pub mod game;
 pub mod scenes;
+pub mod ui;
 pub mod util;
 
 struct GrandfathersOfTheSaharaExtension;

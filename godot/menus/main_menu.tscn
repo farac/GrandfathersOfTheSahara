@@ -57,12 +57,13 @@ theme_override_constants/margin_bottom = 50
 layout_mode = 2
 
 [node name="NewGameButton" type="SceneChangeButton" parent="MarginContainer/VSplitContainer/MarginContainer/VBoxContainer"]
-scene_on_click = "creens/running/running.tscn"
+scene_on_click = "running"
 layout_mode = 2
 size_flags_vertical = 3
 text = "New Game"
 
 [node name="SettingsButton" type="SceneChangeButton" parent="MarginContainer/VSplitContainer/MarginContainer/VBoxContainer"]
+scene_on_click = "settings"
 layout_mode = 2
 size_flags_vertical = 3
 text = "Settings"
