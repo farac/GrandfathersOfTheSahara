@@ -1,6 +1,5 @@
 use godot::{
     classes::{Button, IButton},
-    meta::ParamType,
     prelude::*,
 };
 
@@ -19,9 +18,9 @@ impl IButton for SceneChangeButton {
         let scene_tree = self.base().get_tree();
 
         if let Some(mut scene_tree) = scene_tree {
-            let on_click = self.scene_on_click.clone();
+            let on_click = &self.scene_on_click;
 
-            scene_tree.change_scene_to_file(on_click.owned_to_arg());
+            scene_tree.change_scene_to_file(on_click);
         } else {
             godot_error!("Scene tree should exist.");
         }

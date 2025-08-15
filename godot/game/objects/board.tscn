@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c3rygwqgs4mp4"]
 
-[ext_resource type="PackedScene" uid="uid://df0tleqk37ngc" path="res://game/objects/tile.tscn" id="1_rek28"]
+[ext_resource type="PackedScene" uid="uid://df0tleqk37ngc" path="res://game/objects/tile.tscn" id="1_e3jj5"]
 
 [node name="Board" type="Node2D"]
 
@@ -12,7 +12,7 @@ offset_top = 300.0
 offset_right = 350.0
 offset_bottom = 350.0
 
-[node name="Center" parent="Cross" instance=ExtResource("1_rek28")]
+[node name="Center" parent="Cross" instance=ExtResource("1_e3jj5")]
 is_cross = true
 scale = Vector2(0.2, 0.2)
 
@@ -23,27 +23,27 @@ offset_top = -51.0
 offset_right = 50.0
 offset_bottom = -1.0
 
-[node name="N1" parent="Cross/N" instance=ExtResource("1_rek28")]
+[node name="N1" parent="Cross/N" instance=ExtResource("1_e3jj5")]
 is_cross = true
 scale = Vector2(0.2, 0.2)
 
-[node name="N2" parent="Cross/N" instance=ExtResource("1_rek28")]
+[node name="N2" parent="Cross/N" instance=ExtResource("1_e3jj5")]
 is_cross = true
 position = Vector2(0, -51)
 scale = Vector2(0.2, 0.2)
 
-[node name="N3" parent="Cross/N" instance=ExtResource("1_rek28")]
+[node name="N3" parent="Cross/N" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([false, true, false, true])
 position = Vector2(0, -102)
 scale = Vector2(0.2, 0.2)
 
-[node name="N4" parent="Cross/N" instance=ExtResource("1_rek28")]
+[node name="N4" parent="Cross/N" instance=ExtResource("1_e3jj5")]
 is_cross = true
 position = Vector2(0, -153)
 scale = Vector2(0.2, 0.2)
 
-[node name="N5" parent="Cross/N" instance=ExtResource("1_rek28")]
+[node name="N5" parent="Cross/N" instance=ExtResource("1_e3jj5")]
 is_cross = true
 position = Vector2(0, -204)
 scale = Vector2(0.2, 0.2)
@@ -56,31 +56,31 @@ offset_top = 3.05176e-05
 offset_right = 101.0
 offset_bottom = 50.0
 
-[node name="E1" parent="Cross/E" instance=ExtResource("1_rek28")]
+[node name="E1" parent="Cross/E" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([true, false, false, false])
 scale = Vector2(0.2, 0.2)
 
-[node name="E2" parent="Cross/E" instance=ExtResource("1_rek28")]
+[node name="E2" parent="Cross/E" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([false, false, true, false])
 treasure_layout = Array[String](["", "", "water", ""])
 position = Vector2(50.9999, -3.05176e-05)
 scale = Vector2(0.2, 0.2)
 
-[node name="E3" parent="Cross/E" instance=ExtResource("1_rek28")]
+[node name="E3" parent="Cross/E" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([true, false, false, false])
 position = Vector2(102, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="E4" parent="Cross/E" instance=ExtResource("1_rek28")]
+[node name="E4" parent="Cross/E" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([false, false, true, false])
 position = Vector2(153, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="E5" parent="Cross/E" instance=ExtResource("1_rek28")]
+[node name="E5" parent="Cross/E" instance=ExtResource("1_e3jj5")]
 is_cross = true
 position = Vector2(204, 0)
 scale = Vector2(0.2, 0.2)
@@ -99,29 +99,29 @@ offset_bottom = 76.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="S1" parent="Cross/S" instance=ExtResource("1_rek28")]
+[node name="S1" parent="Cross/S" instance=ExtResource("1_e3jj5")]
 is_cross = true
 scale = Vector2(0.2, 0.2)
 
-[node name="S2" parent="Cross/S" instance=ExtResource("1_rek28")]
+[node name="S2" parent="Cross/S" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([false, true, false, false])
 position = Vector2(0, 51)
 scale = Vector2(0.2, 0.2)
 
-[node name="S3" parent="Cross/S" instance=ExtResource("1_rek28")]
+[node name="S3" parent="Cross/S" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([false, false, false, true])
 position = Vector2(0, 102)
 scale = Vector2(0.2, 0.2)
 
-[node name="S4" parent="Cross/S" instance=ExtResource("1_rek28")]
+[node name="S4" parent="Cross/S" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([false, true, false, false])
 position = Vector2(0, 153)
 scale = Vector2(0.2, 0.2)
 
-[node name="S5" parent="Cross/S" instance=ExtResource("1_rek28")]
+[node name="S5" parent="Cross/S" instance=ExtResource("1_e3jj5")]
 is_cross = true
 position = Vector2(0, 204)
 scale = Vector2(0.2, 0.2)
@@ -133,28 +133,28 @@ offset_left = -51.0
 offset_right = -1.0
 offset_bottom = 50.0
 
-[node name="W1" parent="Cross/W" instance=ExtResource("1_rek28")]
+[node name="W1" parent="Cross/W" instance=ExtResource("1_e3jj5")]
 is_cross = true
 scale = Vector2(0.2, 0.2)
 
-[node name="W2" parent="Cross/W" instance=ExtResource("1_rek28")]
+[node name="W2" parent="Cross/W" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([true, false, true, false])
 position = Vector2(-51, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="W3" parent="Cross/W" instance=ExtResource("1_rek28")]
+[node name="W3" parent="Cross/W" instance=ExtResource("1_e3jj5")]
 is_cross = true
 position = Vector2(-102, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="W4" parent="Cross/W" instance=ExtResource("1_rek28")]
+[node name="W4" parent="Cross/W" instance=ExtResource("1_e3jj5")]
 is_cross = true
 oasis_layout = Array[bool]([true, false, true, false])
 position = Vector2(-153, 0)
 scale = Vector2(0.2, 0.2)
 
-[node name="W5" parent="Cross/W" instance=ExtResource("1_rek28")]
+[node name="W5" parent="Cross/W" instance=ExtResource("1_e3jj5")]
 is_cross = true
 position = Vector2(-204, 0)
 scale = Vector2(0.2, 0.2)
