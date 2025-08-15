@@ -1,7 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://dsgvefwbo3x75"]
+[gd_scene load_steps=3 format=3 uid="uid://dsgvefwbo3x75"]
 
 [ext_resource type="PackedScene" uid="uid://c3rygwqgs4mp4" path="res://game/objects/board.tscn" id="1_rcqg7"]
+[ext_resource type="PackedScene" uid="uid://0j5s46m15uqh" path="res://game/screens/running/ui/rumor_board.tscn" id="2_asxfy"]
 
 [node name="Running" type="Node2D"]
 
 [node name="Board" parent="." instance=ExtResource("1_rcqg7")]
+
+[node name="RumorBoard" parent="." instance=ExtResource("2_asxfy")]
+offset_left = 640.0
+offset_top = 40.0
+offset_right = 640.0
+offset_bottom = 40.0

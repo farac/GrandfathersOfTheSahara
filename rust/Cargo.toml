@@ -8,5 +8,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
+const_format = "0.2.34"
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
 thiserror = "2.0.11"

@@ -29,28 +29,14 @@ impl IButton for SceneChangeButton {
 
 #[derive(GodotClass)]
 #[class(init, base=Button)]
-pub struct QuitButton {
+pub struct OnClickButton {
     base: Base<Button>,
 }
 
 #[godot_api]
-impl IButton for QuitButton {
+impl IButton for OnClickButton {
     fn pressed(&mut self) {
-        let scene_tree = self.base().get_tree();
-
-        if let Some(scene_tree) = scene_tree {
-            let tree_root = scene_tree.get_root();
-
-            if let Some(mut tree_root) = tree_root {
-                let signal = "close_requested";
-
-                tree_root.emit_signal(signal, &[]);
-            } else {
-                godot_error!("Scene tree root should exist.");
-            }
-        } else {
-            godot_error!("Scene tree should exist.");
-        }
+        self.to_gd().call("on_click", &[]);
     }
 }
 
