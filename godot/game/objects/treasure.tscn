@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://bu0klrch6r5ly"]
+[gd_scene load_steps=3 format=3 uid="uid://bu0klrch6r5ly"]
 
 [ext_resource type="Texture2D" uid="uid://uhx33nqd6r8y" path="res://assets/icons/tile/oasis.png" id="1_v0etb"]
+[ext_resource type="Texture2D" uid="uid://cunbjigx6lebm" path="res://assets/icons/treasure/water.png" id="1_ydyyq"]
 
 [node name="Treasure" type="Treasure"]
-position = Vector2(-1, 0)
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -43,7 +43,9 @@ size_flags_horizontal = 4
 size_flags_vertical = 2
 
 [node name="TreasureSprite" type="Sprite2D" parent="Control/SpriteContainer"]
-scale = Vector2(0.1, 0.1)
+position = Vector2(24, 24)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_ydyyq")
 
 [node name="TreeContainer" type="CenterContainer" parent="Control"]
 layout_mode = 1

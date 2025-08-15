@@ -1,6 +1,6 @@
-use std::{io::ErrorKind, str::FromStr};
+use std::str::FromStr;
 
-use godot::classes::{Image, ImageTexture, Sprite2D};
+use godot::classes::{CompressedTexture2D, Sprite2D};
 use godot::prelude::*;
 
 use thiserror::Error;
@@ -136,10 +136,10 @@ impl TryFrom<&GString> for TreasureKind {
     }
 }
 
-impl TryFrom<&TreasureKind> for Option<Gd<ImageTexture>> {
-    type Error = ErrorKind;
+impl TryFrom<&TreasureKind> for Option<Gd<CompressedTexture2D>> {
+    type Error = IoError;
 
-    fn try_from(kind: &TreasureKind) -> Result<Option<Gd<ImageTexture>>, ErrorKind> {
+    fn try_from(kind: &TreasureKind) -> Result<Option<Gd<CompressedTexture2D>>, IoError> {
         if *kind == TreasureKind::None {
             return Ok(None);
         }
@@ -148,23 +148,15 @@ impl TryFrom<&TreasureKind> for Option<Gd<ImageTexture>> {
 
         let path = format!("res://assets/icons/treasure/{icon_name}.png");
 
-        let image = Image::load_from_file(&path);
-
-        if let Some(image) = image {
-            let texture = ImageTexture::create_from_image(&image);
-
-            Ok(texture)
-        } else {
-            Err(ErrorKind::NotFound)
-        }
+        try_load::<CompressedTexture2D>(&path).map(Some)
     }
 }
 
-impl TryFrom<TreasureKind> for Option<Gd<ImageTexture>> {
-    type Error = ErrorKind;
+impl TryFrom<TreasureKind> for Option<Gd<CompressedTexture2D>> {
+    type Error = IoError;
 
-    fn try_from(kind: TreasureKind) -> Result<Option<Gd<ImageTexture>>, ErrorKind> {
-        let image_texture: Option<Gd<ImageTexture>> = (&kind).try_into()?;
+    fn try_from(kind: TreasureKind) -> Result<Option<Gd<CompressedTexture2D>>, IoError> {
+        let image_texture: Option<Gd<CompressedTexture2D>> = (&kind).try_into()?;
 
         Ok(image_texture)
     }
@@ -196,7 +188,7 @@ impl Treasure {
             return self.set_icon_hidden();
         }
 
-        let texture: Option<Gd<ImageTexture>> = (&kind)
+        let texture: Option<Gd<CompressedTexture2D>> = (&kind)
             .try_into()
             .expect("Provided invalid TreasureKind to Treasure.ready()");
 

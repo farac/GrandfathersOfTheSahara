@@ -64,6 +64,7 @@ scale = Vector2(0.2, 0.2)
 [node name="E2" parent="Cross/E" instance=ExtResource("1_rek28")]
 is_cross = true
 oasis_layout = Array[bool]([false, false, true, false])
+treasure_layout = Array[String](["", "", "water", ""])
 position = Vector2(50.9999, -3.05176e-05)
 scale = Vector2(0.2, 0.2)
 
