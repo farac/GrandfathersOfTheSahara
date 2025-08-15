@@ -30,6 +30,76 @@ offset_bottom = 80.0
 grow_horizontal = 2
 color = Color(0, 0.439155, 0.297465, 1)
 
+[node name="TreeContainer" type="CenterContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TreeSprite" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(36, -23)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite2" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(-16, 3)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite3" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(-25, 19)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite4" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(10, 8)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite5" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(7, -26)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite6" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(-25, -25)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite7" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(31, 2)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite8" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(-35, -12)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite9" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(-36, 25)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite10" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(-11, -39)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite11" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(21, -33)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
+[node name="TreeSprite12" type="Sprite2D" parent="Control/TreeContainer"]
+position = Vector2(-3, 29)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0etb")
+
 [node name="SpriteContainer" type="CenterContainer" parent="Control"]
 layout_mode = 1
 anchors_preset = 8
@@ -46,18 +116,3 @@ size_flags_vertical = 2
 position = Vector2(24, 24)
 scale = Vector2(0.05, 0.05)
 texture = ExtResource("1_ydyyq")
-
-[node name="TreeContainer" type="CenterContainer" parent="Control"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TreeSprite" type="Sprite2D" parent="Control/TreeContainer"]
-position = Vector2(-25, -25)
-scale = Vector2(0.05, 0.05)
-texture = ExtResource("1_v0etb")
