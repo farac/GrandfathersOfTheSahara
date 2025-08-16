@@ -1,9 +1,12 @@
 use godot::builtin::GString;
 
 use godot::classes::{INode, Node};
+use godot::global::godot_print;
 use godot::obj::Gd;
 use godot::prelude::GodotClass;
 use godot::{builtin::Array, obj::Base, prelude::godot_api};
+
+use crate::util::loader::{GameConfig, TilesetConfig, TomlLoader};
 
 #[derive(Default, Debug, Clone)]
 pub struct TileData {
@@ -71,5 +74,13 @@ impl INode for TileDeckComponent {
             base,
             tiles: std::array::from_fn(|_| TileData::default()),
         }
+    }
+    fn ready(&mut self) {
+        let node: Gd<Node> = self.base.to_gd().upcast();
+        let tileset = TomlLoader::get(node, GameConfig::Tileset)
+            .expect("Couldn't load tileset. Check if config/tileset.toml exists");
+
+        let parsed_config = TilesetConfig::try_from(&tileset);
+        //       godot_print!("{parsed_config:?}");
     }
 }

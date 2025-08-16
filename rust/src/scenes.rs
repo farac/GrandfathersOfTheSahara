@@ -1,8 +1,8 @@
 use const_format::concatcp;
 use thiserror::Error;
 
-static GAME_SCENES_ROOT: &str = "res://game/";
-static MENU_SCENES_ROOT: &str = "res://menus/";
+static GAME_SCREENS: &str = "res://game/screens/";
+static MENU_SCREENS: &str = "res://menus/";
 
 #[derive(Clone, Copy, Debug)]
 pub enum GameScene {
@@ -33,9 +33,9 @@ impl<'a> TryFrom<&'a str> for GameScene {
 impl GameScene {
     pub fn to_path(&self) -> &'static str {
         match &self {
-            GameScene::Running => concatcp!(GAME_SCENES_ROOT, "screens/running/running.tscn"),
-            GameScene::Settings => concatcp!(MENU_SCENES_ROOT, "settings.tscn"),
-            GameScene::MainMenu => concatcp!(MENU_SCENES_ROOT, "main_menu.tscn"),
+            GameScene::Running => concatcp!(GAME_SCREENS, "running/running.tscn"),
+            GameScene::Settings => concatcp!(MENU_SCREENS, "settings.tscn"),
+            GameScene::MainMenu => concatcp!(MENU_SCREENS, "main_menu.tscn"),
         }
     }
 }

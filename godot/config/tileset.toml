@@ -1,0 +1,90 @@
+# Configuration for the cross center
+[cross.c]
+is_desert = false
+
+# 4 lists describing each part of the starting cross
+# Read the directions like you would read a map
+# Numbered going outwards from the center
+# N1
+[[cross.n]]
+is_desert = false
+w = true
+# N2
+[[cross.n]]
+is_desert = false
+e = true
+# N3
+[[cross.n]]
+is_desert = false
+w = true
+# N4
+[[cross.n]]
+is_desert = false
+e = true
+# N5
+[[cross.n]]
+is_desert = false
+
+# E1
+[[cross.e]]
+is_desert = false
+# E2
+[[cross.e]]
+is_desert = false
+s = true
+# E3
+[[cross.e]]
+is_desert = false
+n = true
+# E4
+[[cross.e]]
+s = true
+is_desert = false
+# E5
+[[cross.e]]
+is_desert = false
+
+# S1
+[[cross.s]]
+is_desert = false
+# S2
+[[cross.s]]
+is_desert = false
+# S3
+[[cross.s]]
+is_desert = false
+e = true
+w = true
+# S4
+[[cross.s]]
+is_desert = false
+# S5
+[[cross.s]]
+is_desert = false
+
+# W1
+[[cross.w]]
+is_desert = false
+# W2
+[[cross.w]]
+is_desert = false
+n = true
+s = true
+# W3
+[[cross.w]]
+is_desert = false
+# W4
+[[cross.w]]
+is_desert = false
+n = true
+s = true
+# W5
+[[cross.w]]
+is_desert = false
+
+# Lists describing each of the "decks" used in the game
+[[deck]]
+[[deck]]
+[[deck]]
+[[deck]]
+[[deck]]

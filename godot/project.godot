@@ -14,3 +14,7 @@ config/name="Grandfathers Of The Sahara"
 run/main_scene="res://menus/main_menu.tscn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GlobalTomlLoader="*res://config/toml_loader.tscn"
