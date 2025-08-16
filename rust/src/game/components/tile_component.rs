@@ -81,6 +81,6 @@ impl INode for TileDeckComponent {
             .expect("Couldn't load tileset. Check if config/tileset.toml exists");
 
         let parsed_config = TilesetConfig::try_from(&tileset);
-        //       godot_print!("{parsed_config:?}");
+        godot_print!("{parsed_config:?}");
     }
 }

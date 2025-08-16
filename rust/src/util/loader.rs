@@ -1,4 +1,3 @@
-use godot::global::godot_print;
 use std::collections::HashMap;
 use thiserror::Error;
 use toml::map::Map;
@@ -10,8 +9,6 @@ use godot::obj::{Base, Gd};
 use godot::prelude::GodotClass;
 use toml::de::Error as TomlError;
 use toml::{Table, Value};
-
-use crate::game::entities::tile::Tile;
 
 static GAME_CONFIGS_ROOT: &str = "res://config/";
 
@@ -88,12 +85,11 @@ pub struct CrossConfigArray([TileConfig; 5]);
 
 impl CrossConfigArray {
     fn from_key_in_table(key: &str, table: &Table) -> Option<Self> {
-        let val = table.get(key);
-        // .and_then(|v| CrossConfigArray::try_from(v).ok())
-        godot_print!("VAL {val:?}");
-        let cross_config_array = CrossConfigArray::try_from(val.unwrap()).ok();
-        // godot_print!("CCA {cross_config_array:?}");
-        None
+        let val = table
+            .get(key)
+            .and_then(|v| CrossConfigArray::try_from(v).ok());
+
+        val
     }
     fn from_key_in_table_as_array(key: &str, table: &Table) -> Option<[TileConfig; 5]> {
         CrossConfigArray::from_key_in_table(key, table).map(|b| b.into())
@@ -114,19 +110,12 @@ impl TryFrom<&Vec<Value>> for CrossConfigArray {
             return Err("Could not parse value as array of 5 elements");
         }
 
-        let mut array: Option<[TileConfig; 5]> = None;
+        let tile_configs: Vec<TileConfig> = value
+            .iter()
+            .map(TileConfig::try_from)
+            .collect::<Result<Vec<TileConfig>, &str>>()?;
 
-        for (idx, tile_value) in value.iter().enumerate() {
-            let tile_config = TileConfig::try_from(tile_value)?;
-
-            if let &Some(mut array) = &array {
-                array[idx] = tile_config.clone();
-            } else {
-                array = Some(std::array::from_fn(|_| tile_config.clone()))
-            }
-        }
-
-        let array = array.ok_or("Error parsing array")?;
+        let array = std::array::from_fn(|idx| tile_configs[idx].clone());
 
         Ok(CrossConfigArray(array))
     }
@@ -138,12 +127,10 @@ impl TryFrom<&Value> for CrossConfigArray {
     fn try_from(value: &Value) -> Result<Self, &'static str> {
         match value {
             Value::Array(value) => {
-                godot_print!("CCA {value:?}");
                 let array: Result<CrossConfigArray, &'static str> =
                     value.try_into().or(Err("Couldn't parse value as array"));
 
-                // array
-                Err("Test")
+                array
             }
             _ => Err("Couldn't parse value as array"),
         }
@@ -198,6 +185,7 @@ impl TryFrom<&Value> for TileConfig {
 
 #[derive(Debug, Clone)]
 pub struct CrossConfig {
+    c: TileConfig,
     n: [TileConfig; 5],
     e: [TileConfig; 5],
     s: [TileConfig; 5],
@@ -210,16 +198,21 @@ impl TryFrom<&Option<&Value>> for CrossConfig {
     fn try_from(value: &Option<&Value>) -> Result<Self, &'static str> {
         if let Some(value) = value {
             if let Value::Table(table) = value {
+                let center_value = value
+                    .get("c")
+                    .ok_or("Missing center entry in cross config")?;
+                let c = TileConfig::try_from(center_value)
+                    .map_err(|_| "Missing center entry in cross config")?;
                 let n = CrossConfigArray::from_key_in_table_as_array("n", table)
-                    .ok_or("Missing entry in cross config")?;
+                    .ok_or("Missing north entry in cross config")?;
                 let e = CrossConfigArray::from_key_in_table_as_array("e", table)
-                    .ok_or("Missing entry in cross config")?;
+                    .ok_or("Missing east entry in cross config")?;
                 let s = CrossConfigArray::from_key_in_table_as_array("s", table)
-                    .ok_or("Missing entry in cross config")?;
+                    .ok_or("Missing south entry in cross config")?;
                 let w = CrossConfigArray::from_key_in_table_as_array("w", table)
-                    .ok_or("Missing entry in cross config")?;
+                    .ok_or("Missing west entry in cross config")?;
 
-                Ok(Self { n, e, s, w })
+                Ok(Self { c, n, e, s, w })
             } else {
                 Err("Cross config was not a table")
             }
@@ -307,5 +300,145 @@ impl TomlLoader {
         self.configs.insert(GameConfig::Tileset, table.clone());
 
         Ok(table)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use assert_matches::assert_matches;
+    use toml::Table;
+
+    use crate::util::loader::{CrossConfig, TileConfig, TilesetConfig};
+
+    #[test]
+    fn test_parse_tileset_config() {
+        let input = String::from(
+            "
+# Configuration for the cross center
+[cross.c]
+is_desert = false
+
+# 4 lists describing each part of the starting cross
+# Read the directions like you would read a map
+# Numbered going outwards from the center
+# N1
+[[cross.n]]
+is_desert = false
+w = true
+# N2
+[[cross.n]]
+is_desert = false
+e = true
+# N3
+[[cross.n]]
+is_desert = false
+w = true
+# N4
+[[cross.n]]
+is_desert = false
+e = true
+# N5
+[[cross.n]]
+is_desert = false
+
+# E1
+[[cross.e]]
+is_desert = false
+# E2
+[[cross.e]]
+is_desert = false
+s = true
+# E3
+[[cross.e]]
+is_desert = false
+n = true
+# E4
+[[cross.e]]
+s = true
+is_desert = false
+# E5
+[[cross.e]]
+is_desert = false
+
+# S1
+[[cross.s]]
+is_desert = false
+# S2
+[[cross.s]]
+is_desert = false
+# S3
+[[cross.s]]
+is_desert = false
+e = true
+w = true
+# S4
+[[cross.s]]
+is_desert = false
+# S5
+[[cross.s]]
+is_desert = false
+
+# W1
+[[cross.w]]
+is_desert = false
+# W2
+[[cross.w]]
+is_desert = false
+n = true
+s = true
+# W3
+[[cross.w]]
+is_desert = false
+# W4
+[[cross.w]]
+is_desert = false
+n = true
+s = true
+# W5
+[[cross.w]]
+is_desert = false
+
+# Lists describing each of the 'decks' used in the game
+[[deck]]
+[[deck]]
+[[deck]]
+[[deck]]
+[[deck]]
+",
+        );
+
+        let table = toml::from_str::<Table>(&input).unwrap();
+
+        let parsed_config = TilesetConfig::try_from(&table);
+
+        println!("{parsed_config:?}");
+
+        assert_matches!(parsed_config, Ok(_));
+
+        let tileset_config = parsed_config.unwrap();
+
+        assert_matches!(
+            tileset_config,
+            TilesetConfig {
+                cross: CrossConfig { c, n, e:_, w, s:_ }
+            } => {
+                assert_eq!(c.is_desert, Some(false));
+                assert_matches!(n, array => {
+                    assert_eq!(array[0].is_desert, Some(false));
+                    assert_matches!(array[0].n, Some(false) | None);
+                    assert_matches!(array[0].e, Some(false) | None);
+                    assert_matches!(array[0].s, Some(false) | None);
+                    assert_eq!(array[0].w, Some(true));
+                });
+
+                assert_matches!(w, array => {
+                    assert_eq!(array[1].is_desert, Some(false));
+                    assert_eq!(array[1].n, Some(true));
+                    assert_matches!(array[1].e, Some(false) | None);
+                    assert_eq!(array[1].s, Some(true));
+                    assert_matches!(array[1].w, Some(false) | None);
+                });
+            }
+        );
     }
 }

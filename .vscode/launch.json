@@ -1,26 +1,31 @@
 {
-    "configurations": [
-        {
-            "name": "Launch and Debug Project (Godot 4)",
-            "type": "codelldb",
-            "request": "launch",
-            "preLaunchTask": "rust: cargo build",
-            "cwd": "${workspaceFolder}",
-            "args": [
-                "-e",
-                "-w",
-                "--path /home/rudovc/git/roko/GrandfathersOfTheSahara/godot"
-            ],
-            "program": "/usr/bin/godot",
-            "sourceLanguages": ["rust", "cpp"]
-        },
-        {
-            "name": "Attach and Debug Project (Godot 4)",
-            "type": "codelldb",
-            "request": "attach",
-            "cwd": "${workspaceFolder}",
-            "sourceLanguages": ["rust", "cpp"]
-        }
-    ]
+  "configurations": [
+    {
+      "name": "LLDB: Launch and Debug Project (Godot 4)",
+      "type": "codelldb",
+      "request": "launch",
+      "preLaunchTask": "rust: cargo build",
+      "cwd": "${workspaceFolder}/godot",
+      "args": ["-w", "--path /home/rudovc/git/roko/GrandfathersOfTheSahara/godot"],
+      "program": "/usr/bin/godot",
+      "sourceLanguages": ["rust", "cpp"]
+    },
+    {
+      "name": "LLDB: Attach and Debug Project (Godot 4)",
+      "type": "codelldb",
+      "request": "attach",
+      "cwd": "${workspaceFolder}/godot",
+      "sourceLanguages": ["rust", "cpp"]
+    },
+    {
+      "name": "GDB: Launch and Debug Project (Godot 4)",
+      "type": "rust-gdb",
+      "request": "launch",
+      "preLaunchTask": "rust: cargo build",
+      "cwd": "${workspaceFolder}/godot",
+      "args": ["-w", "--path /home/rudovc/git/roko/GrandfathersOfTheSahara/godot"],
+      "program": "/usr/bin/godot",
+      "sourceLanguages": ["rust", "cpp"]
+    }
+  ]
 }
-
