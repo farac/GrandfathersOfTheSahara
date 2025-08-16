@@ -139,15 +139,15 @@ impl TryFrom<&Value> for CrossConfigArray {
 
 #[derive(Debug, Clone)]
 pub struct TileConfig {
-    is_desert: Option<bool>,
-    n: Option<bool>,
-    e: Option<bool>,
-    s: Option<bool>,
-    w: Option<bool>,
-    treasure_n: Option<String>,
-    treasure_e: Option<String>,
-    treasure_s: Option<String>,
-    treasure_w: Option<String>,
+    pub is_desert: Option<bool>,
+    pub n: Option<bool>,
+    pub e: Option<bool>,
+    pub s: Option<bool>,
+    pub w: Option<bool>,
+    pub treasure_n: Option<String>,
+    pub treasure_e: Option<String>,
+    pub treasure_s: Option<String>,
+    pub treasure_w: Option<String>,
 }
 
 impl TryFrom<&Value> for TileConfig {
@@ -192,6 +192,21 @@ pub struct CrossConfig {
     w: [TileConfig; 5],
 }
 
+impl CrossConfig {
+    pub fn get_side(&self, side: &str) -> Result<[TileConfig; 5], &'static str> {
+        match side {
+            "cross_n" => Ok(self.n.clone()),
+            "cross_e" => Ok(self.e.clone()),
+            "cross_s" => Ok(self.s.clone()),
+            "cross_w" => Ok(self.w.clone()),
+            _ => Err("Requested invalid side for cross config"),
+        }
+    }
+    pub fn get_center(&self) -> TileConfig {
+        self.c.clone()
+    }
+}
+
 impl TryFrom<&Option<&Value>> for CrossConfig {
     type Error = &'static str;
 
@@ -222,27 +237,77 @@ impl TryFrom<&Option<&Value>> for CrossConfig {
     }
 }
 
-// #[derive(Debug, Clone)]
-// pub struct DeckConfig([TileConfig; 17]);
-//
-// impl From<&Table> for DeckConfig {
-//     fn from(table: &Table) -> Self {
-//         todo!();
-//     }
-// }
-//
-// pub struct DeckConfigArray([DeckConfig; 5]);
-//
-// impl From<&Table> for DeckConfigArray {
-//     fn from(table: &Table) -> Self {
-//         todo!();
-//     }
-// }
+#[derive(Debug, Clone)]
+pub struct DeckConfig(pub [TileConfig; 17]);
+
+impl TryFrom<&Value> for DeckConfig {
+    type Error = &'static str;
+
+    fn try_from(value: &Value) -> Result<Self, &'static str> {
+        match value {
+            Value::Array(value) => {
+                let value: Vec<Result<TileConfig, &str>> =
+                    value.iter().map(TileConfig::try_from).collect();
+
+                if value.len() != 17 {
+                    return Err("Deck requires exactly 17 tiles");
+                }
+
+                let array: [TileConfig; 17] =
+                    std::array::from_fn(|idx| value[idx].clone().unwrap());
+
+                Ok(DeckConfig(array))
+            }
+            _ => Err("Couldn't parse value as array"),
+        }
+    }
+}
+
+pub struct DeckConfigArray([DeckConfig; 5]);
+
+impl TryFrom<&Table> for DeckConfigArray {
+    type Error = &'static str;
+
+    fn try_from(table: &Table) -> Result<Self, &'static str> {
+        let value = table
+            .get("decks")
+            .ok_or("Could not find list of decks in config")?;
+
+        match value {
+            Value::Array(value) => {
+                let vec_of_nested_decks: Result<Vec<&Value>, &str> =
+                    value.iter().try_fold(vec![], |mut acc, t| {
+                        let deck = t
+                            .get("deck")
+                            .ok_or("Missing property 'deck' in decks array")?;
+
+                        acc.push(deck);
+
+                        Ok(acc)
+                    });
+
+                let value: Vec<Result<DeckConfig, &str>> = vec_of_nested_decks?
+                    .iter()
+                    .map(|e| DeckConfig::try_from(*e))
+                    .collect();
+
+                if value.len() != 5 {
+                    return Err("Config requires exactly 5 tile decks");
+                }
+
+                let array: [DeckConfig; 5] = std::array::from_fn(|idx| value[idx].clone().unwrap());
+
+                Ok(DeckConfigArray(array))
+            }
+            _ => Err("Couldn't parse value as array"),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct TilesetConfig {
-    cross: CrossConfig,
-    // deck: [DeckConfig; 5],
+    pub cross: CrossConfig,
+    pub deck: [DeckConfig; 5],
 }
 
 impl TryFrom<&Table> for TilesetConfig {
@@ -250,12 +315,9 @@ impl TryFrom<&Table> for TilesetConfig {
 
     fn try_from(table: &Table) -> Result<Self, Self::Error> {
         let cross = CrossConfig::try_from(&table.get("cross"))?;
-        // let deck = DeckConfigArray::from(table).0;
+        let deck = DeckConfigArray::try_from(table)?.0;
 
-        Ok(Self {
-            cross,
-            // deck
-        })
+        Ok(Self { cross, deck })
     }
 }
 
@@ -273,16 +335,20 @@ impl TomlLoader {
             .expect("Expected node to be part of a scene tree");
         let root = tree.get_root().expect("Expected scene tree to have a root");
 
+        {
+            let gd_loader = root.get_node_as::<TomlLoader>("./GlobalTomlLoader");
+            let loader = gd_loader.bind();
+
+            let table = loader.configs.get(&config);
+
+            if let Some(table) = table {
+                return Some(table.clone());
+            }
+        }
+
         let mut gd_loader = root.get_node_as::<TomlLoader>("./GlobalTomlLoader");
         let mut loader = gd_loader.bind_mut();
-
-        let table = loader.configs.get(&config);
-
-        if let Some(table) = table {
-            Some(table.clone())
-        } else {
-            loader.load(config).ok()
-        }
+        loader.load(config).ok()
     }
     fn load(&mut self, config: GameConfig) -> Result<Table, LoadTomlError> {
         let table_path = match config {
@@ -308,7 +374,7 @@ mod tests {
     use assert_matches::assert_matches;
     use toml::Table;
 
-    use crate::util::loader::{CrossConfig, TileConfig, TilesetConfig};
+    use crate::util::loader::{CrossConfig, TilesetConfig};
 
     #[test]
     fn test_parse_tileset_config() {
@@ -399,11 +465,1039 @@ s = true
 is_desert = false
 
 # Lists describing each of the 'decks' used in the game
-[[deck]]
-[[deck]]
-[[deck]]
-[[deck]]
-[[deck]]
+# Deck 1 
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+
+# Deck 2 
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+
+# Deck 3
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+
+# Deck 4
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+
+# Deck 5
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = \"none\"
+treasure_e = \"none\"
+treasure_s = \"none\"
+treasure_w = \"none\"
 ",
         );
 
@@ -420,6 +1514,7 @@ is_desert = false
         assert_matches!(
             tileset_config,
             TilesetConfig {
+                deck: [_, _, _, _, _],
                 cross: CrossConfig { c, n, e:_, w, s:_ }
             } => {
                 assert_eq!(c.is_desert, Some(false));

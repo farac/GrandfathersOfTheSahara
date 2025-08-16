@@ -83,8 +83,1037 @@ s = true
 is_desert = false
 
 # Lists describing each of the "decks" used in the game
-[[deck]]
-[[deck]]
-[[deck]]
-[[deck]]
-[[deck]]
+
+# Deck 1 
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+
+# Deck 2 
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+
+# Deck 3
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+
+# Deck 4
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+
+# Deck 5
+[[decks]]
+# 1
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 2
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 3
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 4
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 5
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 6
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 7
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 8
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 9
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 10
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 11
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 12
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 13
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 14
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 15
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 16
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+
+# 17
+[[decks.deck]]
+is_desert = false
+n = false
+e = false
+s = false
+w = false
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"

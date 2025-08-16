@@ -1,16 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://li3xpkusnj24"]
-
-[sub_resource type="GDScript" id="GDScript_4uj5x"]
-script/source = "extends OnClickButton
-
-func on_click():
-	print(\"Hello\")
-"
+[gd_scene load_steps=2 format=3 uid="uid://li3xpkusnj24"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4uj5x"]
 size = Vector2(264, 264)
 
-[node name="TileDeck" type="Node2D"]
+[node name="TileDeck" type="TileDeck"]
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -35,9 +28,8 @@ theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 2
 theme_override_constants/margin_bottom = 2
 
-[node name="OnClickButton" type="OnClickButton" parent="Control/MarginContainer"]
+[node name="OnClickButton" type="Button" parent="Control/MarginContainer"]
 layout_mode = 2
-script = SubResource("GDScript_4uj5x")
 
 [node name="TileComponent" type="TileDeckComponent" parent="Control"]
 
@@ -54,3 +46,13 @@ color = Color(0.48, 0.4392, 0.3168, 1)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Control/Area2D"]
 position = Vector2(124, 124)
 shape = SubResource("RectangleShape2D_4uj5x")
+
+[node name="Label" type="Label" parent="Control"]
+offset_left = 37.0
+offset_top = 100.0
+offset_right = 221.0
+offset_bottom = 148.0
+theme_override_font_sizes/font_size = 30
+text = "REMAINING"
+
+[connection signal="pressed" from="Control/MarginContainer/OnClickButton" to="." method="get_next_tile"]
