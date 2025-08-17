@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://c1uwyqxhau1ha"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wy3lv"]
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 1, 0.416667, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fv6kg"]
+size = Vector2(264, 264)
+
+[node name="HoverableOutline" type="HoverableOutline"]
+
+[node name="Outline" type="PanelContainer" parent="."]
+visible = false
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 254.0
+offset_bottom = 254.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_wy3lv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(124, 124)
+shape = SubResource("RectangleShape2D_fv6kg")
