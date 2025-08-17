@@ -9,10 +9,14 @@ use crate::util::loader::TomlLoader;
 use godot::builtin::Array;
 use godot::builtin::Color;
 use godot::builtin::GString;
+use godot::builtin::Vector2;
+use godot::classes::viewport;
 use godot::classes::INode2D;
 
+use godot::classes::Input;
 use godot::classes::Line2D;
 use godot::classes::Node2D;
+use godot::global::MouseButton;
 use godot::obj::Gd;
 use godot::obj::WithBaseField;
 use godot::{
@@ -61,9 +65,14 @@ impl From<&CardinalDirection> for &'static str {
 pub struct Tile {
     base: Base<Node2D>,
 
+    #[init(val = false)]
+    is_active: bool,
+
     #[export]
+    #[init(val = GString::from(""))]
     cross_id: GString,
     #[export]
+    #[init(val = 0)]
     cross_index: u8,
 }
 
@@ -97,6 +106,12 @@ impl Tile {
         tile_component.is_cross = tile_component_data.is_cross;
         tile_component.oasis_layout = tile_component_data.oasis_layout.clone();
         tile_component.treasure_layout = tile_component_data.treasure_layout.clone();
+    }
+    pub fn set_active(&mut self) {
+        self.is_active = true;
+    }
+    pub fn place(&mut self) {
+        self.is_active = false;
     }
 }
 
@@ -176,6 +191,29 @@ impl INode2D for Tile {
             }
 
             treasure.set_kind(treasure_kind);
+        }
+    }
+    fn process(&mut self, _dt: f64) {
+        if !self.is_active {
+            return;
+        }
+
+        let input = Input::singleton();
+        let pressed = input.is_mouse_button_pressed(MouseButton::LEFT);
+
+        if pressed {
+            self.is_active = false;
+        }
+
+        let mut base = self.base_mut();
+        let mouse_position = base
+            .get_viewport()
+            .expect("Expected node to have a viewport")
+            .get_mouse_position();
+
+        base.set_position(mouse_position);
+        if pressed {
+            base.set_scale(Vector2::from_tuple((0.2, 0.2)))
         }
     }
 }

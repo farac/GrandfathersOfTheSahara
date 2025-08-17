@@ -8,6 +8,7 @@
 [node name="Running" type="RunningGameScene"]
 
 [node name="Board" parent="." instance=ExtResource("1_rcqg7")]
+metadata/_edit_group_ = true
 
 [node name="RumorBoard" parent="." instance=ExtResource("2_asxfy")]
 offset_left = 640.0

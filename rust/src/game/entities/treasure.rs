@@ -177,7 +177,9 @@ pub struct Treasure {
     base: Base<Node2D>,
 
     #[export]
+    #[init(val = GString::from("none"))]
     initial_treasure: GString,
+    #[init(val = Some(TreasureKind::None))]
     pub kind: Option<TreasureKind>,
 }
 

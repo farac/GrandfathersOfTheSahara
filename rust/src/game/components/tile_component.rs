@@ -1,3 +1,4 @@
+use derivative::Derivative;
 use godot::builtin::GString;
 
 use godot::classes::{INode, Node};
@@ -7,10 +8,16 @@ use godot::{builtin::Array, obj::Base, prelude::godot_api};
 
 use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader};
 
-#[derive(Default, Debug, Clone)]
+#[derive(Derivative, Debug, Clone)]
+#[derivative(Default)]
 pub struct TileData {
+    #[derivative(Default(value = "false"))]
     pub is_cross: bool,
+    #[derivative(Default(value = "[false, false, false, false]"))]
     pub oasis_layout: [bool; 4],
+    #[derivative(Default(
+        value = r#"[String::from("none"), String::from("none"), String::from("none"), String::from("none")]"#
+    ))]
     pub treasure_layout: [String; 4],
 }
 
@@ -40,7 +47,7 @@ impl From<TileConfig> for TileData {
 }
 
 #[derive(GodotClass, Debug)]
-#[class(base=Node)]
+#[class( base=Node)]
 pub struct TileComponent {
     base: Base<Node>,
 

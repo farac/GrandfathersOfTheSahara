@@ -1,4 +1,4 @@
-use godot::builtin::Color;
+use godot::builtin::{Color, Vector2};
 use godot::classes::{INode2D, Label, Node2D};
 use godot::obj::{Base, Gd, WithBaseField};
 use godot::prelude::{godot_api, GodotClass};
@@ -38,12 +38,20 @@ impl TileDeck {
         {
             let tile_component = tile_component.bind();
             new_tile = scene_loader.instantiate_tile_scene_from_tile_component(&tile_component);
+            new_tile.bind_mut().set_active();
         }
 
         let mut gd_scene = RunningGameScene::get_running_game(&self.base());
 
         gd_scene.add_child(&new_tile);
         new_tile.set_owner(&gd_scene);
+
+        let mouse_position = new_tile
+            .get_viewport()
+            .expect("Expected game to have a viewport")
+            .get_mouse_position();
+        new_tile.set_position(mouse_position);
+        new_tile.set_scale(Vector2::from_tuple((0.3, 0.3)));
     }
 }
 
