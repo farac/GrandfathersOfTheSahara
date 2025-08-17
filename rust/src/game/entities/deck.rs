@@ -1,10 +1,19 @@
-use godot::builtin::GString;
+use godot::builtin::Color;
 use godot::classes::{INode2D, Label, Node, Node2D};
-use godot::global::godot_print;
 use godot::obj::{Base, Gd, WithBaseField};
 use godot::prelude::{godot_api, GodotClass};
+use phf::{phf_map, Map};
 
 use crate::game::components::tile_component::{NextTileData, TileComponent, TileDeckComponent};
+
+// TODO: Move this color information to the mapping in config/tileset.toml
+const TILE_COLOR_MAP: Map<&'static str, &'static str> = phf_map! {
+    "1" => "#fee17c",
+    "2" => "#b3d7ed",
+    "3" => "#99d761",
+    "4" => "#f89b49",
+    "5" => "#c97db4",
+};
 
 #[derive(Debug, GodotClass)]
 #[class(init, base=Node2D)]
@@ -22,8 +31,6 @@ impl TileDeck {
         let mut gd_tile_deck_component = self.get_tile_deck_component();
         let next_tile = gd_tile_deck_component.bind_mut().get_next_tile_data();
 
-        godot_print!("{next_tile:?}");
-
         next_tile.map(|nt| TileComponent::from_tile_data(nt.0))
     }
     fn get_tile_deck_component(&self) -> Gd<TileDeckComponent> {
@@ -31,7 +38,8 @@ impl TileDeck {
             .get_node_as::<TileDeckComponent>("./TileDeckComponent")
     }
     fn get_label(&self) -> Gd<Label> {
-        self.to_gd().get_node_as::<Label>("./Control/Label")
+        self.to_gd()
+            .get_node_as::<Label>("./Control/CenterContainer/Label")
     }
 }
 
@@ -53,6 +61,15 @@ impl INode2D for TileDeck {
         tile_deck_component.set_owner(&tile_deck);
 
         let mut label = self.get_label();
-        label.set_text(&GString::from(&self.deck_index.to_string()));
+        let index_string = (self.deck_index + 1).to_string();
+        let color_string = *TILE_COLOR_MAP
+            .get(&index_string)
+            .expect("Expected valid deck index");
+
+        label.set_text(&index_string);
+        label.add_theme_color_override(
+            &format!("Deck {index_string} color"),
+            Color::from_html(color_string).expect("Couldn't parse color string for deck"),
+        );
     }
 }

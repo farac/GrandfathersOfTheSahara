@@ -83,7 +83,7 @@ impl Tile {
         self.base()
             .get_node_as::<Line2D>(&format!("./Paths/{}", direction))
     }
-    fn show_desert_icon(&self, is_desert: bool) {
+    fn show_desert_icon_if_not_cross(&self, is_desert: bool) {
         let is_cross = self.get_tile_component().bind().is_cross;
 
         self.base()
@@ -95,43 +95,47 @@ impl Tile {
 #[godot_api]
 impl INode2D for Tile {
     fn ready(&mut self) {
-        self.show_desert_icon(true);
+        {
+            let mut gd_tile_components = self.get_tile_component();
 
-        let mut gd_tile_components = self.get_tile_component();
+            let cross_id = self.cross_id.to_string();
+            let mut tile_config: Option<TileConfig> = None;
 
-        let cross_id = self.cross_id.to_string();
-        let mut tile_config: Option<TileConfig> = None;
+            if !cross_id.is_empty() && CROSS_IDS.contains(&cross_id.as_str()) {
+                let node: Gd<Node2D> = self.base.to_gd();
+                let tileset = TomlLoader::get(node.upcast(), GameConfig::Tileset)
+                    .expect("Couldn't load tileset. Check if config/tileset.toml exists");
 
-        if !cross_id.is_empty() && CROSS_IDS.contains(&cross_id.as_str()) {
-            let node: Gd<Node2D> = self.base.to_gd();
-            let tileset = TomlLoader::get(node.upcast(), GameConfig::Tileset)
-                .expect("Couldn't load tileset. Check if config/tileset.toml exists");
+                let parsed_config = TilesetConfig::try_from(&tileset)
+                    .expect("Couldn't parse tileset. Check syntax of config/tileset.toml");
 
-            let parsed_config = TilesetConfig::try_from(&tileset)
-                .expect("Couldn't parse tileset. Check syntax of config/tileset.toml");
+                if &cross_id == "cross_c" {
+                    tile_config = Some(parsed_config.cross.get_center());
+                } else {
+                    tile_config = Some(
+                        parsed_config.cross.get_side(&cross_id).unwrap()[self.cross_index as usize]
+                            .clone(),
+                    );
+                }
+            }
 
-            if &cross_id == "cross_c" {
-                tile_config = Some(parsed_config.cross.get_center());
-            } else {
-                tile_config = Some(
-                    parsed_config.cross.get_side(&cross_id).unwrap()[self.cross_index as usize]
-                        .clone(),
-                );
+            if let Some(tile_config) = tile_config {
+                let tile_data = TileData::from(tile_config);
+
+                let mut tile_components = gd_tile_components.bind_mut();
+                tile_components.oasis_layout = Array::from(&tile_data.oasis_layout);
+
+                let treasure_layout = tile_data.treasure_layout.iter().map(GString::from);
+
+                tile_components.treasure_layout = Array::from_iter(treasure_layout);
+                tile_components.is_cross = tile_data.is_cross;
             }
         }
 
-        if let Some(tile_config) = tile_config {
-            let tile_data = TileData::from(tile_config);
-
-            let mut tile_components = gd_tile_components.bind_mut();
-            tile_components.oasis_layout = Array::from(&tile_data.oasis_layout);
-
-            let treasure_layout = tile_data.treasure_layout.iter().map(GString::from);
-
-            tile_components.treasure_layout = Array::from_iter(treasure_layout);
-        }
-
+        let gd_tile_components = self.get_tile_component();
         let tile_components = gd_tile_components.bind();
+
+        self.show_desert_icon_if_not_cross(true);
 
         for (idx, oasis) in tile_components.oasis_layout.iter_shared().enumerate() {
             let direction = CardinalDirection::try_from(idx).expect("Error in Tile.ready");
@@ -148,7 +152,7 @@ impl INode2D for Tile {
             let mut treasure = gd_treasure.bind_mut();
 
             if oasis {
-                self.show_desert_icon(false);
+                self.show_desert_icon_if_not_cross(false);
             }
 
             let treasure_at_idx = tile_components
@@ -161,7 +165,7 @@ impl INode2D for Tile {
                 .expect("Couldn't parse treasure_layout into");
 
             if treasure_kind != TreasureKind::None {
-                self.show_desert_icon(false);
+                self.show_desert_icon_if_not_cross(false);
             }
 
             treasure.set_kind(treasure_kind);

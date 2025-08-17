@@ -127,10 +127,16 @@ impl TryFrom<&Value> for CrossConfigArray {
     fn try_from(value: &Value) -> Result<Self, &'static str> {
         match value {
             Value::Array(value) => {
-                let array: Result<CrossConfigArray, &'static str> =
-                    value.try_into().or(Err("Couldn't parse value as array"));
+                let tile_configs: Vec<TileConfig> = value
+                    .iter()
+                    .map(TileConfig::try_from_for_cross)
+                    .collect::<Result<Vec<TileConfig>, &'static str>>()?;
 
-                array
+                let array: [TileConfig; 5] = tile_configs.try_into().or(Err(
+                    "Couldn't coerce TileConfig for center cross into array of 5 tiles",
+                ))?;
+
+                Ok(CrossConfigArray(array))
             }
             _ => Err("Couldn't parse value as array"),
         }
@@ -139,6 +145,7 @@ impl TryFrom<&Value> for CrossConfigArray {
 
 #[derive(Debug, Clone)]
 pub struct TileConfig {
+    pub is_cross: Option<bool>,
     pub is_desert: Option<bool>,
     pub n: Option<bool>,
     pub e: Option<bool>,
@@ -150,10 +157,20 @@ pub struct TileConfig {
     pub treasure_w: Option<String>,
 }
 
+impl TileConfig {
+    fn try_from_for_cross(value: &Value) -> Result<Self, &'static str> {
+        let mut base = Self::try_from(value)?;
+
+        base.is_cross = Some(true);
+
+        Ok(base)
+    }
+}
+
 impl TryFrom<&Value> for TileConfig {
     type Error = &'static str;
 
-    fn try_from(value: &Value) -> Result<Self, Self::Error> {
+    fn try_from(value: &Value) -> Result<Self, &'static str> {
         match value {
             Value::Table(table) => {
                 let is_desert = ConfigBool::from_key_in_table_as_bool("is_desert", table);
@@ -167,6 +184,7 @@ impl TryFrom<&Value> for TileConfig {
                 let treasure_w = ConfigString::from_key_in_table_as_string("treasure_w", table);
 
                 Ok(Self {
+                    is_cross: Some(false),
                     is_desert,
                     n,
                     e,
@@ -216,7 +234,7 @@ impl TryFrom<&Option<&Value>> for CrossConfig {
                 let center_value = value
                     .get("c")
                     .ok_or("Missing center entry in cross config")?;
-                let c = TileConfig::try_from(center_value)
+                let c = TileConfig::try_from_for_cross(center_value)
                     .map_err(|_| "Missing center entry in cross config")?;
                 let n = CrossConfigArray::from_key_in_table_as_array("n", table)
                     .ok_or("Missing north entry in cross config")?;
@@ -275,16 +293,13 @@ impl TryFrom<&Table> for DeckConfigArray {
 
         match value {
             Value::Array(value) => {
-                let vec_of_nested_decks: Result<Vec<&Value>, &str> =
-                    value.iter().try_fold(vec![], |mut acc, t| {
-                        let deck = t
-                            .get("deck")
-                            .ok_or("Missing property 'deck' in decks array")?;
-
-                        acc.push(deck);
-
-                        Ok(acc)
-                    });
+                let vec_of_nested_decks: Result<Vec<&Value>, &'static str> = value
+                    .iter()
+                    .map(|t| {
+                        t.get("deck")
+                            .ok_or("Missing property 'deck' in decks array")
+                    })
+                    .collect();
 
                 let value: Vec<Result<DeckConfig, &str>> = vec_of_nested_decks?
                     .iter()

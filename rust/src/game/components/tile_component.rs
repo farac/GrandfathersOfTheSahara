@@ -29,8 +29,10 @@ impl From<TileConfig> for TileData {
             value.treasure_w.clone().unwrap_or("none".to_owned()),
         ];
 
+        let is_cross = value.is_cross.unwrap_or(false);
+
         Self {
-            is_cross: false,
+            is_cross,
             oasis_layout,
             treasure_layout,
         }

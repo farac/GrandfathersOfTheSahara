@@ -13,7 +13,7 @@ debug = 2
 
 [dependencies]
 assert_matches = "1.5.0"
-# phf = { version = "0.12.1", features = ["macros"] }
+phf = { version = "0.12.1", features = ["macros"] }
 const_format = "0.2.34"
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
 thiserror = "2.0.11"
