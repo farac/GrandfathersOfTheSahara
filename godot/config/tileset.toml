@@ -88,7 +88,7 @@ is_desert = false
 [[decks]]
 # 1
 [[decks.deck]]
-is_desert = false
+is_desert = true
 n = false
 e = false
 s = false
@@ -101,7 +101,7 @@ treasure_w = "none"
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
+n = true
 e = false
 s = false
 w = false
@@ -112,7 +112,7 @@ treasure_w = "none"
 
 # 3
 [[decks.deck]]
-is_desert = false
+is_desert = true
 n = false
 e = false
 s = false
@@ -125,13 +125,13 @@ treasure_w = "none"
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
+n = true
 e = false
-s = false
+s = true
 w = false
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "goods:gems"
 treasure_w = "none"
 
 # 5

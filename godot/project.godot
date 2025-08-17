@@ -18,3 +18,4 @@ config/icon="res://icon.svg"
 [autoload]
 
 GlobalTomlLoader="*res://config/toml_loader.tscn"
+GlobalSceneLoader="*res://game/scene_loader.tscn"

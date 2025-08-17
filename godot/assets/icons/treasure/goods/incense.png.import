@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://duqp0de53vn8b"
-path="res://.godot/imported/salt.png-d61f40da9a68f7faefaf8501becf5f75.ctex"
+uid="uid://plxlblq4f027"
+path="res://.godot/imported/incense.png-c7556dc9d1117813d383e9a2400ba6cc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/treasure/good/salt.png"
-dest_files=["res://.godot/imported/salt.png-d61f40da9a68f7faefaf8501becf5f75.ctex"]
+source_file="res://assets/icons/treasure/goods/incense.png"
+dest_files=["res://.godot/imported/incense.png-c7556dc9d1117813d383e9a2400ba6cc.ctex"]
 
 [params]
 

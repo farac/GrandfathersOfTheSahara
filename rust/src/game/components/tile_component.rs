@@ -113,7 +113,7 @@ impl NextTileData for TileDeckComponent {
 
 #[godot_api]
 impl TileDeckComponent {
-    pub fn from_tile_deck_index(node: Gd<Node>, deck_index: u8) -> Gd<Self> {
+    pub fn from_tile_deck_index(node: &Node, deck_index: u8) -> Gd<Self> {
         Gd::from_init_fn(|base| {
             let tileset = TomlLoader::get(node, GameConfig::Tileset)
                 .expect("Couldn't load tileset. Check if config/tileset.toml exists");

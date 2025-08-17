@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://clcj1cu818pa3"
-path="res://.godot/imported/myrrh.png-bc32969c52ad01de06e1f9076384235f.ctex"
+path="res://.godot/imported/myrrh.png-7a26781ba9d02f0733f747fc83c34557.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/treasure/good/myrrh.png"
-dest_files=["res://.godot/imported/myrrh.png-bc32969c52ad01de06e1f9076384235f.ctex"]
+source_file="res://assets/icons/treasure/goods/myrrh.png"
+dest_files=["res://.godot/imported/myrrh.png-7a26781ba9d02f0733f747fc83c34557.ctex"]
 
 [params]
 

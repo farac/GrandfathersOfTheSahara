@@ -1,8 +1,8 @@
 use const_format::concatcp;
 use thiserror::Error;
 
-static GAME_SCREENS: &str = "res://game/screens/";
-static MENU_SCREENS: &str = "res://menus/";
+const GAME_SCREENS: &str = "res://game/screens/";
+const MENU_SCREENS: &str = "res://menus/";
 
 #[derive(Clone, Copy, Debug)]
 pub enum GameScene {

@@ -3,13 +3,15 @@ use godot::prelude::*;
 
 use thiserror::Error;
 
+const MAX_TREASURE_SUBSTRINGS: u8 = 2;
+
 #[derive(Error, Debug)]
 pub enum TreasureKindParseError {
     #[error("TreasureKind expected {0} arguments, received {1}")]
     ArgumentCount(String, usize),
-    #[error("TreasureKind expected one of water, goods, camels, rumors, received {0}")]
+    #[error("TreasureKind expected one of water, goods:[gems, myrrh, salt, incense], camels, rumors, received {0}")]
     ParseTreasure(String),
-    #[error("TreasureKinds expected goods to be one of , received {0}")]
+    #[error("TreasureKinds expected goods to be one of goods:[gems, myrrh, salt, incense], received {0}")]
     ParseGoods(String),
 }
 
@@ -19,6 +21,20 @@ pub enum Good {
     Myrrh,
     Salt,
     Gems,
+}
+
+impl TryFrom<&str> for Good {
+    type Error = TreasureKindParseError;
+
+    fn try_from(value: &str) -> Result<Self, TreasureKindParseError> {
+        match value {
+            "incense" => Ok(Good::Incense),
+            "myrrh" => Ok(Good::Myrrh),
+            "salt" => Ok(Good::Salt),
+            "gems" => Ok(Good::Gems),
+            _ => Err(TreasureKindParseError::ParseGoods(String::from(value))),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -36,9 +52,12 @@ impl From<&TreasureKind> for &str {
             TreasureKind::Water => "water",
             TreasureKind::Camels => "camels",
             TreasureKind::Rumors => "rumors",
-            TreasureKind::Goods(_) => {
-                todo!();
-            }
+            TreasureKind::Goods(good) => match good {
+                Good::Incense => "goods/incense",
+                Good::Myrrh => "goods/myrrh",
+                Good::Salt => "goods/salt",
+                Good::Gems => "goods/gems",
+            },
             TreasureKind::None => "none",
         }
     }
@@ -57,13 +76,13 @@ impl TryFrom<&str> for TreasureKind {
 
     fn try_from(value: &str) -> Result<Self, TreasureKindParseError> {
         let substrings: Vec<String> = value
-            .split(',')
+            .split(':')
             .map(|substring| substring.to_lowercase())
             .collect();
 
-        if substrings.is_empty() || substrings.len() > 3 {
+        if substrings.is_empty() || substrings.len() > MAX_TREASURE_SUBSTRINGS as usize {
             return Err(TreasureKindParseError::ArgumentCount(
-                "1 to 3".to_owned(),
+                "1 to 2".to_owned(),
                 substrings.len(),
             ));
         }
@@ -71,13 +90,13 @@ impl TryFrom<&str> for TreasureKind {
         match substrings[0].as_str() {
             "water" => Ok(TreasureKind::Water),
             "goods" => {
-                if substrings.len() != 3 {
+                if substrings.len() != MAX_TREASURE_SUBSTRINGS as usize {
                     Err(TreasureKindParseError::ArgumentCount(
-                        "3".to_owned(),
+                        "2".to_owned(),
                         substrings.len(),
                     ))
                 } else {
-                    Ok(TreasureKind::try_from(substrings[2].to_owned())?)
+                    Ok(TreasureKind::Goods(Good::try_from(substrings[1].as_str())?))
                 }
             }
             "camels" => Ok(TreasureKind::Camels),

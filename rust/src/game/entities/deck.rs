@@ -1,10 +1,15 @@
 use godot::builtin::Color;
-use godot::classes::{INode2D, Label, Node, Node2D};
+use godot::classes::{INode2D, Label, Node2D};
 use godot::obj::{Base, Gd, WithBaseField};
 use godot::prelude::{godot_api, GodotClass};
 use phf::{phf_map, Map};
 
-use crate::game::components::tile_component::{NextTileData, TileComponent, TileDeckComponent};
+use crate::game::components::tile_component::{
+    NextTileData, NextTileDataRemaining, TileComponent, TileDeckComponent,
+};
+use crate::game::entities::tile::Tile;
+use crate::game::RunningGameScene;
+use crate::util::loader::SceneLoader;
 
 // TODO: Move this color information to the mapping in config/tileset.toml
 const TILE_COLOR_MAP: Map<&'static str, &'static str> = phf_map! {
@@ -24,14 +29,38 @@ struct TileDeck {
     deck_index: u8,
 }
 
+impl TileDeck {
+    fn spawn_new_tile(&self, tile_component: Gd<TileComponent>) {
+        let gd_scene_loader = SceneLoader::get(&self.base());
+        let scene_loader = gd_scene_loader.bind();
+        let mut new_tile: Gd<Tile>;
+
+        {
+            let tile_component = tile_component.bind();
+            new_tile = scene_loader.instantiate_tile_scene_from_tile_component(&tile_component);
+        }
+
+        let mut gd_scene = RunningGameScene::get_running_game(&self.base());
+
+        gd_scene.add_child(&new_tile);
+        new_tile.set_owner(&gd_scene);
+    }
+}
+
 #[godot_api]
 impl TileDeck {
     #[func]
-    fn get_next_tile(&mut self) -> Option<Gd<TileComponent>> {
+    fn get_next_tile(&mut self) {
         let mut gd_tile_deck_component = self.get_tile_deck_component();
-        let next_tile = gd_tile_deck_component.bind_mut().get_next_tile_data();
+        let next_tile: Option<NextTileDataRemaining>;
 
-        next_tile.map(|nt| TileComponent::from_tile_data(nt.0))
+        {
+            next_tile = gd_tile_deck_component.bind_mut().get_next_tile_data();
+        }
+
+        if let Some(tile) = next_tile.map(|nt| TileComponent::from_tile_data(nt.0)) {
+            self.spawn_new_tile(tile)
+        }
     }
     fn get_tile_deck_component(&self) -> Gd<TileDeckComponent> {
         self.to_gd()
@@ -47,9 +76,9 @@ impl TileDeck {
 impl INode2D for TileDeck {
     fn ready(&mut self) {
         let mut tile_deck_component: Gd<TileDeckComponent>;
-        let gd_base: Gd<Node> = self.base.to_gd().upcast();
+        let base = self.base();
 
-        tile_deck_component = TileDeckComponent::from_tile_deck_index(gd_base, self.deck_index);
+        tile_deck_component = TileDeckComponent::from_tile_deck_index(&base, self.deck_index);
         tile_deck_component.set_name("TileDeckComponent");
 
         {

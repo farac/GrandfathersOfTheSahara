@@ -4,13 +4,18 @@ use toml::map::Map;
 
 use const_format::concatcp;
 use godot::classes::file_access::ModeFlags;
-use godot::classes::{FileAccess, Node};
+use godot::classes::{FileAccess, INode, Node, PackedScene};
 use godot::obj::{Base, Gd};
-use godot::prelude::GodotClass;
+use godot::prelude::load;
+use godot::prelude::{godot_api, GodotClass};
 use toml::de::Error as TomlError;
 use toml::{Table, Value};
 
-static GAME_CONFIGS_ROOT: &str = "res://config/";
+use crate::game::components::tile_component::TileComponent;
+use crate::game::entities::tile::Tile;
+
+const GAME_CONFIGS_ROOT: &str = "res://config/";
+const GAME_OBJECTS_ROOT: &str = "res://game/objects/";
 
 #[derive(Error, Debug)]
 pub enum LoadTomlError {
@@ -344,7 +349,7 @@ pub struct TomlLoader {
 }
 
 impl TomlLoader {
-    pub fn get(node: Gd<Node>, config: GameConfig) -> Option<Map<String, Value>> {
+    pub fn get(node: &Node, config: GameConfig) -> Option<Map<String, Value>> {
         let tree = node
             .get_tree()
             .expect("Expected node to be part of a scene tree");
@@ -1550,5 +1555,43 @@ treasure_w = \"none\"
                 });
             }
         );
+    }
+}
+
+#[derive(GodotClass, Debug)]
+#[class(init, base=Node)]
+pub struct SceneLoader {
+    base: Base<Node>,
+    tile_scene: Gd<PackedScene>,
+}
+
+impl SceneLoader {
+    pub fn get(node: &Node) -> Gd<SceneLoader> {
+        let tree = node
+            .get_tree()
+            .expect("Expected node to be part of a scene tree");
+        let root = tree.get_root().expect("Expected scene tree to have a root");
+
+        root.get_node_as::<SceneLoader>("./GlobalSceneLoader")
+    }
+    pub fn instantiate_tile_scene_from_tile_component(
+        &self,
+        tile_component: &TileComponent,
+    ) -> Gd<Tile> {
+        let mut gd_tile = self.tile_scene.instantiate_as::<Tile>();
+
+        {
+            let mut tile = gd_tile.bind_mut();
+            tile.set_from_tile_component(tile_component);
+        }
+
+        gd_tile
+    }
+}
+
+#[godot_api]
+impl INode for SceneLoader {
+    fn ready(&mut self) {
+        self.tile_scene = load(concatcp!(GAME_OBJECTS_ROOT, "tile.tscn"));
     }
 }

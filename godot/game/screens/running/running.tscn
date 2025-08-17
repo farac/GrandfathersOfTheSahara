@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://li3xpkusnj24" path="res://game/objects/tile_deck.tscn" id="3_wgd6x"]
 [ext_resource type="StyleBox" uid="uid://gc5qundmq1lb" path="res://styles/box_container.tres" id="3_wirfl"]
 
-[node name="Running" type="Node2D"]
+[node name="Running" type="RunningGameScene"]
 
 [node name="Board" parent="." instance=ExtResource("1_rcqg7")]
 

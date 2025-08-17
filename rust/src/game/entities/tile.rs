@@ -21,7 +21,7 @@ use godot::{
     prelude::{godot_api, GodotClass},
 };
 
-static CROSS_IDS: [&str; 5] = ["cross_c", "cross_n", "cross_e", "cross_s", "cross_w"];
+const CROSS_IDS: [&str; 5] = ["cross_c", "cross_n", "cross_e", "cross_s", "cross_w"];
 
 #[derive(Debug, Clone)]
 pub enum CardinalDirection {
@@ -90,6 +90,14 @@ impl Tile {
             .get_node_as::<Sprite2D>("./Layout/C/Desert")
             .set_visible(is_desert && !is_cross);
     }
+    pub fn set_from_tile_component(&mut self, tile_component_data: &TileComponent) {
+        let mut gd_tile_component = self.get_tile_component();
+        let mut tile_component = gd_tile_component.bind_mut();
+
+        tile_component.is_cross = tile_component_data.is_cross;
+        tile_component.oasis_layout = tile_component_data.oasis_layout.clone();
+        tile_component.treasure_layout = tile_component_data.treasure_layout.clone();
+    }
 }
 
 #[godot_api]
@@ -102,8 +110,7 @@ impl INode2D for Tile {
             let mut tile_config: Option<TileConfig> = None;
 
             if !cross_id.is_empty() && CROSS_IDS.contains(&cross_id.as_str()) {
-                let node: Gd<Node2D> = self.base.to_gd();
-                let tileset = TomlLoader::get(node.upcast(), GameConfig::Tileset)
+                let tileset = TomlLoader::get(&self.base(), GameConfig::Tileset)
                     .expect("Couldn't load tileset. Check if config/tileset.toml exists");
 
                 let parsed_config = TilesetConfig::try_from(&tileset)
