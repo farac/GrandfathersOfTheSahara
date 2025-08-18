@@ -27,11 +27,9 @@ use godot::{
 
 const CROSS_IDS: [&str; 5] = ["cross_c", "cross_n", "cross_e", "cross_s", "cross_w"];
 
-pub type CardinalDirectionFlag = u8;
-
 bitflags! {
-    #[derive(Debug, Clone, PartialEq )]
-    pub struct CardinalDirectionFlags: CardinalDirectionFlag {
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct CardinalDirectionFlags: u8 {
         const N = 0b0001;
         const E = 0b0010;
         const S = 0b0100;
@@ -39,13 +37,49 @@ bitflags! {
     }
 }
 
-#[derive(Debug, Clone)]
+bitflags! {
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct OasisLayoutFlags: u16 {
+        const N1 = CardinalDirectionFlags::N.bits() as u16;
+        const E1 = CardinalDirectionFlags::E.bits() as u16;
+        const S1 = CardinalDirectionFlags::S.bits() as u16;
+        const W1 = CardinalDirectionFlags::W.bits() as u16;
+        const N2 = (CardinalDirectionFlags::N.bits() as u16) << 4;
+        const E2 = (CardinalDirectionFlags::E.bits() as u16) << 4;
+        const S2 = (CardinalDirectionFlags::S.bits() as u16) << 4;
+        const W2 = (CardinalDirectionFlags::W.bits() as u16) << 4;
+        const N3 = (CardinalDirectionFlags::N.bits() as u16) << 8;
+        const E3 = (CardinalDirectionFlags::E.bits() as u16) << 8;
+        const S3 = (CardinalDirectionFlags::S.bits() as u16) << 8;
+        const W3 = (CardinalDirectionFlags::W.bits() as u16) << 8;
+        const N4 = (CardinalDirectionFlags::N.bits() as u16) << 12;
+        const E4 = (CardinalDirectionFlags::E.bits() as u16) << 12;
+        const S4 = (CardinalDirectionFlags::S.bits() as u16) << 12;
+        const W4 = (CardinalDirectionFlags::W.bits() as u16) << 12;
+    }
+}
+
+impl OasisLayoutFlags {
+    pub fn from_cardinal_direction_flags(f: &CardinalDirectionFlags, idx: u8) -> Self {
+        let bits = (f.bits() as u16) << (4 * idx);
+        OasisLayoutFlags::from_bits_truncate(bits)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum CardinalDirection {
     N,
     E,
     S,
     W,
 }
+
+const DIRECTIONS: [CardinalDirection; 4] = [
+    CardinalDirection::N,
+    CardinalDirection::E,
+    CardinalDirection::S,
+    CardinalDirection::W,
+];
 
 impl From<CardinalDirectionFlags> for Vec<CardinalDirection> {
     fn from(value: CardinalDirectionFlags) -> Self {
@@ -54,8 +88,8 @@ impl From<CardinalDirectionFlags> for Vec<CardinalDirection> {
         value.iter_names().for_each(|f| match f.0 {
             "N" => direction_vec.push(CardinalDirection::N),
             "E" => direction_vec.push(CardinalDirection::E),
-            "W" => direction_vec.push(CardinalDirection::S),
-            "S" => direction_vec.push(CardinalDirection::W),
+            "S" => direction_vec.push(CardinalDirection::S),
+            "W" => direction_vec.push(CardinalDirection::W),
             _ => (),
         });
 
@@ -118,7 +152,7 @@ impl Tile {
         let mut tile_component = gd_tile_component.bind_mut();
 
         tile_component.is_cross = tile_component_data.is_cross;
-        tile_component.oasis_layout = tile_component_data.oasis_layout.clone();
+        tile_component.oasis_layout = tile_component_data.oasis_layout;
         tile_component.treasure_layout = tile_component_data.treasure_layout.clone();
     }
     pub fn set_active(&mut self) {
@@ -159,8 +193,7 @@ impl INode2D for Tile {
                 let tile_data = TileData::from(tile_config);
 
                 let mut tile_components = gd_tile_components.bind_mut();
-                tile_components.oasis_layout =
-                    Array::from(&tile_data.oasis_layout.map(|f| f.bits()));
+                tile_components.oasis_layout = tile_data.oasis_layout.bits();
 
                 let treasure_layout = tile_data.treasure_layout.iter().map(GString::from);
 
@@ -174,28 +207,34 @@ impl INode2D for Tile {
 
         self.show_desert_icon_if_not_cross(true);
 
-        // TODO: This logic is not adapted for bitflag oasis layouts
-        for (idx, oasis) in tile_components.oasis_layout.iter_shared().enumerate() {
+        for oasis_idx in 0..3 {
+            let flag = (OasisLayoutFlags::from_bits_truncate(tile_components.oasis_layout).bits()
+                >> (oasis_idx * 4)) as u8;
+
             let directions: Vec<CardinalDirection> =
-                CardinalDirectionFlags::from_bits_truncate(oasis).into();
+                CardinalDirectionFlags::from_bits_truncate(flag).into();
 
-            for direction in directions.iter() {
-                let mut gd_treasure = self.get_treasure_at_direction(direction);
+            for direction in DIRECTIONS {
+                let mut gd_treasure = self.get_treasure_at_direction(&direction);
 
-                if oasis == 0 {
-                    gd_treasure.set_visible(false);
-                    let mut gd_path = self.get_path_at_direction(direction);
+                if flag == 0 {
+                    let mut gd_path = self.get_path_at_direction(&direction);
 
                     gd_path.set_default_color(Color::from_rgb(255., 255., 255.));
 
                     continue;
                 }
 
+                if directions.contains(&direction) {
+                    gd_treasure.set_visible(true);
+                    self.show_desert_icon_if_not_cross(false);
+                }
+
                 let mut treasure = gd_treasure.bind_mut();
 
                 let treasure_at_idx = tile_components
                     .treasure_layout
-                    .get(idx)
+                    .get(oasis_idx)
                     .unwrap_or(GString::from(""));
 
                 let treasure_kind: TreasureKind = treasure_at_idx
@@ -207,10 +246,6 @@ impl INode2D for Tile {
                 }
 
                 treasure.set_kind(treasure_kind);
-            }
-
-            if oasis > 0 {
-                self.show_desert_icon_if_not_cross(false);
             }
         }
     }

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cunbjigx6lebm" path="res://assets/icons/treasure/water.png" id="1_ydyyq"]
 
 [node name="Treasure" type="Treasure"]
+visible = false
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3

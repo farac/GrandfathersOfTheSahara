@@ -12,7 +12,7 @@ use toml::de::Error as TomlError;
 use toml::{Table, Value};
 
 use crate::game::components::tile_component::TileComponent;
-use crate::game::entities::tile::{CardinalDirectionFlags, Tile};
+use crate::game::entities::tile::{CardinalDirectionFlags, OasisLayoutFlags, Tile};
 
 const GAME_CONFIGS_ROOT: &str = "res://config/";
 const GAME_OBJECTS_ROOT: &str = "res://game/objects/";
@@ -32,20 +32,6 @@ pub enum GameConfig {
 
 #[derive(Clone, Debug)]
 pub struct ConfigOasisFlags(CardinalDirectionFlags);
-
-// impl ConfigOasisFlags {
-//     fn from_key_in_table(key: &str, table: &Table) -> Option<Self> {
-//         table
-//             .get(key)
-//             .and_then(|v| ConfigOasisFlags::try_from(v).ok())
-//     }
-//     fn from_key_in_table_as_oasis_flags(
-//         key: &str,
-//         table: &Table,
-//     ) -> Option<CardinalDirectionFlags> {
-//         ConfigOasisFlags::from_key_in_table(key, table).map(|b| b.into())
-//     }
-// }
 
 impl From<ConfigOasisFlags> for CardinalDirectionFlags {
     fn from(value: ConfigOasisFlags) -> Self {
@@ -68,26 +54,26 @@ impl TryFrom<&Value> for ConfigOasisFlags {
 }
 
 #[derive(Debug, Clone)]
-pub struct ConfigOasisFlagsArray([ConfigOasisFlags; 4]);
+pub struct ConfigOasisLayoutFlags(OasisLayoutFlags);
 
-impl ConfigOasisFlagsArray {
+impl ConfigOasisLayoutFlags {
     fn from_key_in_table(key: &str, table: &Table) -> Option<Self> {
         let res = table
             .get(key)
-            .and_then(|v| ConfigOasisFlagsArray::try_from(v).ok());
+            .and_then(|v| ConfigOasisLayoutFlags::try_from(v).ok());
 
         res
     }
     fn from_key_in_table_as_oasis_flags_array(
         key: &str,
         table: &Table,
-    ) -> Option<ConfigOasisFlagsArray> {
-        ConfigOasisFlagsArray::from_key_in_table(key, table)
+    ) -> Option<ConfigOasisLayoutFlags> {
+        ConfigOasisLayoutFlags::from_key_in_table(key, table)
     }
 }
 
-impl From<ConfigOasisFlagsArray> for [ConfigOasisFlags; 4] {
-    fn from(value: ConfigOasisFlagsArray) -> Self {
+impl From<ConfigOasisLayoutFlags> for OasisLayoutFlags {
+    fn from(value: ConfigOasisLayoutFlags) -> Self {
         value.0
     }
 }
@@ -112,7 +98,7 @@ impl From<ConfigOasisFlagsArray> for [ConfigOasisFlags; 4] {
 //     }
 // }
 
-impl TryFrom<&Value> for ConfigOasisFlagsArray {
+impl TryFrom<&Value> for ConfigOasisLayoutFlags {
     type Error = &'static str;
 
     fn try_from(value: &Value) -> Result<Self, &'static str> {
@@ -125,11 +111,14 @@ impl TryFrom<&Value> for ConfigOasisFlagsArray {
 
                 oasis_flags.resize(4, ConfigOasisFlags(CardinalDirectionFlags::empty()));
 
-                let array: [ConfigOasisFlags; 4] = oasis_flags.try_into().or(Err(
-                    "Couldn't coerce ConfigOasisFlags for tile into array of 4 u8s",
-                ))?;
+                let output_flags = oasis_flags.iter().enumerate().fold(
+                    OasisLayoutFlags::empty(),
+                    |acc, (idx, flags)| {
+                        acc | OasisLayoutFlags::from_cardinal_direction_flags(&flags.0, idx as u8)
+                    },
+                );
 
-                Ok(ConfigOasisFlagsArray(array))
+                Ok(ConfigOasisLayoutFlags(output_flags))
             }
             _ => Err("Couldn't parse value as array"),
         }
@@ -259,7 +248,7 @@ impl TryFrom<&Value> for CrossConfigArray {
 pub struct TileConfig {
     pub is_cross: Option<bool>,
     pub is_desert: Option<bool>,
-    pub oasis: Option<[CardinalDirectionFlags; 4]>,
+    pub oasis: Option<OasisLayoutFlags>,
     pub treasure_n: Option<String>,
     pub treasure_e: Option<String>,
     pub treasure_s: Option<String>,
@@ -284,7 +273,7 @@ impl TryFrom<&Value> for TileConfig {
             Value::Table(table) => {
                 let is_desert = ConfigBool::from_key_in_table_as_bool("is_desert", table);
                 let oasis =
-                    ConfigOasisFlagsArray::from_key_in_table_as_oasis_flags_array("oasis", table);
+                    ConfigOasisLayoutFlags::from_key_in_table_as_oasis_flags_array("oasis", table);
                 let treasure_n = ConfigString::from_key_in_table_as_string("treasure_n", table);
                 let treasure_e = ConfigString::from_key_in_table_as_string("treasure_e", table);
                 let treasure_s = ConfigString::from_key_in_table_as_string("treasure_s", table);
@@ -293,7 +282,7 @@ impl TryFrom<&Value> for TileConfig {
                 Ok(Self {
                     is_cross: Some(false),
                     is_desert,
-                    oasis: oasis.map(|f| f.0.map(|c| c.0)),
+                    oasis: oasis.map(|f| f.0),
                     treasure_n,
                     treasure_e,
                     treasure_s,
@@ -494,7 +483,7 @@ mod tests {
     use toml::Table;
 
     use crate::{
-        game::entities::tile::CardinalDirectionFlags,
+        game::entities::tile::OasisLayoutFlags,
         util::loader::{CrossConfig, TilesetConfig},
     };
 
@@ -598,10 +587,7 @@ treasure_w = "none"
 # 2
 [[decks.deck]]
 is_desert = false
-n = true
-e = false
-s = false
-w = false
+oasis = ["N"]
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -619,10 +605,7 @@ treasure_w = "none"
 # 4
 [[decks.deck]]
 is_desert = false
-n = true
-e = false
-s = true
-w = false
+oasis = ["E"]
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "goods:gems"
@@ -906,7 +889,7 @@ treasure_w = "none"
 [[decks]]
 # 1
 [[decks.deck]]
-is_desert = false
+is_desert = true
 oasis = []
 treasure_n = "none"
 treasure_e = "none"
@@ -916,7 +899,7 @@ treasure_w = "none"
 # 2
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["E"]
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -925,10 +908,10 @@ treasure_w = "none"
 # 3
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "rumors"
 treasure_w = "none"
 
 # 4
@@ -1384,20 +1367,37 @@ treasure_w = "none"
         assert_matches!(
             tileset_config,
             TilesetConfig {
-                deck: [_, _, _, _, _],
+                deck: [deck_one, _, deck_three, _, _],
                 cross: CrossConfig { c, n, e:_, w, s:_ }
             } => {
                 assert_eq!(c.is_desert, Some(false));
                 assert_eq!(c.oasis, None);
                 assert_matches!(n, array => {
                     assert_eq!(array[0].is_desert, Some(false));
-                    assert_eq!(array[0].oasis.clone().unwrap()[0], CardinalDirectionFlags::W);
-                    assert_eq!(array[0].oasis.clone().unwrap()[1], CardinalDirectionFlags::empty());
-                    assert_eq!(array[1].oasis.clone().unwrap()[0], CardinalDirectionFlags::E);
+                    assert_eq!(array[0].oasis, Some(OasisLayoutFlags::W1));
+                    assert_eq!(array[1].oasis, Some(OasisLayoutFlags::E1));
+                    assert_eq!(array[2].oasis, Some(OasisLayoutFlags::W1));
                 });
                 assert_matches!(w, array => {
                     assert_eq!(array[1].is_desert, Some(false));
-                    // TODO: Oasis flags test
+                    assert_eq!(array[0].oasis, None);
+                    assert_eq!(array[1].oasis, Some(OasisLayoutFlags::N1 | OasisLayoutFlags::S2));
+                    assert_eq!(array[2].oasis, None);
+                });
+                assert_matches!(deck_one, deck => {
+                    assert_eq!(deck.0[0].is_desert, Some(true));
+                    assert_eq!(deck.0[1].is_desert, Some(false));
+                    assert_eq!(deck.0[0].oasis, Some(OasisLayoutFlags::empty()));
+                    assert_eq!(deck.0[1].oasis, Some(OasisLayoutFlags::N1));
+                    assert_eq!(deck.0[2].oasis, Some(OasisLayoutFlags::empty()));
+                });
+                assert_matches!(deck_three, deck => {
+                    dbg!(&deck);
+                    assert_eq!(deck.0[0].is_desert, Some(true));
+                    assert_eq!(deck.0[1].is_desert, Some(false));
+                    assert_eq!(deck.0[0].oasis, Some(OasisLayoutFlags::empty()));
+                    assert_eq!(deck.0[1].oasis, Some(OasisLayoutFlags::E1));
+                    assert_eq!(deck.0[2].oasis, Some(OasisLayoutFlags::S1));
                 });
             }
         );
