@@ -1,26 +1,36 @@
+# Treasures are determined based on cardinal direction
+# Each tile is allowed to have up to 4 non-overlapping oasis entries
+# Which are in a list called "oasis"
+# A single oasis is described by a u8 of bit flags as follows:
+# 0b0001 = NORTH
+# 0b0010 = EAST
+# 0b0100 = SOUTH
+# 0b1000 = WEST
+
+# Read the directions like you would read a map
+
 # Configuration for the cross center
 [cross.c]
 is_desert = false
 
 # 4 lists describing each part of the starting cross
-# Read the directions like you would read a map
 # Numbered going outwards from the center
 # N1
 [[cross.n]]
 is_desert = false
-w = true
+oasis = ["W"]
 # N2
 [[cross.n]]
 is_desert = false
-e = true
+oasis = ["E"]
 # N3
 [[cross.n]]
 is_desert = false
-w = true
+oasis = ["W"]
 # N4
 [[cross.n]]
 is_desert = false
-e = true
+oasis = ["E"]
 # N5
 [[cross.n]]
 is_desert = false
@@ -31,14 +41,14 @@ is_desert = false
 # E2
 [[cross.e]]
 is_desert = false
-s = true
+oasis = ["S"]
 # E3
 [[cross.e]]
 is_desert = false
-n = true
+oasis = ["N"]
 # E4
 [[cross.e]]
-s = true
+oasis = ["S"]
 is_desert = false
 # E5
 [[cross.e]]
@@ -53,8 +63,7 @@ is_desert = false
 # S3
 [[cross.s]]
 is_desert = false
-e = true
-w = true
+oasis = ["E", "W"]
 # S4
 [[cross.s]]
 is_desert = false
@@ -68,16 +77,14 @@ is_desert = false
 # W2
 [[cross.w]]
 is_desert = false
-n = true
-s = true
+oasis = ["N", "S"]
 # W3
 [[cross.w]]
 is_desert = false
 # W4
 [[cross.w]]
 is_desert = false
-n = true
-s = true
+oasis = ["N", "S"]
 # W5
 [[cross.w]]
 is_desert = false
@@ -89,10 +96,7 @@ is_desert = false
 # 1
 [[decks.deck]]
 is_desert = true
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -113,10 +117,7 @@ treasure_w = "none"
 # 3
 [[decks.deck]]
 is_desert = true
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -137,10 +138,7 @@ treasure_w = "none"
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -149,10 +147,7 @@ treasure_w = "none"
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -161,10 +156,7 @@ treasure_w = "none"
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -173,10 +165,7 @@ treasure_w = "none"
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -185,10 +174,7 @@ treasure_w = "none"
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -197,10 +183,7 @@ treasure_w = "none"
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -209,10 +192,7 @@ treasure_w = "none"
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -221,10 +201,7 @@ treasure_w = "none"
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -233,10 +210,7 @@ treasure_w = "none"
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -245,10 +219,7 @@ treasure_w = "none"
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -257,10 +228,7 @@ treasure_w = "none"
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -269,10 +237,7 @@ treasure_w = "none"
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -281,10 +246,7 @@ treasure_w = "none"
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -296,10 +258,7 @@ treasure_w = "none"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -308,10 +267,7 @@ treasure_w = "none"
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -320,10 +276,7 @@ treasure_w = "none"
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -332,10 +285,7 @@ treasure_w = "none"
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -344,10 +294,7 @@ treasure_w = "none"
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -356,10 +303,7 @@ treasure_w = "none"
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -368,10 +312,7 @@ treasure_w = "none"
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -380,10 +321,7 @@ treasure_w = "none"
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -392,10 +330,7 @@ treasure_w = "none"
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -404,10 +339,7 @@ treasure_w = "none"
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -416,10 +348,7 @@ treasure_w = "none"
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -428,10 +357,7 @@ treasure_w = "none"
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -440,10 +366,7 @@ treasure_w = "none"
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -452,10 +375,7 @@ treasure_w = "none"
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -464,10 +384,7 @@ treasure_w = "none"
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -476,10 +393,7 @@ treasure_w = "none"
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -488,10 +402,7 @@ treasure_w = "none"
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -503,10 +414,7 @@ treasure_w = "none"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -515,10 +423,7 @@ treasure_w = "none"
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -527,10 +432,7 @@ treasure_w = "none"
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -539,10 +441,7 @@ treasure_w = "none"
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -551,10 +450,7 @@ treasure_w = "none"
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -563,10 +459,7 @@ treasure_w = "none"
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -575,10 +468,7 @@ treasure_w = "none"
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -587,10 +477,7 @@ treasure_w = "none"
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -599,10 +486,7 @@ treasure_w = "none"
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -611,10 +495,7 @@ treasure_w = "none"
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -623,10 +504,7 @@ treasure_w = "none"
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -635,10 +513,7 @@ treasure_w = "none"
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -647,10 +522,7 @@ treasure_w = "none"
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -659,10 +531,7 @@ treasure_w = "none"
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -671,10 +540,7 @@ treasure_w = "none"
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -683,10 +549,7 @@ treasure_w = "none"
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -695,10 +558,7 @@ treasure_w = "none"
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -710,10 +570,7 @@ treasure_w = "none"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -722,10 +579,7 @@ treasure_w = "none"
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -734,10 +588,7 @@ treasure_w = "none"
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -746,10 +597,7 @@ treasure_w = "none"
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -758,10 +606,7 @@ treasure_w = "none"
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -770,10 +615,7 @@ treasure_w = "none"
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -782,10 +624,7 @@ treasure_w = "none"
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -794,10 +633,7 @@ treasure_w = "none"
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -806,10 +642,7 @@ treasure_w = "none"
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -818,10 +651,7 @@ treasure_w = "none"
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -830,10 +660,7 @@ treasure_w = "none"
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -842,10 +669,7 @@ treasure_w = "none"
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -854,10 +678,7 @@ treasure_w = "none"
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -866,10 +687,7 @@ treasure_w = "none"
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -878,10 +696,7 @@ treasure_w = "none"
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -890,10 +705,7 @@ treasure_w = "none"
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -902,10 +714,7 @@ treasure_w = "none"
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -917,10 +726,7 @@ treasure_w = "none"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -929,10 +735,7 @@ treasure_w = "none"
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -941,10 +744,7 @@ treasure_w = "none"
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -953,10 +753,7 @@ treasure_w = "none"
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -965,10 +762,7 @@ treasure_w = "none"
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -977,10 +771,7 @@ treasure_w = "none"
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -989,10 +780,7 @@ treasure_w = "none"
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1001,10 +789,7 @@ treasure_w = "none"
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1013,10 +798,7 @@ treasure_w = "none"
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1025,10 +807,7 @@ treasure_w = "none"
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1037,10 +816,7 @@ treasure_w = "none"
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1049,10 +825,7 @@ treasure_w = "none"
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1061,10 +834,7 @@ treasure_w = "none"
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1073,10 +843,7 @@ treasure_w = "none"
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1085,10 +852,7 @@ treasure_w = "none"
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1097,10 +861,7 @@ treasure_w = "none"
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -1109,10 +870,7 @@ treasure_w = "none"
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
+oasis = []
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"

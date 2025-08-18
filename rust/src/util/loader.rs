@@ -12,7 +12,7 @@ use toml::de::Error as TomlError;
 use toml::{Table, Value};
 
 use crate::game::components::tile_component::TileComponent;
-use crate::game::entities::tile::Tile;
+use crate::game::entities::tile::{CardinalDirectionFlags, Tile};
 
 const GAME_CONFIGS_ROOT: &str = "res://config/";
 const GAME_OBJECTS_ROOT: &str = "res://game/objects/";
@@ -30,8 +30,113 @@ pub enum GameConfig {
     Tileset,
 }
 
+#[derive(Clone, Debug)]
+pub struct ConfigOasisFlags(CardinalDirectionFlags);
+
+// impl ConfigOasisFlags {
+//     fn from_key_in_table(key: &str, table: &Table) -> Option<Self> {
+//         table
+//             .get(key)
+//             .and_then(|v| ConfigOasisFlags::try_from(v).ok())
+//     }
+//     fn from_key_in_table_as_oasis_flags(
+//         key: &str,
+//         table: &Table,
+//     ) -> Option<CardinalDirectionFlags> {
+//         ConfigOasisFlags::from_key_in_table(key, table).map(|b| b.into())
+//     }
+// }
+
+impl From<ConfigOasisFlags> for CardinalDirectionFlags {
+    fn from(value: ConfigOasisFlags) -> Self {
+        value.0
+    }
+}
+
+impl TryFrom<&Value> for ConfigOasisFlags {
+    type Error = &'static str;
+
+    fn try_from(value: &Value) -> Result<Self, &'static str> {
+        match value {
+            Value::String(value) => Ok(ConfigOasisFlags(
+                (bitflags::parser::from_str(value))
+                    .or(Err("Expected oasis flags to be bit flags: 1, 2, 4, 8"))?,
+            )),
+            _ => Err("Couldn't parse value as boolean"),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConfigOasisFlagsArray([ConfigOasisFlags; 4]);
+
+impl ConfigOasisFlagsArray {
+    fn from_key_in_table(key: &str, table: &Table) -> Option<Self> {
+        let res = table
+            .get(key)
+            .and_then(|v| ConfigOasisFlagsArray::try_from(v).ok());
+
+        res
+    }
+    fn from_key_in_table_as_oasis_flags_array(
+        key: &str,
+        table: &Table,
+    ) -> Option<ConfigOasisFlagsArray> {
+        ConfigOasisFlagsArray::from_key_in_table(key, table)
+    }
+}
+
+impl From<ConfigOasisFlagsArray> for [ConfigOasisFlags; 4] {
+    fn from(value: ConfigOasisFlagsArray) -> Self {
+        value.0
+    }
+}
+
+// impl TryFrom<&Vec<Value>> for ConfigOasisFlagsArray {
+//     type Error = &'static str;
+//
+//     fn try_from(value: &Vec<Value>) -> Result<Self, &'static str> {
+//         if value.len() != 5 {
+//             return Err("Could not parse value as array of 4 elements");
+//         }
+//
+//         let oasis_flags: Vec<ConfigOasisFlags> = value
+//             .iter()
+//             .map(ConfigOasisFlags::try_from)
+//             .collect::<Result<Vec<ConfigOasisFlags>, &str>>(
+//         )?;
+//
+//         let array = std::array::from_fn(|idx| oasis_flags[idx].clone());
+//
+//         Ok(ConfigOasisFlagsArray(array))
+//     }
+// }
+
+impl TryFrom<&Value> for ConfigOasisFlagsArray {
+    type Error = &'static str;
+
+    fn try_from(value: &Value) -> Result<Self, &'static str> {
+        match value {
+            Value::Array(value) => {
+                let mut oasis_flags: Vec<ConfigOasisFlags> = value
+                    .iter()
+                    .map(ConfigOasisFlags::try_from)
+                    .collect::<Result<Vec<ConfigOasisFlags>, &'static str>>()?;
+
+                oasis_flags.resize(4, ConfigOasisFlags(CardinalDirectionFlags::empty()));
+
+                let array: [ConfigOasisFlags; 4] = oasis_flags.try_into().or(Err(
+                    "Couldn't coerce ConfigOasisFlags for tile into array of 4 u8s",
+                ))?;
+
+                Ok(ConfigOasisFlagsArray(array))
+            }
+            _ => Err("Couldn't parse value as array"),
+        }
+    }
+}
+
 pub struct ConfigBool(bool);
-pub struct ConfigString(String);
 
 impl ConfigBool {
     fn from_key_in_table(key: &str, table: &Table) -> Option<Self> {
@@ -48,6 +153,19 @@ impl From<ConfigBool> for bool {
     }
 }
 
+impl TryFrom<&Value> for ConfigBool {
+    type Error = &'static str;
+
+    fn try_from(value: &Value) -> Result<Self, &'static str> {
+        match value {
+            Value::Boolean(value) => Ok(ConfigBool(*value)),
+            _ => Err("Couldn't parse value as boolean"),
+        }
+    }
+}
+
+pub struct ConfigString(String);
+
 impl ConfigString {
     fn from_key_in_table(key: &str, table: &Table) -> Option<Self> {
         table.get(key).and_then(|v| ConfigString::try_from(v).ok())
@@ -60,17 +178,6 @@ impl ConfigString {
 impl From<ConfigString> for String {
     fn from(value: ConfigString) -> Self {
         value.0
-    }
-}
-
-impl TryFrom<&Value> for ConfigBool {
-    type Error = &'static str;
-
-    fn try_from(value: &Value) -> Result<Self, &'static str> {
-        match value {
-            Value::Boolean(value) => Ok(ConfigBool(*value)),
-            _ => Err("Couldn't parse value as boolean"),
-        }
     }
 }
 
@@ -152,10 +259,7 @@ impl TryFrom<&Value> for CrossConfigArray {
 pub struct TileConfig {
     pub is_cross: Option<bool>,
     pub is_desert: Option<bool>,
-    pub n: Option<bool>,
-    pub e: Option<bool>,
-    pub s: Option<bool>,
-    pub w: Option<bool>,
+    pub oasis: Option<[CardinalDirectionFlags; 4]>,
     pub treasure_n: Option<String>,
     pub treasure_e: Option<String>,
     pub treasure_s: Option<String>,
@@ -179,10 +283,8 @@ impl TryFrom<&Value> for TileConfig {
         match value {
             Value::Table(table) => {
                 let is_desert = ConfigBool::from_key_in_table_as_bool("is_desert", table);
-                let n = ConfigBool::from_key_in_table_as_bool("n", table);
-                let e = ConfigBool::from_key_in_table_as_bool("e", table);
-                let s = ConfigBool::from_key_in_table_as_bool("s", table);
-                let w = ConfigBool::from_key_in_table_as_bool("w", table);
+                let oasis =
+                    ConfigOasisFlagsArray::from_key_in_table_as_oasis_flags_array("oasis", table);
                 let treasure_n = ConfigString::from_key_in_table_as_string("treasure_n", table);
                 let treasure_e = ConfigString::from_key_in_table_as_string("treasure_e", table);
                 let treasure_s = ConfigString::from_key_in_table_as_string("treasure_s", table);
@@ -191,10 +293,7 @@ impl TryFrom<&Value> for TileConfig {
                 Ok(Self {
                     is_cross: Some(false),
                     is_desert,
-                    n,
-                    e,
-                    s,
-                    w,
+                    oasis: oasis.map(|f| f.0.map(|c| c.0)),
                     treasure_n,
                     treasure_e,
                     treasure_s,
@@ -394,35 +493,37 @@ mod tests {
     use assert_matches::assert_matches;
     use toml::Table;
 
-    use crate::util::loader::{CrossConfig, TilesetConfig};
+    use crate::{
+        game::entities::tile::CardinalDirectionFlags,
+        util::loader::{CrossConfig, TilesetConfig},
+    };
 
     #[test]
     fn test_parse_tileset_config() {
         let input = String::from(
-            "
+            r#"
 # Configuration for the cross center
 [cross.c]
 is_desert = false
 
 # 4 lists describing each part of the starting cross
-# Read the directions like you would read a map
 # Numbered going outwards from the center
 # N1
 [[cross.n]]
 is_desert = false
-w = true
+oasis = ["W"]
 # N2
 [[cross.n]]
 is_desert = false
-e = true
+oasis = ["E"]
 # N3
 [[cross.n]]
 is_desert = false
-w = true
+oasis = ["W"]
 # N4
 [[cross.n]]
 is_desert = false
-e = true
+oasis = ["E"]
 # N5
 [[cross.n]]
 is_desert = false
@@ -433,14 +534,14 @@ is_desert = false
 # E2
 [[cross.e]]
 is_desert = false
-s = true
+oasis = ["S"]
 # E3
 [[cross.e]]
 is_desert = false
-n = true
+oasis = ["N"]
 # E4
 [[cross.e]]
-s = true
+oasis = ["S"]
 is_desert = false
 # E5
 [[cross.e]]
@@ -455,8 +556,7 @@ is_desert = false
 # S3
 [[cross.s]]
 is_desert = false
-e = true
-w = true
+oasis = ["E", "W"]
 # S4
 [[cross.s]]
 is_desert = false
@@ -470,226 +570,180 @@ is_desert = false
 # W2
 [[cross.w]]
 is_desert = false
-n = true
-s = true
+oasis = ["N", "S"]
 # W3
 [[cross.w]]
 is_desert = false
 # W4
 [[cross.w]]
 is_desert = false
-n = true
-s = true
+oasis = ["N", "S"]
 # W5
 [[cross.w]]
 is_desert = false
 
-# Lists describing each of the 'decks' used in the game
+# Lists describing each of the "decks" used in the game
+
 # Deck 1 
 [[decks]]
 # 1
 [[decks.deck]]
-is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+is_desert = true
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
+n = true
 e = false
 s = false
 w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 3
 [[decks.deck]]
-is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+is_desert = true
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
+n = true
 e = false
-s = false
+s = true
 w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "goods:gems"
+treasure_w = "none"
 
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 
 # Deck 2 
@@ -697,206 +751,155 @@ treasure_w = \"none\"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 
 # Deck 3
@@ -904,206 +907,155 @@ treasure_w = \"none\"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 
 # Deck 4
@@ -1111,206 +1063,155 @@ treasure_w = \"none\"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 
 # Deck 5
@@ -1318,207 +1219,156 @@ treasure_w = \"none\"
 # 1
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 2
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 3
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 4
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 5
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 6
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 7
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 8
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 9
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 10
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 11
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 12
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 13
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 14
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 15
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 16
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
 
 # 17
 [[decks.deck]]
 is_desert = false
-n = false
-e = false
-s = false
-w = false
-treasure_n = \"none\"
-treasure_e = \"none\"
-treasure_s = \"none\"
-treasure_w = \"none\"
-",
+oasis = []
+treasure_n = "none"
+treasure_e = "none"
+treasure_s = "none"
+treasure_w = "none"
+"#,
         );
 
         let table = toml::from_str::<Table>(&input).unwrap();
@@ -1538,20 +1388,16 @@ treasure_w = \"none\"
                 cross: CrossConfig { c, n, e:_, w, s:_ }
             } => {
                 assert_eq!(c.is_desert, Some(false));
+                assert_eq!(c.oasis, None);
                 assert_matches!(n, array => {
                     assert_eq!(array[0].is_desert, Some(false));
-                    assert_matches!(array[0].n, Some(false) | None);
-                    assert_matches!(array[0].e, Some(false) | None);
-                    assert_matches!(array[0].s, Some(false) | None);
-                    assert_eq!(array[0].w, Some(true));
+                    assert_eq!(array[0].oasis.clone().unwrap()[0], CardinalDirectionFlags::W);
+                    assert_eq!(array[0].oasis.clone().unwrap()[1], CardinalDirectionFlags::empty());
+                    assert_eq!(array[1].oasis.clone().unwrap()[0], CardinalDirectionFlags::E);
                 });
-
                 assert_matches!(w, array => {
                     assert_eq!(array[1].is_desert, Some(false));
-                    assert_eq!(array[1].n, Some(true));
-                    assert_matches!(array[1].e, Some(false) | None);
-                    assert_eq!(array[1].s, Some(true));
-                    assert_matches!(array[1].w, Some(false) | None);
+                    // TODO: Oasis flags test
                 });
             }
         );

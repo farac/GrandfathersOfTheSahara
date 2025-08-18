@@ -6,11 +6,11 @@ use crate::util::loader::GameConfig;
 use crate::util::loader::TileConfig;
 use crate::util::loader::TilesetConfig;
 use crate::util::loader::TomlLoader;
+use bitflags::bitflags;
 use godot::builtin::Array;
 use godot::builtin::Color;
 use godot::builtin::GString;
 use godot::builtin::Vector2;
-use godot::classes::viewport;
 use godot::classes::INode2D;
 
 use godot::classes::Input;
@@ -27,6 +27,18 @@ use godot::{
 
 const CROSS_IDS: [&str; 5] = ["cross_c", "cross_n", "cross_e", "cross_s", "cross_w"];
 
+pub type CardinalDirectionFlag = u8;
+
+bitflags! {
+    #[derive(Debug, Clone, PartialEq )]
+    pub struct CardinalDirectionFlags: CardinalDirectionFlag {
+        const N = 0b0001;
+        const E = 0b0010;
+        const S = 0b0100;
+        const W = 0b1000;
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum CardinalDirection {
     N,
@@ -35,17 +47,19 @@ pub enum CardinalDirection {
     W,
 }
 
-impl TryFrom<usize> for CardinalDirection {
-    type Error = &'static str;
+impl From<CardinalDirectionFlags> for Vec<CardinalDirection> {
+    fn from(value: CardinalDirectionFlags) -> Self {
+        let mut direction_vec = vec![];
 
-    fn try_from(value: usize) -> Result<Self, Self::Error> {
-        match value {
-            0 => Ok(CardinalDirection::N),
-            1 => Ok(CardinalDirection::E),
-            2 => Ok(CardinalDirection::S),
-            3 => Ok(CardinalDirection::W),
-            _ => Err("Cardinal direction enum is out of range (1, 2, 3, 4)"),
-        }
+        value.iter_names().for_each(|f| match f.0 {
+            "N" => direction_vec.push(CardinalDirection::N),
+            "E" => direction_vec.push(CardinalDirection::E),
+            "W" => direction_vec.push(CardinalDirection::S),
+            "S" => direction_vec.push(CardinalDirection::W),
+            _ => (),
+        });
+
+        direction_vec
     }
 }
 
@@ -145,7 +159,8 @@ impl INode2D for Tile {
                 let tile_data = TileData::from(tile_config);
 
                 let mut tile_components = gd_tile_components.bind_mut();
-                tile_components.oasis_layout = Array::from(&tile_data.oasis_layout);
+                tile_components.oasis_layout =
+                    Array::from(&tile_data.oasis_layout.map(|f| f.bits()));
 
                 let treasure_layout = tile_data.treasure_layout.iter().map(GString::from);
 
@@ -159,38 +174,44 @@ impl INode2D for Tile {
 
         self.show_desert_icon_if_not_cross(true);
 
+        // TODO: This logic is not adapted for bitflag oasis layouts
         for (idx, oasis) in tile_components.oasis_layout.iter_shared().enumerate() {
-            let direction = CardinalDirection::try_from(idx).expect("Error in Tile.ready");
-            let mut gd_treasure = self.get_treasure_at_direction(&direction);
+            let directions: Vec<CardinalDirection> =
+                CardinalDirectionFlags::from_bits_truncate(oasis).into();
 
-            if !oasis {
-                gd_treasure.set_visible(false);
-                let mut gd_path = self.get_path_at_direction(&direction);
+            for direction in directions.iter() {
+                let mut gd_treasure = self.get_treasure_at_direction(direction);
 
-                gd_path.set_default_color(Color::from_rgb(255., 255., 255.));
+                if oasis == 0 {
+                    gd_treasure.set_visible(false);
+                    let mut gd_path = self.get_path_at_direction(direction);
 
-                continue;
+                    gd_path.set_default_color(Color::from_rgb(255., 255., 255.));
+
+                    continue;
+                }
+
+                let mut treasure = gd_treasure.bind_mut();
+
+                let treasure_at_idx = tile_components
+                    .treasure_layout
+                    .get(idx)
+                    .unwrap_or(GString::from(""));
+
+                let treasure_kind: TreasureKind = treasure_at_idx
+                    .try_into()
+                    .expect("Couldn't parse treasure_layout into");
+
+                if treasure_kind != TreasureKind::None {
+                    self.show_desert_icon_if_not_cross(false);
+                }
+
+                treasure.set_kind(treasure_kind);
             }
-            let mut treasure = gd_treasure.bind_mut();
 
-            if oasis {
+            if oasis > 0 {
                 self.show_desert_icon_if_not_cross(false);
             }
-
-            let treasure_at_idx = tile_components
-                .treasure_layout
-                .get(idx)
-                .unwrap_or(GString::from(""));
-
-            let treasure_kind: TreasureKind = treasure_at_idx
-                .try_into()
-                .expect("Couldn't parse treasure_layout into");
-
-            if treasure_kind != TreasureKind::None {
-                self.show_desert_icon_if_not_cross(false);
-            }
-
-            treasure.set_kind(treasure_kind);
         }
     }
     fn process(&mut self, _dt: f64) {

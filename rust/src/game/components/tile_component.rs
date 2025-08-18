@@ -6,6 +6,7 @@ use godot::obj::Gd;
 use godot::prelude::GodotClass;
 use godot::{builtin::Array, obj::Base, prelude::godot_api};
 
+use crate::game::entities::tile::{CardinalDirectionFlag, CardinalDirectionFlags};
 use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader};
 
 #[derive(Derivative, Debug, Clone)]
@@ -13,8 +14,13 @@ use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader};
 pub struct TileData {
     #[derivative(Default(value = "false"))]
     pub is_cross: bool,
-    #[derivative(Default(value = "[false, false, false, false]"))]
-    pub oasis_layout: [bool; 4],
+    #[derivative(Default(value = "[
+            CardinalDirectionFlags::empty(),
+            CardinalDirectionFlags::empty(),
+            CardinalDirectionFlags::empty(),
+            CardinalDirectionFlags::empty(),
+        ]"))]
+    pub oasis_layout: [CardinalDirectionFlags; 4],
     #[derivative(Default(
         value = r#"[String::from("none"), String::from("none"), String::from("none"), String::from("none")]"#
     ))]
@@ -23,12 +29,12 @@ pub struct TileData {
 
 impl From<TileConfig> for TileData {
     fn from(value: TileConfig) -> Self {
-        let oasis_layout = [
-            value.n.unwrap_or(false),
-            value.e.unwrap_or(false),
-            value.s.unwrap_or(false),
-            value.w.unwrap_or(false),
-        ];
+        let oasis_layout = value.oasis.unwrap_or([
+            CardinalDirectionFlags::empty(),
+            CardinalDirectionFlags::empty(),
+            CardinalDirectionFlags::empty(),
+            CardinalDirectionFlags::empty(),
+        ]);
         let treasure_layout = [
             value.treasure_n.clone().unwrap_or("none".to_owned()),
             value.treasure_e.clone().unwrap_or("none".to_owned()),
@@ -54,7 +60,7 @@ pub struct TileComponent {
     #[export]
     pub is_cross: bool,
     #[export]
-    pub oasis_layout: Array<bool>,
+    pub oasis_layout: Array<CardinalDirectionFlag>,
     #[export]
     pub treasure_layout: Array<GString>,
 }
@@ -66,7 +72,7 @@ impl INode for TileComponent {
             base,
             is_cross: false,
             treasure_layout: godot::builtin::array!["", "", "", ""],
-            oasis_layout: godot::builtin::array![false, false, false, false],
+            oasis_layout: godot::builtin::array![0, 0, 0, 0],
         }
     }
 }
@@ -74,7 +80,11 @@ impl INode for TileComponent {
 #[godot_api]
 impl TileComponent {
     pub fn from_tile_data(tile_data: TileData) -> Gd<Self> {
-        let oasis_layout: Array<bool> = tile_data.oasis_layout.into_iter().collect();
+        let oasis_layout: Array<u8> = tile_data
+            .oasis_layout
+            .into_iter()
+            .map(|f| f.bits())
+            .collect();
         let treasure_layout = tile_data
             .treasure_layout
             .into_iter()
