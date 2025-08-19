@@ -48,7 +48,7 @@ pub struct TileComponent {
     base: Base<Node>,
 
     pub is_cross: bool,
-    pub oasis_layout: u16,
+    pub oasis_layout: OasisLayoutFlags,
     pub treasure_layout: Array<GString>,
 }
 
@@ -59,7 +59,7 @@ impl INode for TileComponent {
             base,
             is_cross: false,
             treasure_layout: godot::builtin::array!["", "", "", ""],
-            oasis_layout: 0,
+            oasis_layout: OasisLayoutFlags::empty(),
         }
     }
 }
@@ -67,7 +67,7 @@ impl INode for TileComponent {
 #[godot_api]
 impl TileComponent {
     pub fn from_tile_data(tile_data: TileData) -> Gd<Self> {
-        let oasis_layout = tile_data.oasis_layout.bits();
+        let oasis_layout = tile_data.oasis_layout;
         let treasure_layout = tile_data
             .treasure_layout
             .into_iter()

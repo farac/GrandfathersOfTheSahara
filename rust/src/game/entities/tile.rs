@@ -16,6 +16,7 @@ use godot::classes::INode2D;
 use godot::classes::Input;
 use godot::classes::Line2D;
 use godot::classes::Node2D;
+use godot::global::godot_print;
 use godot::global::MouseButton;
 use godot::obj::Gd;
 use godot::obj::WithBaseField;
@@ -152,7 +153,7 @@ impl Tile {
         let mut tile_component = gd_tile_component.bind_mut();
 
         tile_component.is_cross = tile_component_data.is_cross;
-        tile_component.oasis_layout = tile_component_data.oasis_layout;
+        tile_component.oasis_layout = tile_component_data.oasis_layout.clone();
         tile_component.treasure_layout = tile_component_data.treasure_layout.clone();
     }
     pub fn set_active(&mut self) {
@@ -193,7 +194,7 @@ impl INode2D for Tile {
                 let tile_data = TileData::from(tile_config);
 
                 let mut tile_components = gd_tile_components.bind_mut();
-                tile_components.oasis_layout = tile_data.oasis_layout.bits();
+                tile_components.oasis_layout = tile_data.oasis_layout;
 
                 let treasure_layout = tile_data.treasure_layout.iter().map(GString::from);
 
@@ -208,40 +209,37 @@ impl INode2D for Tile {
         self.show_desert_icon_if_not_cross(true);
 
         for oasis_idx in 0..3 {
-            let flag = (OasisLayoutFlags::from_bits_truncate(tile_components.oasis_layout).bits()
-                >> (oasis_idx * 4)) as u8;
+            let flag = (tile_components.oasis_layout.bits() >> (oasis_idx * 4)) as u8;
 
             let directions: Vec<CardinalDirection> =
                 CardinalDirectionFlags::from_bits_truncate(flag).into();
 
-            for direction in DIRECTIONS {
-                let mut gd_treasure = self.get_treasure_at_direction(&direction);
+            for (direction_idx, direction) in DIRECTIONS.iter().enumerate() {
+                let mut gd_treasure = self.get_treasure_at_direction(direction);
 
-                if flag == 0 {
-                    let mut gd_path = self.get_path_at_direction(&direction);
+                if directions.contains(direction) {
+                    let mut gd_path = self.get_path_at_direction(direction);
 
                     gd_path.set_default_color(Color::from_rgb(255., 255., 255.));
-
-                    continue;
-                }
-
-                if directions.contains(&direction) {
                     gd_treasure.set_visible(true);
                     self.show_desert_icon_if_not_cross(false);
                 }
 
-                let mut treasure = gd_treasure.bind_mut();
-
                 let treasure_at_idx = tile_components
                     .treasure_layout
-                    .get(oasis_idx)
+                    .get(direction_idx)
                     .unwrap_or(GString::from(""));
 
                 let treasure_kind: TreasureKind = treasure_at_idx
                     .try_into()
                     .expect("Couldn't parse treasure_layout into");
 
+                let mut treasure = gd_treasure.bind_mut();
+
                 if treasure_kind != TreasureKind::None {
+                    let mut sprite = treasure.get_sprite();
+                    sprite.set_visible(true);
+
                     self.show_desert_icon_if_not_cross(false);
                 }
 

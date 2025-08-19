@@ -9,7 +9,7 @@ const MAX_TREASURE_SUBSTRINGS: u8 = 2;
 pub enum TreasureKindParseError {
     #[error("TreasureKind expected {0} arguments, received {1}")]
     ArgumentCount(String, usize),
-    #[error("TreasureKind expected one of water, goods:[gems, myrrh, salt, incense], camels, rumors, received {0}")]
+    #[error("TreasureKind expected one of water, double_water, goods:[gems, myrrh, salt, incense], camels, rumors, received {0}")]
     ParseTreasure(String),
     #[error("TreasureKinds expected goods to be one of goods:[gems, myrrh, salt, incense], received {0}")]
     ParseGoods(String),
@@ -40,6 +40,7 @@ impl TryFrom<&str> for Good {
 #[derive(Clone, Debug, PartialEq)]
 pub enum TreasureKind {
     Water,
+    DoubleWater,
     Goods(Good),
     Camels,
     Rumors,
@@ -50,6 +51,7 @@ impl From<&TreasureKind> for &str {
     fn from(val: &TreasureKind) -> Self {
         match val {
             TreasureKind::Water => "water",
+            TreasureKind::DoubleWater => "double_water",
             TreasureKind::Camels => "camels",
             TreasureKind::Rumors => "rumors",
             TreasureKind::Goods(good) => match good {
@@ -88,6 +90,7 @@ impl TryFrom<&str> for TreasureKind {
         }
 
         match substrings[0].as_str() {
+            "double_water" => Ok(TreasureKind::DoubleWater),
             "water" => Ok(TreasureKind::Water),
             "goods" => {
                 if substrings.len() != MAX_TREASURE_SUBSTRINGS as usize {

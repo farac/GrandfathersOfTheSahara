@@ -46,7 +46,7 @@ impl TryFrom<&Value> for ConfigOasisFlags {
         match value {
             Value::String(value) => Ok(ConfigOasisFlags(
                 (bitflags::parser::from_str(value))
-                    .or(Err("Expected oasis flags to be bit flags: 1, 2, 4, 8"))?,
+                    .or(Err("Expected oasis flags to be bit flags"))?,
             )),
             _ => Err("Couldn't parse value as boolean"),
         }
@@ -578,10 +578,10 @@ is_desert = false
 # 1
 [[decks.deck]]
 is_desert = true
-oasis = []
+oasis = ["E | S"]
 treasure_n = "none"
-treasure_e = "none"
-treasure_s = "none"
+treasure_e = "salt"
+treasure_s = "rumors"
 treasure_w = "none"
 
 # 2
@@ -1387,7 +1387,9 @@ treasure_w = "none"
                 assert_matches!(deck_one, deck => {
                     assert_eq!(deck.0[0].is_desert, Some(true));
                     assert_eq!(deck.0[1].is_desert, Some(false));
-                    assert_eq!(deck.0[0].oasis, Some(OasisLayoutFlags::empty()));
+                    assert_eq!(deck.0[0].oasis, Some(OasisLayoutFlags::E1 | OasisLayoutFlags::S1));
+                    assert_eq!(deck.0[0].treasure_e, Some(String::from("salt")));
+                    assert_eq!(deck.0[0].treasure_s, Some(String::from("rumors")));
                     assert_eq!(deck.0[1].oasis, Some(OasisLayoutFlags::N1));
                     assert_eq!(deck.0[2].oasis, Some(OasisLayoutFlags::empty()));
                 });
