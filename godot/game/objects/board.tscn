@@ -11,12 +11,14 @@ offset_left = 35.0
 offset_top = 40.0
 offset_right = 615.0
 offset_bottom = 620.0
+mouse_filter = 1
 theme_override_styles/panel = ExtResource("1_hc4aq")
 
 [node name="Cross" type="Control" parent="Boundary"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 1
 
 [node name="C" type="Control" parent="Boundary/Cross"]
 layout_mode = 1
@@ -31,6 +33,7 @@ offset_right = 15.0
 offset_bottom = 15.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="Center" parent="Boundary/Cross/C" instance=ExtResource("1_e3jj5")]
 cross_id = "cross_c"
@@ -49,6 +52,7 @@ offset_right = 25.0
 offset_bottom = -26.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="N1" parent="Boundary/Cross/N" instance=ExtResource("1_e3jj5")]
 cross_id = "cross_n"
@@ -91,6 +95,7 @@ offset_right = 75.9999
 offset_bottom = 25.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="E1" parent="Boundary/Cross/E" instance=ExtResource("1_e3jj5")]
 cross_id = "cross_e"
@@ -133,6 +138,7 @@ offset_right = 25.0
 offset_bottom = 76.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="S1" parent="Boundary/Cross/S" instance=ExtResource("1_e3jj5")]
 cross_id = "cross_s"
@@ -175,6 +181,7 @@ offset_right = -26.0
 offset_bottom = 25.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="W1" parent="Boundary/Cross/W" instance=ExtResource("1_e3jj5")]
 cross_id = "cross_w"

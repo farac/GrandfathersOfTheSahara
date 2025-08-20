@@ -1,3 +1,4 @@
+use crate::game::components::hover_outline::CollisionOutline;
 use crate::game::components::tile_component::TileComponent;
 use crate::game::components::tile_component::TileData;
 use crate::game::entities::treasure::Treasure;
@@ -16,7 +17,7 @@ use godot::classes::INode2D;
 use godot::classes::Input;
 use godot::classes::Line2D;
 use godot::classes::Node2D;
-use godot::global::godot_print;
+use godot::global::godot_error;
 use godot::global::MouseButton;
 use godot::obj::Gd;
 use godot::obj::WithBaseField;
@@ -109,6 +110,39 @@ impl From<&CardinalDirection> for &'static str {
     }
 }
 
+impl From<&CardinalDirection> for CardinalDirectionFlags {
+    fn from(value: &CardinalDirection) -> Self {
+        match value {
+            CardinalDirection::N => CardinalDirectionFlags::N,
+            CardinalDirection::E => CardinalDirectionFlags::E,
+            CardinalDirection::S => CardinalDirectionFlags::S,
+            CardinalDirection::W => CardinalDirectionFlags::W,
+        }
+    }
+}
+
+#[derive(GodotClass, Debug)]
+#[class(init, base=Node2D)]
+pub struct TileCollisionAreas {
+    base: Base<Node2D>,
+}
+
+impl TileCollisionAreas {
+    fn get_collision_area_at_direction(
+        &self,
+        direction: &CardinalDirection,
+    ) -> Gd<CollisionOutline> {
+        let base = self.base();
+
+        match direction {
+            CardinalDirection::N => base.get_node_as::<CollisionOutline>("./CollisionN"),
+            CardinalDirection::E => base.get_node_as::<CollisionOutline>("./CollisionE"),
+            CardinalDirection::S => base.get_node_as::<CollisionOutline>("./CollisionS"),
+            CardinalDirection::W => base.get_node_as::<CollisionOutline>("./CollisionW"),
+        }
+    }
+}
+
 #[derive(GodotClass, Debug)]
 #[class(init, base=Node2D)]
 pub struct Tile {
@@ -116,6 +150,9 @@ pub struct Tile {
 
     #[init(val = false)]
     is_active: bool,
+
+    #[init(val = CardinalDirectionFlags::empty())]
+    outside_connections: CardinalDirectionFlags,
 
     #[export]
     #[init(val = GString::from(""))]
@@ -157,10 +194,25 @@ impl Tile {
         tile_component.treasure_layout = tile_component_data.treasure_layout.clone();
     }
     pub fn set_active(&mut self) {
+        self.outside_connections = CardinalDirectionFlags::all();
         self.is_active = true;
     }
-    pub fn place(&mut self) {
+    pub fn place_at(&mut self, direction: CardinalDirection) {
+        self.outside_connections = CardinalDirectionFlags::from(&direction);
         self.is_active = false;
+    }
+    pub fn get_collision_areas(&self) -> Gd<TileCollisionAreas> {
+        self.base()
+            .get_node_as::<TileCollisionAreas>("./Collisions")
+    }
+    pub fn get_collision_area_at_direction(
+        &self,
+        direction: &CardinalDirection,
+    ) -> Gd<CollisionOutline> {
+        self.base()
+            .get_node_as::<TileCollisionAreas>("./Collisions")
+            .bind()
+            .get_collision_area_at_direction(direction)
     }
 }
 
@@ -182,11 +234,48 @@ impl INode2D for Tile {
 
                 if &cross_id == "cross_c" {
                     tile_config = Some(parsed_config.cross.get_center());
+                    self.outside_connections = CardinalDirectionFlags::all();
                 } else {
                     tile_config = Some(
                         parsed_config.cross.get_side(&cross_id).unwrap()[self.cross_index as usize]
                             .clone(),
                     );
+
+                    match cross_id.as_str() {
+                        "cross_n" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    CardinalDirectionFlags::N | CardinalDirectionFlags::S;
+                            } else {
+                                self.outside_connections = CardinalDirectionFlags::S;
+                            }
+                        }
+                        "cross_e" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    CardinalDirectionFlags::E | CardinalDirectionFlags::W;
+                            } else {
+                                self.outside_connections = CardinalDirectionFlags::W;
+                            }
+                        }
+                        "cross_s" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    CardinalDirectionFlags::S | CardinalDirectionFlags::N;
+                            } else {
+                                self.outside_connections = CardinalDirectionFlags::N;
+                            }
+                        }
+                        "cross_w" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    CardinalDirectionFlags::W | CardinalDirectionFlags::E;
+                            } else {
+                                self.outside_connections = CardinalDirectionFlags::E;
+                            }
+                        }
+                        _ => godot_error!("Expected `cross_id` to be one of cross_[c, n, e, s, w]"),
+                    }
                 }
             }
 
@@ -246,6 +335,17 @@ impl INode2D for Tile {
                 treasure.set_kind(treasure_kind);
             }
         }
+
+        for connection in self.outside_connections.iter() {
+            let directions: Vec<CardinalDirection> = connection.into();
+
+            for direction in directions.iter() {
+                let mut gd_collision_area = self.get_collision_area_at_direction(direction);
+                let mut collision_area = gd_collision_area.bind_mut();
+
+                collision_area.disable_collision();
+            }
+        }
     }
     fn process(&mut self, _dt: f64) {
         if !self.is_active {
@@ -266,6 +366,7 @@ impl INode2D for Tile {
             .get_mouse_position();
 
         base.set_position(mouse_position);
+
         if pressed {
             base.set_scale(Vector2::from_tuple((0.2, 0.2)))
         }

@@ -15,6 +15,7 @@ offset_left = 640.0
 offset_top = 40.0
 offset_right = 640.0
 offset_bottom = 40.0
+mouse_filter = 1
 
 [node name="TileDeckBoard" type="PanelContainer" parent="."]
 anchors_preset = 8
