@@ -38,7 +38,11 @@ impl TileDeck {
         {
             let tile_component = tile_component.bind();
             new_tile = scene_loader.instantiate_tile_scene_from_tile_component(&tile_component);
-            new_tile.bind_mut().set_active();
+        }
+
+        {
+            let mut new_tile = new_tile.bind_mut();
+            new_tile.set_active();
         }
 
         let mut gd_scene = RunningGameScene::get_running_game(&self.base());

@@ -1,4 +1,5 @@
 use godot::{
+    builtin::Variant,
     classes::{Area2D, CollisionPolygon2D, CollisionShape2D, IArea2D, PanelContainer},
     obj::{Base, Gd, WithBaseField},
     prelude::{godot_api, GodotClass},
@@ -58,6 +59,42 @@ impl IArea2D for HoverableOutline {
 #[class(init, base=Area2D)]
 pub struct CollisionOutline {
     base: Base<Area2D>,
+
+    #[export]
+    pub side: u8,
+}
+
+#[godot_api]
+impl CollisionOutline {
+    #[func]
+    fn emit_active_collision(&self) {
+        let mut scene_tree = self
+            .base()
+            .get_tree()
+            .expect("Expected CollisionOutline node to be part of a scene tree");
+
+        // TODO: Replace this with a global manager implemented in code
+        scene_tree.call_group(
+            "Tiles",
+            "insert_active_collision",
+            &[Variant::from(self.to_gd().instance_id())],
+        );
+    }
+
+    #[func]
+    fn cancel_collision(&self) {
+        let mut scene_tree = self
+            .base()
+            .get_tree()
+            .expect("Expected CollisionOutline node to be part of a scene tree");
+
+        // TODO: Replace this with a global manager implemented in code
+        scene_tree.call_group(
+            "Tiles",
+            "remove_active_collision",
+            &[Variant::from(self.to_gd().instance_id())],
+        );
+    }
 }
 
 impl CollisionOutline {
@@ -99,7 +136,17 @@ impl IArea2D for CollisionOutline {
 
         self.base()
             .signals()
+            .mouse_entered()
+            .connect_other(&*self, |this| this.emit_active_collision());
+
+        self.base()
+            .signals()
             .mouse_exited()
             .connect_other(&*self, |this| this.hide_outline());
+
+        self.base()
+            .signals()
+            .mouse_exited()
+            .connect_other(&*self, |this| this.cancel_collision());
     }
 }

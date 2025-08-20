@@ -18,8 +18,10 @@ use godot::classes::Input;
 use godot::classes::Line2D;
 use godot::classes::Node2D;
 use godot::global::godot_error;
+use godot::global::godot_print;
 use godot::global::MouseButton;
 use godot::obj::Gd;
+use godot::obj::InstanceId;
 use godot::obj::WithBaseField;
 use godot::{
     classes::Sprite2D,
@@ -76,6 +78,17 @@ pub enum CardinalDirection {
     W,
 }
 
+impl CardinalDirection {
+    fn invert(&self) -> Self {
+        match self {
+            CardinalDirection::N => CardinalDirection::S,
+            CardinalDirection::E => CardinalDirection::W,
+            CardinalDirection::S => CardinalDirection::N,
+            CardinalDirection::W => CardinalDirection::E,
+        }
+    }
+}
+
 const DIRECTIONS: [CardinalDirection; 4] = [
     CardinalDirection::N,
     CardinalDirection::E,
@@ -128,6 +141,16 @@ pub struct TileCollisionAreas {
 }
 
 impl TileCollisionAreas {
+    fn get_collision_outlines(&self) -> [Gd<CollisionOutline>; 4] {
+        let base = self.base();
+
+        [
+            base.get_node_as::<CollisionOutline>("./CollisionN"),
+            base.get_node_as::<CollisionOutline>("./CollisionE"),
+            base.get_node_as::<CollisionOutline>("./CollisionS"),
+            base.get_node_as::<CollisionOutline>("./CollisionW"),
+        ]
+    }
     fn get_collision_area_at_direction(
         &self,
         direction: &CardinalDirection,
@@ -151,15 +174,15 @@ pub struct Tile {
     #[init(val = false)]
     is_active: bool,
 
-    #[init(val = CardinalDirectionFlags::empty())]
-    outside_connections: CardinalDirectionFlags,
-
     #[export]
     #[init(val = GString::from(""))]
     cross_id: GString,
     #[export]
     #[init(val = 0)]
     cross_index: u8,
+
+    // TODO: Replace this with a global manager implemented in code
+    active_collisions: Vec<InstanceId>,
 }
 
 impl Tile {
@@ -186,6 +209,8 @@ impl Tile {
             .set_visible(is_desert && !is_cross);
     }
     pub fn set_from_tile_component(&mut self, tile_component_data: &TileComponent) {
+        self.disable_all_collisions();
+
         let mut gd_tile_component = self.get_tile_component();
         let mut tile_component = gd_tile_component.bind_mut();
 
@@ -193,13 +218,54 @@ impl Tile {
         tile_component.oasis_layout = tile_component_data.oasis_layout.clone();
         tile_component.treasure_layout = tile_component_data.treasure_layout.clone();
     }
+    pub fn disable_all_collisions(&mut self) {
+        for direction in DIRECTIONS.iter() {
+            self.disable_collision_at_direction(direction);
+        }
+    }
+    pub fn enable_all_collisions(&mut self) {
+        for direction in DIRECTIONS.iter() {
+            self.enable_collision_at_direction(direction);
+        }
+    }
+    fn disable_collision_at_direction(&mut self, direction: &CardinalDirection) {
+        let mut gd_collision_area = self.get_collision_area_at_direction(direction);
+        let mut collision_area = gd_collision_area.bind_mut();
+
+        collision_area.disable_collision();
+    }
+    fn enable_collision_at_direction(&mut self, direction: &CardinalDirection) {
+        let mut gd_collision_area = self.get_collision_area_at_direction(direction);
+        let mut collision_area = gd_collision_area.bind_mut();
+
+        collision_area.enable_collision();
+    }
     pub fn set_active(&mut self) {
-        self.outside_connections = CardinalDirectionFlags::all();
         self.is_active = true;
     }
-    pub fn place_at(&mut self, direction: CardinalDirection) {
-        self.outside_connections = CardinalDirectionFlags::from(&direction);
+    pub fn place_at(&mut self, direction: CardinalDirection, position: Vector2) -> Vector2 {
+        // TODO: A low of hacks here with enabling and disabling collisions instead of just setting
+        // a sensible default state and flipping only the ones we need. Just prototyping
+        self.enable_all_collisions();
+
+        let (offset_x, offset_y) = match direction {
+            // Tiles are 250px. Their default scale is 0.2. Therefore, the offset is 50px
+            CardinalDirection::N => (-50, -50),
+            CardinalDirection::E => (0, -50),
+            CardinalDirection::S => (0, 0),
+            CardinalDirection::W => (-50, 0),
+        };
+
+        let outside_connection = direction.invert();
+
+        let mut gd_collision_area = self.get_collision_area_at_direction(&outside_connection);
+        let mut collision_area = gd_collision_area.bind_mut();
+
+        collision_area.disable_collision();
+
         self.is_active = false;
+
+        position + Vector2::from_tuple((offset_x as f32, offset_y as f32))
     }
     pub fn get_collision_areas(&self) -> Gd<TileCollisionAreas> {
         self.base()
@@ -217,8 +283,27 @@ impl Tile {
 }
 
 #[godot_api]
+impl Tile {
+    // TODO: Replace this with a global manager implemented in code
+    #[func]
+    fn insert_active_collision(&mut self, id: InstanceId) {
+        self.active_collisions.push(id);
+    }
+    // TODO: Replace this with a global manager implemented in code
+    #[func]
+    fn remove_active_collision(&mut self, id: InstanceId) {
+        let index = self.active_collisions.iter().position(|inner| *inner == id);
+
+        if let Some(index) = index {
+            self.active_collisions.swap_remove(index);
+        }
+    }
+}
+
+#[godot_api]
 impl INode2D for Tile {
     fn ready(&mut self) {
+        let mut outside_connections = CardinalDirectionFlags::empty();
         {
             let mut gd_tile_components = self.get_tile_component();
 
@@ -234,7 +319,7 @@ impl INode2D for Tile {
 
                 if &cross_id == "cross_c" {
                     tile_config = Some(parsed_config.cross.get_center());
-                    self.outside_connections = CardinalDirectionFlags::all();
+                    outside_connections = CardinalDirectionFlags::all();
                 } else {
                     tile_config = Some(
                         parsed_config.cross.get_side(&cross_id).unwrap()[self.cross_index as usize]
@@ -244,34 +329,34 @@ impl INode2D for Tile {
                     match cross_id.as_str() {
                         "cross_n" => {
                             if self.cross_index < 4 {
-                                self.outside_connections =
+                                outside_connections =
                                     CardinalDirectionFlags::N | CardinalDirectionFlags::S;
                             } else {
-                                self.outside_connections = CardinalDirectionFlags::S;
+                                outside_connections = CardinalDirectionFlags::S;
                             }
                         }
                         "cross_e" => {
                             if self.cross_index < 4 {
-                                self.outside_connections =
+                                outside_connections =
                                     CardinalDirectionFlags::E | CardinalDirectionFlags::W;
                             } else {
-                                self.outside_connections = CardinalDirectionFlags::W;
+                                outside_connections = CardinalDirectionFlags::W;
                             }
                         }
                         "cross_s" => {
                             if self.cross_index < 4 {
-                                self.outside_connections =
+                                outside_connections =
                                     CardinalDirectionFlags::S | CardinalDirectionFlags::N;
                             } else {
-                                self.outside_connections = CardinalDirectionFlags::N;
+                                outside_connections = CardinalDirectionFlags::N;
                             }
                         }
                         "cross_w" => {
                             if self.cross_index < 4 {
-                                self.outside_connections =
+                                outside_connections =
                                     CardinalDirectionFlags::W | CardinalDirectionFlags::E;
                             } else {
-                                self.outside_connections = CardinalDirectionFlags::E;
+                                outside_connections = CardinalDirectionFlags::E;
                             }
                         }
                         _ => godot_error!("Expected `cross_id` to be one of cross_[c, n, e, s, w]"),
@@ -336,14 +421,11 @@ impl INode2D for Tile {
             }
         }
 
-        for connection in self.outside_connections.iter() {
+        for connection in outside_connections.iter() {
             let directions: Vec<CardinalDirection> = connection.into();
 
             for direction in directions.iter() {
-                let mut gd_collision_area = self.get_collision_area_at_direction(direction);
-                let mut collision_area = gd_collision_area.bind_mut();
-
-                collision_area.disable_collision();
+                self.disable_collision_at_direction(direction);
             }
         }
     }
@@ -354,9 +436,27 @@ impl INode2D for Tile {
 
         let input = Input::singleton();
         let pressed = input.is_mouse_button_pressed(MouseButton::LEFT);
+        let mut target_position: Option<Vector2> = None;
 
         if pressed {
-            self.is_active = false;
+            if self.active_collisions.len() != 1 {
+                godot_error!("Must have exactly 1 collision to place tile");
+            } else {
+                self.is_active = false;
+
+                let collision_id = self.active_collisions[0];
+
+                // TODO: This isn't safe, but we can potentially make it safe(r) _by implementing a manager_
+                let collision: Gd<CollisionOutline> = Gd::from_instance_id(collision_id);
+                let position = collision.get_global_position();
+                let side: Vec<CardinalDirection> =
+                    CardinalDirectionFlags::from_bits_truncate(collision.bind().side).into();
+
+                target_position = Some(self.place_at(side[0].clone(), position));
+
+                let mut base = self.base_mut();
+                base.set_scale(Vector2::from_tuple((0.2, 0.2)))
+            }
         }
 
         let mut base = self.base_mut();
@@ -365,10 +465,6 @@ impl INode2D for Tile {
             .expect("Expected node to have a viewport")
             .get_mouse_position();
 
-        base.set_position(mouse_position);
-
-        if pressed {
-            base.set_scale(Vector2::from_tuple((0.2, 0.2)))
-        }
+        base.set_position(target_position.unwrap_or(mouse_position));
     }
 }
