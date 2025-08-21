@@ -142,7 +142,7 @@ treasure_w = "none"
 [[decks.deck]]
 is_desert = false
 oasis = ["N | W", "S | E"]
-treasure_n = "incense"
+treasure_n = "goods:incense"
 treasure_e = "none"
 treasure_s = "camels"
 treasure_w = "none"
@@ -154,7 +154,7 @@ oasis = ["W | N"]
 treasure_n = "water"
 treasure_e = "none"
 treasure_s = "none"
-treasure_w = "myrrh"
+treasure_w = "goods:myrrh"
 
 # 8
 [[decks.deck]]
@@ -208,7 +208,7 @@ oasis = ["W | N"]
 treasure_n = "rumors"
 treasure_e = "none"
 treasure_s = "none"
-treasure_w = "myrrh"
+treasure_w = "goods:myrrh"
 
 # 14
 [[decks.deck]]
@@ -233,7 +233,7 @@ treasure_w = "none"
 is_desert = false
 oasis = ["S | E"]
 treasure_n = "water"
-treasure_e = "incense"
+treasure_e = "goods:incense"
 treasure_s = "none"
 treasure_w = "none"
 

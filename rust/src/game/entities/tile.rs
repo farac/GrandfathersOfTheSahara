@@ -18,8 +18,6 @@ use godot::classes::Input;
 use godot::classes::Line2D;
 use godot::classes::Node2D;
 use godot::global::godot_error;
-use godot::global::godot_print;
-use godot::global::MouseButton;
 use godot::obj::Gd;
 use godot::obj::InstanceId;
 use godot::obj::WithBaseField;
@@ -30,6 +28,24 @@ use godot::{
 };
 
 const CROSS_IDS: [&str; 5] = ["cross_c", "cross_n", "cross_e", "cross_s", "cross_w"];
+
+enum InputActions {
+    Primary,
+    _Secondary,
+    RotateCw,
+    RotateCcw,
+}
+
+impl From<InputActions> for String {
+    fn from(value: InputActions) -> Self {
+        match value {
+            InputActions::Primary => String::from("Primary"),
+            InputActions::_Secondary => String::from("Secondary"),
+            InputActions::RotateCw => String::from("Rotate CW"),
+            InputActions::RotateCcw => String::from("Rotate CCW"),
+        }
+    }
+}
 
 bitflags! {
     #[derive(Debug, Clone, PartialEq)]
@@ -180,9 +196,14 @@ pub struct Tile {
     #[export]
     #[init(val = 0)]
     cross_index: u8,
+    #[init(val = 0)]
+    outside_connections: u8,
 
     // TODO: Replace this with a global manager implemented in code
     active_collisions: Vec<InstanceId>,
+
+    #[init(val = 0.)]
+    throttle_wheel: f64,
 }
 
 impl Tile {
@@ -219,13 +240,13 @@ impl Tile {
         tile_component.treasure_layout = tile_component_data.treasure_layout.clone();
     }
     pub fn disable_all_collisions(&mut self) {
-        for direction in DIRECTIONS.iter() {
-            self.disable_collision_at_direction(direction);
+        for direction in DIRECTIONS {
+            self.disable_collision_at_direction(&direction);
         }
     }
     pub fn enable_all_collisions(&mut self) {
-        for direction in DIRECTIONS.iter() {
-            self.enable_collision_at_direction(direction);
+        for direction in DIRECTIONS {
+            self.enable_collision_at_direction(&direction);
         }
     }
     fn disable_collision_at_direction(&mut self, direction: &CardinalDirection) {
@@ -250,10 +271,10 @@ impl Tile {
 
         let (offset_x, offset_y) = match direction {
             // Tiles are 250px. Their default scale is 0.2. Therefore, the offset is 50px
-            CardinalDirection::N => (-50, -50),
-            CardinalDirection::E => (0, -50),
-            CardinalDirection::S => (0, 0),
-            CardinalDirection::W => (-50, 0),
+            CardinalDirection::N => (-50, -51),
+            CardinalDirection::E => (1, -50),
+            CardinalDirection::S => (0, 1),
+            CardinalDirection::W => (-51, 0),
         };
 
         let outside_connection = direction.invert();
@@ -280,124 +301,24 @@ impl Tile {
             .bind()
             .get_collision_area_at_direction(direction)
     }
-}
-
-#[godot_api]
-impl Tile {
-    // TODO: Replace this with a global manager implemented in code
-    #[func]
-    fn insert_active_collision(&mut self, id: InstanceId) {
-        self.active_collisions.push(id);
-    }
-    // TODO: Replace this with a global manager implemented in code
-    #[func]
-    fn remove_active_collision(&mut self, id: InstanceId) {
-        let index = self.active_collisions.iter().position(|inner| *inner == id);
-
-        if let Some(index) = index {
-            self.active_collisions.swap_remove(index);
-        }
-    }
-}
-
-#[godot_api]
-impl INode2D for Tile {
-    fn ready(&mut self) {
-        let mut outside_connections = CardinalDirectionFlags::empty();
-        {
-            let mut gd_tile_components = self.get_tile_component();
-
-            let cross_id = self.cross_id.to_string();
-            let mut tile_config: Option<TileConfig> = None;
-
-            if !cross_id.is_empty() && CROSS_IDS.contains(&cross_id.as_str()) {
-                let tileset = TomlLoader::get(&self.base(), GameConfig::Tileset)
-                    .expect("Couldn't load tileset. Check if config/tileset.toml exists");
-
-                let parsed_config = TilesetConfig::try_from(&tileset)
-                    .expect("Couldn't parse tileset. Check syntax of config/tileset.toml");
-
-                if &cross_id == "cross_c" {
-                    tile_config = Some(parsed_config.cross.get_center());
-                    outside_connections = CardinalDirectionFlags::all();
-                } else {
-                    tile_config = Some(
-                        parsed_config.cross.get_side(&cross_id).unwrap()[self.cross_index as usize]
-                            .clone(),
-                    );
-
-                    match cross_id.as_str() {
-                        "cross_n" => {
-                            if self.cross_index < 4 {
-                                outside_connections =
-                                    CardinalDirectionFlags::N | CardinalDirectionFlags::S;
-                            } else {
-                                outside_connections = CardinalDirectionFlags::S;
-                            }
-                        }
-                        "cross_e" => {
-                            if self.cross_index < 4 {
-                                outside_connections =
-                                    CardinalDirectionFlags::E | CardinalDirectionFlags::W;
-                            } else {
-                                outside_connections = CardinalDirectionFlags::W;
-                            }
-                        }
-                        "cross_s" => {
-                            if self.cross_index < 4 {
-                                outside_connections =
-                                    CardinalDirectionFlags::S | CardinalDirectionFlags::N;
-                            } else {
-                                outside_connections = CardinalDirectionFlags::N;
-                            }
-                        }
-                        "cross_w" => {
-                            if self.cross_index < 4 {
-                                outside_connections =
-                                    CardinalDirectionFlags::W | CardinalDirectionFlags::E;
-                            } else {
-                                outside_connections = CardinalDirectionFlags::E;
-                            }
-                        }
-                        _ => godot_error!("Expected `cross_id` to be one of cross_[c, n, e, s, w]"),
-                    }
-                }
-            }
-
-            if let Some(tile_config) = tile_config {
-                let tile_data = TileData::from(tile_config);
-
-                let mut tile_components = gd_tile_components.bind_mut();
-                tile_components.oasis_layout = tile_data.oasis_layout;
-
-                let treasure_layout = tile_data.treasure_layout.iter().map(GString::from);
-
-                tile_components.treasure_layout = Array::from_iter(treasure_layout);
-                tile_components.is_cross = tile_data.is_cross;
-            }
-        }
-
+    pub fn refresh_state(&mut self) {
         let gd_tile_components = self.get_tile_component();
         let tile_components = gd_tile_components.bind();
 
-        self.show_desert_icon_if_not_cross(true);
+        let mut enable_oasis: CardinalDirectionFlags = CardinalDirectionFlags::empty();
 
-        for oasis_idx in 0..3 {
+        for oasis_idx in 0..4 {
             let flag = (tile_components.oasis_layout.bits() >> (oasis_idx * 4)) as u8;
 
             let directions: Vec<CardinalDirection> =
                 CardinalDirectionFlags::from_bits_truncate(flag).into();
 
             for (direction_idx, direction) in DIRECTIONS.iter().enumerate() {
-                let mut gd_treasure = self.get_treasure_at_direction(direction);
-
                 if directions.contains(direction) {
-                    let mut gd_path = self.get_path_at_direction(direction);
-
-                    gd_path.set_default_color(Color::from_rgb(255., 255., 255.));
-                    gd_treasure.set_visible(true);
-                    self.show_desert_icon_if_not_cross(false);
+                    enable_oasis |= CardinalDirectionFlags::from(direction);
                 }
+
+                let mut gd_treasure = self.get_treasure_at_direction(direction);
 
                 let treasure_at_idx = tile_components
                     .treasure_layout
@@ -421,22 +342,181 @@ impl INode2D for Tile {
             }
         }
 
-        for connection in outside_connections.iter() {
+        let disable_oasis: CardinalDirectionFlags = enable_oasis.clone().complement();
+
+        let enable_oasis: Vec<CardinalDirection> = enable_oasis.into();
+        let disable_oasis: Vec<CardinalDirection> = disable_oasis.into();
+
+        for direction in enable_oasis {
+            let mut gd_path = self.get_path_at_direction(&direction);
+            let mut gd_treasure = self.get_treasure_at_direction(&direction);
+
+            gd_path.set_default_color(Color::from_rgb(255., 255., 255.));
+            gd_treasure.set_visible(true);
+            self.show_desert_icon_if_not_cross(false);
+        }
+
+        for direction in disable_oasis {
+            let mut gd_path = self.get_path_at_direction(&direction);
+            let mut gd_treasure = self.get_treasure_at_direction(&direction);
+
+            gd_path.set_default_color(Color::from_html("#883f12").unwrap());
+            gd_treasure.set_visible(false);
+        }
+
+        for connection in CardinalDirectionFlags::from_bits_truncate(self.outside_connections) {
             let directions: Vec<CardinalDirection> = connection.into();
 
-            for direction in directions.iter() {
-                self.disable_collision_at_direction(direction);
+            for direction in directions {
+                self.disable_collision_at_direction(&direction);
             }
         }
     }
-    fn process(&mut self, _dt: f64) {
+}
+
+#[godot_api]
+impl Tile {
+    // TODO: Replace this with a global manager implemented in code
+    #[func]
+    fn insert_active_collision(&mut self, id: InstanceId) {
+        self.active_collisions.push(id);
+    }
+    // TODO: Replace this with a global manager implemented in code
+    #[func]
+    fn remove_active_collision(&mut self, id: InstanceId) {
+        let index = self.active_collisions.iter().position(|inner| *inner == id);
+
+        if let Some(index) = index {
+            self.active_collisions.swap_remove(index);
+        }
+    }
+}
+
+#[godot_api]
+impl INode2D for Tile {
+    fn ready(&mut self) {
+        {
+            let mut gd_tile_components = self.get_tile_component();
+
+            let cross_id = self.cross_id.to_string();
+            let mut tile_config: Option<TileConfig> = None;
+
+            if !cross_id.is_empty() && CROSS_IDS.contains(&cross_id.as_str()) {
+                let tileset = TomlLoader::get(&self.base(), GameConfig::Tileset)
+                    .expect("Couldn't load tileset. Check if config/tileset.toml exists");
+
+                let parsed_config = TilesetConfig::try_from(&tileset)
+                    .expect("Couldn't parse tileset. Check syntax of config/tileset.toml");
+
+                if &cross_id == "cross_c" {
+                    tile_config = Some(parsed_config.cross.get_center());
+                    self.outside_connections = CardinalDirectionFlags::all().bits();
+                } else {
+                    tile_config = Some(
+                        parsed_config.cross.get_side(&cross_id).unwrap()[self.cross_index as usize]
+                            .clone(),
+                    );
+
+                    match cross_id.as_str() {
+                        "cross_n" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    (CardinalDirectionFlags::N | CardinalDirectionFlags::S).bits();
+                            } else {
+                                self.outside_connections = CardinalDirectionFlags::S.bits();
+                            }
+                        }
+                        "cross_e" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    (CardinalDirectionFlags::E | CardinalDirectionFlags::W).bits();
+                            } else {
+                                self.outside_connections = (CardinalDirectionFlags::W).bits();
+                            }
+                        }
+                        "cross_s" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    (CardinalDirectionFlags::S | CardinalDirectionFlags::N).bits();
+                            } else {
+                                self.outside_connections = (CardinalDirectionFlags::N).bits();
+                            }
+                        }
+                        "cross_w" => {
+                            if self.cross_index < 4 {
+                                self.outside_connections =
+                                    (CardinalDirectionFlags::W | CardinalDirectionFlags::E).bits();
+                            } else {
+                                self.outside_connections = (CardinalDirectionFlags::E).bits();
+                            }
+                        }
+                        _ => godot_error!("Expected `cross_id` to be one of cross_[c, n, e, s, w]"),
+                    }
+                }
+            }
+
+            if let Some(tile_config) = tile_config {
+                let tile_data = TileData::from(tile_config);
+
+                let mut tile_components = gd_tile_components.bind_mut();
+                tile_components.oasis_layout = tile_data.oasis_layout;
+
+                let treasure_layout = tile_data.treasure_layout.iter().map(GString::from);
+
+                tile_components.treasure_layout = Array::from_iter(treasure_layout);
+                tile_components.is_cross = tile_data.is_cross;
+            }
+        }
+
+        self.show_desert_icon_if_not_cross(true);
+
+        self.refresh_state();
+
+        let collision_areas = self.get_collision_areas();
+
+        collision_areas
+            .bind()
+            .get_collision_outlines()
+            .iter()
+            .enumerate()
+            .for_each(|(i, o)| {
+                o.signals().submitted_at().connect_other(self, move |tile| {
+                    tile.disable_collision_at_direction(&DIRECTIONS[i])
+                });
+            });
+    }
+    fn process(&mut self, dt: f64) {
         if !self.is_active {
             return;
         }
 
         let input = Input::singleton();
-        let pressed = input.is_mouse_button_pressed(MouseButton::LEFT);
+        let pressed = input.is_action_just_pressed(&String::from(InputActions::Primary));
         let mut target_position: Option<Vector2> = None;
+
+        let wheel_up = input.is_action_just_released(&String::from(InputActions::RotateCcw));
+        let wheel_down = input.is_action_just_released(&String::from(InputActions::RotateCw));
+
+        if self.throttle_wheel == 0. && (wheel_up || wheel_down) {
+            self.throttle_wheel += dt * 1000.;
+
+            {
+                let mut gd_tile_component = self.get_tile_component();
+                let mut tile_component = gd_tile_component.bind_mut();
+
+                if wheel_up {
+                    tile_component.rotate_ccw();
+                } else {
+                    tile_component.rotate_cw();
+                }
+            }
+
+            self.refresh_state();
+        } else if self.throttle_wheel >= 256. {
+            self.throttle_wheel = 0.;
+        } else if self.throttle_wheel > 0. {
+            self.throttle_wheel += dt * 1000.;
+        }
 
         if pressed {
             if self.active_collisions.len() != 1 {
@@ -452,11 +532,15 @@ impl INode2D for Tile {
                 let side: Vec<CardinalDirection> =
                     CardinalDirectionFlags::from_bits_truncate(collision.bind().side).into();
 
+                collision.signals().submitted_at().emit();
+
                 target_position = Some(self.place_at(side[0].clone(), position));
 
                 let mut base = self.base_mut();
                 base.set_scale(Vector2::from_tuple((0.2, 0.2)))
             }
+
+            self.refresh_state();
         }
 
         let mut base = self.base_mut();

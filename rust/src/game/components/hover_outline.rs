@@ -95,6 +95,9 @@ impl CollisionOutline {
             &[Variant::from(self.to_gd().instance_id())],
         );
     }
+
+    #[signal]
+    pub fn submitted_at();
 }
 
 impl CollisionOutline {
