@@ -57,6 +57,17 @@ bitflags! {
     }
 }
 
+impl From<CardinalDirection> for CardinalDirectionFlags {
+    fn from(value: CardinalDirection) -> Self {
+        match value {
+            CardinalDirection::N => CardinalDirectionFlags::N,
+            CardinalDirection::E => CardinalDirectionFlags::E,
+            CardinalDirection::S => CardinalDirectionFlags::S,
+            CardinalDirection::W => CardinalDirectionFlags::W,
+        }
+    }
+}
+
 bitflags! {
     #[derive(Debug, Clone, PartialEq)]
     pub struct OasisLayoutFlags: u16 {
@@ -94,7 +105,26 @@ pub enum CardinalDirection {
     W,
 }
 
+impl From<OasisLayoutFlags> for CardinalDirectionFlags {
+    fn from(value: OasisLayoutFlags) -> CardinalDirectionFlags {
+        let mut acc = CardinalDirectionFlags::empty();
+        let bits = value.bits();
+
+        for idx in 0..4 {
+            let res =
+                CardinalDirectionFlags::from_bits_truncate((bits.rotate_right(4 * idx)) as u8);
+
+            acc = res | acc;
+        }
+
+        acc
+    }
+}
+
 impl CardinalDirection {
+    fn _is_opposite(&self, side: &CardinalDirection) -> bool {
+        self.invert() == *side
+    }
     fn invert(&self) -> Self {
         match self {
             CardinalDirection::N => CardinalDirection::S,
@@ -518,29 +548,62 @@ impl INode2D for Tile {
             self.throttle_wheel += dt * 1000.;
         }
 
-        if pressed {
-            if self.active_collisions.len() != 1 {
-                godot_error!("Must have exactly 1 collision to place tile");
-            } else {
-                self.is_active = false;
+        let collision_id = self.active_collisions.first();
 
-                let collision_id = self.active_collisions[0];
+        if let Some(collision_id) = collision_id {
+            // TODO: This isn't safe, but we can potentially make it safe(r) _by implementing a manager_
+            let mut collision: Gd<CollisionOutline> = Gd::from_instance_id(*collision_id);
 
-                // TODO: This isn't safe, but we can potentially make it safe(r) _by implementing a manager_
-                let collision: Gd<CollisionOutline> = Gd::from_instance_id(collision_id);
-                let position = collision.get_global_position();
-                let side: Vec<CardinalDirection> =
-                    CardinalDirectionFlags::from_bits_truncate(collision.bind().side).into();
+            let collision_side: Vec<CardinalDirection> =
+                CardinalDirectionFlags::from_bits_truncate(collision.bind().side).into();
 
-                collision.signals().submitted_at().emit();
+            let placement_is_legal;
 
-                target_position = Some(self.place_at(side[0].clone(), position));
+            {
+                let mut collision = collision.bind_mut();
+                let collided_tile_component = collision.get_tile_component();
 
-                let mut base = self.base_mut();
-                base.set_scale(Vector2::from_tuple((0.2, 0.2)))
+                let gd_tile_component = self.get_tile_component();
+                let tile_component = gd_tile_component.bind();
+
+                let oasis_connection_sides: CardinalDirectionFlags =
+                    collided_tile_component.bind().oasis_layout.clone().into();
+                let tile_connection_sides: CardinalDirectionFlags =
+                    tile_component.oasis_layout.clone().into();
+
+                let connection_side = CardinalDirectionFlags::from(collision_side[0].clone());
+                let tile_connection_side =
+                    CardinalDirectionFlags::from(collision_side[0].clone().invert());
+                let connection_is_oasis = oasis_connection_sides.contains(connection_side);
+                let tile_connection_is_oasis = tile_connection_sides.contains(tile_connection_side);
+
+                placement_is_legal = connection_is_oasis == tile_connection_is_oasis;
+
+                if !placement_is_legal {
+                    collision.forbid_outline();
+                } else {
+                    collision.allow_outline();
+                }
             }
 
-            self.refresh_state();
+            if placement_is_legal && pressed {
+                if self.active_collisions.len() != 1 {
+                    godot_error!("Must have exactly 1 collision to place tile");
+                } else {
+                    self.is_active = false;
+
+                    let position = collision.get_global_position();
+
+                    collision.signals().submitted_at().emit();
+
+                    target_position = Some(self.place_at(collision_side[0].clone(), position));
+
+                    let mut base = self.base_mut();
+                    base.set_scale(Vector2::from_tuple((0.2, 0.2)))
+                }
+
+                self.refresh_state();
+            }
         }
 
         let mut base = self.base_mut();

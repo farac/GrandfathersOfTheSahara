@@ -23,6 +23,7 @@ offset_left = -4.0
 offset_top = -4.0
 offset_right = 254.0
 offset_bottom = 254.0
+mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_wy3lv")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

@@ -1,4 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://bpf7kj0x08e2d"]
+[gd_scene load_steps=3 format=3 uid="uid://bpf7kj0x08e2d"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_snks2"]
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wy3lv"]
 draw_center = false
@@ -13,6 +25,15 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [node name="HoverableOutline" type="CollisionOutline"]
+
+[node name="ForbidOutline" type="PanelContainer" parent="."]
+visible = false
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 254.0
+offset_bottom = 254.0
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_snks2")
 
 [node name="Outline" type="PanelContainer" parent="."]
 visible = false

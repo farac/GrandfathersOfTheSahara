@@ -5,6 +5,8 @@ use godot::{
     prelude::{godot_api, GodotClass},
 };
 
+use crate::game::components::tile_component::TileComponent;
+
 #[derive(Debug, GodotClass)]
 #[class(init, base=Area2D)]
 pub struct HoverableOutline {
@@ -62,6 +64,9 @@ pub struct CollisionOutline {
 
     #[export]
     pub side: u8,
+
+    outline_allowed: bool,
+    outline_visible: bool,
 }
 
 #[godot_api]
@@ -101,21 +106,45 @@ impl CollisionOutline {
 }
 
 impl CollisionOutline {
+    pub fn get_tile_component(&self) -> Gd<TileComponent> {
+        self.base()
+            .get_node_as::<TileComponent>("../../TileComponent")
+    }
+    pub fn allow_outline(&mut self) {
+        if self.outline_allowed {
+            return;
+        }
+
+        self.outline_allowed = true;
+    }
+    pub fn forbid_outline(&mut self) {
+        if !self.outline_allowed {
+            return;
+        }
+
+        self.outline_allowed = false;
+    }
     fn get_outline_node(&self) -> Gd<PanelContainer> {
-        self.base().get_node_as("./Outline")
+        if self.outline_allowed {
+            self.base()
+                .get_node_as::<PanelContainer>("./ForbidOutline")
+                .set_visible(false);
+            self.base().get_node_as("./Outline")
+        } else {
+            self.base()
+                .get_node_as::<PanelContainer>("./Outline")
+                .set_visible(false);
+            self.base().get_node_as("./ForbidOutline")
+        }
     }
     fn get_collision_shape(&self) -> Gd<CollisionPolygon2D> {
         self.base().get_node_as("./CollisionShape2D")
     }
     fn show_outline(&mut self) {
-        let mut outline: Gd<PanelContainer> = self.get_outline_node();
-
-        outline.set_visible(true);
+        self.outline_visible = true;
     }
     fn hide_outline(&mut self) {
-        let mut outline: Gd<PanelContainer> = self.get_outline_node();
-
-        outline.set_visible(false);
+        self.outline_visible = false;
     }
     pub fn enable_collision(&mut self) {
         let mut collision_shape: Gd<CollisionPolygon2D> = self.get_collision_shape();
@@ -150,6 +179,16 @@ impl IArea2D for CollisionOutline {
         self.base()
             .signals()
             .mouse_exited()
+            .connect_other(&*self, |this| this.allow_outline());
+
+        self.base()
+            .signals()
+            .mouse_exited()
             .connect_other(&*self, |this| this.cancel_collision());
+    }
+    fn process(&mut self, _dt: f64) {
+        let mut outline: Gd<PanelContainer> = self.get_outline_node();
+
+        outline.set_visible(self.outline_visible);
     }
 }
