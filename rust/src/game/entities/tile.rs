@@ -1,3 +1,4 @@
+use crate::game::components::board_component::BoardComponent;
 use crate::game::components::hover_outline::CollisionOutline;
 use crate::game::components::tile_component::TileComponent;
 use crate::game::components::tile_component::TileData;
@@ -145,10 +146,26 @@ impl Tile {
     pub fn set_active(&mut self) {
         self.is_active = true;
     }
-    pub fn place_at(&mut self, direction: CardinalDirection, position: Vector2) -> Vector2 {
+    pub fn place_at(
+        &mut self,
+        direction: CardinalDirection,
+        position: Vector2,
+        coordinates: (u8, u8),
+    ) -> Vector2 {
         // TODO: A low of hacks here with enabling and disabling collisions instead of just setting
         // a sensible default state and flipping only the ones we need. Just prototyping
         self.enable_all_collisions();
+
+        let mut gd_board_component = BoardComponent::get(&self.base());
+        let mut board_component = gd_board_component.bind_mut();
+
+        if let Err(error) = board_component.add_tile_at(
+            self.get_tile_component().instance_id(),
+            coordinates.0,
+            coordinates.1,
+        ) {
+            godot_error!("{error:?}");
+        };
 
         let (offset_x, offset_y) = match direction {
             // Tiles are 250px. Their default scale is 0.2. Therefore, the offset is 50px
@@ -276,13 +293,17 @@ impl Tile {
 #[godot_api]
 impl INode2D for Tile {
     fn ready(&mut self) {
+        let is_cross_tile: bool;
+
         {
             let mut gd_tile_components = self.get_tile_component();
 
             let cross_id = self.cross_id.to_string();
+            is_cross_tile = !cross_id.is_empty() && CROSS_IDS.contains(&cross_id.as_str());
+
             let mut tile_config: Option<TileConfig> = None;
 
-            if !cross_id.is_empty() && CROSS_IDS.contains(&cross_id.as_str()) {
+            if is_cross_tile {
                 let tileset = TomlLoader::get(&self.base(), GameConfig::Tileset)
                     .expect("Couldn't load tileset. Check if config/tileset.toml exists");
 
@@ -365,6 +386,30 @@ impl INode2D for Tile {
                     tile.disable_collision_at_direction(&DIRECTIONS[i])
                 });
             });
+
+        if is_cross_tile {
+            let mut board_component = BoardComponent::get(&self.base());
+
+            let (x, y) = match self.cross_id.to_string().as_str() {
+                "cross_c" => (5, 5),
+                "cross_n" => (5, self.cross_index + 6),
+                "cross_e" => (self.cross_index + 6, 5),
+                "cross_s" => (5, 4 - self.cross_index),
+                "cross_w" => (4 - self.cross_index, 5),
+                _ => {
+                    godot_error!("Expected `cross_id` to be one of cross_[c, n, e, s, w]");
+                    return;
+                }
+            };
+
+            let mut board_component = board_component.bind_mut();
+
+            if let Err(error) =
+                board_component.add_tile_at(self.get_tile_component().instance_id(), x, y)
+            {
+                godot_error!("{error:?}");
+            }
+        }
     }
     fn process(&mut self, dt: f64) {
         if !self.is_active {
@@ -409,6 +454,7 @@ impl INode2D for Tile {
                 CardinalDirectionFlags::from_bits_truncate(collision.bind().side).into();
 
             let placement_is_legal;
+            let mut placement_coordinates: (i32, i32) = (0, 0);
 
             {
                 let mut collision = collision.bind_mut();
@@ -435,6 +481,27 @@ impl INode2D for Tile {
                 } else {
                     collision.allow_outline();
                 }
+
+                let collided_instance_id = collided_tile_component.instance_id();
+                let gd_board_component = BoardComponent::get(&self.base());
+                let board_component = gd_board_component.bind();
+                let direction_offset = match collision_side[0] {
+                    CardinalDirection::N => (0, 1),
+                    CardinalDirection::E => (1, 0),
+                    CardinalDirection::S => (0, -1),
+                    CardinalDirection::W => (-1, 0),
+                };
+
+                match board_component.get_tile_coordinates(collided_instance_id) {
+                    Ok((x, y)) => {
+                        let x = x as i32;
+                        let y = y as i32;
+                        placement_coordinates = (x + direction_offset.0, y + direction_offset.1);
+                    }
+                    Err(error) => {
+                        godot_error!("{error:?}");
+                    }
+                }
             }
 
             if placement_is_legal && pressed {
@@ -447,7 +514,14 @@ impl INode2D for Tile {
 
                     collision.signals().submitted_at().emit();
 
-                    target_position = Some(self.place_at(collision_side[0].clone(), position));
+                    let placement_coordinates =
+                        (placement_coordinates.0 as u8, placement_coordinates.1 as u8);
+
+                    target_position = Some(self.place_at(
+                        collision_side[0].clone(),
+                        position,
+                        placement_coordinates,
+                    ));
 
                     let mut base = self.base_mut();
                     base.set_scale(Vector2::from_tuple((0.2, 0.2)))

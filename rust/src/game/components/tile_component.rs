@@ -43,7 +43,7 @@ impl From<TileConfig> for TileData {
 }
 
 #[derive(GodotClass, Debug)]
-#[class( base=Node)]
+#[class(base=Node)]
 pub struct TileComponent {
     base: Base<Node>,
 

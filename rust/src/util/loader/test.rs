@@ -3,9 +3,9 @@ mod tests {
     use assert_matches::assert_matches;
     use toml::Table;
 
-    use crate::{
-        game::entities::tile::OasisLayoutFlags,
-        util::loader::{CrossConfig, TilesetConfig},
+    use crate::util::{
+        flags::OasisLayoutFlags,
+        loader::{CrossConfig, TilesetConfig},
     };
 
     #[test]
@@ -878,8 +878,6 @@ treasure_w = "none"
         let table = toml::from_str::<Table>(&input).unwrap();
 
         let parsed_config = TilesetConfig::try_from(&table);
-
-        println!("{parsed_config:?}");
 
         assert_matches!(parsed_config, Ok(_));
 
