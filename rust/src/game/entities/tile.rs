@@ -3,10 +3,12 @@ use crate::game::components::tile_component::TileComponent;
 use crate::game::components::tile_component::TileData;
 use crate::game::entities::treasure::Treasure;
 use crate::game::entities::treasure::TreasureKind;
+use crate::util::input::InputActions;
 use crate::util::loader::GameConfig;
 use crate::util::loader::TileConfig;
 use crate::util::loader::TilesetConfig;
 use crate::util::loader::TomlLoader;
+use crate::util::loader::CROSS_IDS;
 use bitflags::bitflags;
 use godot::builtin::Array;
 use godot::builtin::Color;
@@ -26,26 +28,6 @@ use godot::{
     obj::Base,
     prelude::{godot_api, GodotClass},
 };
-
-const CROSS_IDS: [&str; 5] = ["cross_c", "cross_n", "cross_e", "cross_s", "cross_w"];
-
-enum InputActions {
-    Primary,
-    _Secondary,
-    RotateCw,
-    RotateCcw,
-}
-
-impl From<InputActions> for String {
-    fn from(value: InputActions) -> Self {
-        match value {
-            InputActions::Primary => String::from("Primary"),
-            InputActions::_Secondary => String::from("Secondary"),
-            InputActions::RotateCw => String::from("Rotate CW"),
-            InputActions::RotateCcw => String::from("Rotate CCW"),
-        }
-    }
-}
 
 bitflags! {
     #[derive(Debug, Clone, PartialEq)]
