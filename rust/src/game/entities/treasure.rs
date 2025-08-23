@@ -179,11 +179,11 @@ impl TryFrom<TreasureKind> for Option<Gd<CompressedTexture2D>> {
 pub struct Treasure {
     base: Base<Node2D>,
 
-    #[export]
-    #[init(val = GString::from("none"))]
-    initial_treasure: GString,
-    #[init(val = Some(TreasureKind::None))]
-    pub kind: Option<TreasureKind>,
+    #[init(val = TreasureKind::None)]
+    pub kind: TreasureKind,
+
+    #[init(val = TreasureKind::None)]
+    sprite_kind: TreasureKind,
 }
 
 impl Treasure {
@@ -191,19 +191,33 @@ impl Treasure {
         self.to_gd()
             .get_node_as::<Sprite2D>("./Control/SpriteContainer/TreasureSprite")
     }
-    fn set_icon_hidden(&self) {
+    fn hide_icon(&self) {
         self.get_sprite().set_visible(false);
     }
-    pub fn set_kind(&mut self, kind: TreasureKind) {
-        let mut sprite = self.get_sprite();
+    fn show_icon(&self) {
+        self.get_sprite().set_visible(true);
+    }
+}
 
-        if kind == TreasureKind::None {
-            self.kind = Some(kind.clone());
-
-            return self.set_icon_hidden();
+#[godot_api]
+impl INode2D for Treasure {
+    fn ready(&mut self) {
+        self.hide_icon();
+    }
+    fn process(&mut self, _dt: f64) {
+        if self.sprite_kind == self.kind {
+            return;
         }
 
-        let texture: Option<Gd<CompressedTexture2D>> = (&kind)
+        let mut sprite = self.get_sprite();
+
+        if self.kind == TreasureKind::None {
+            self.sprite_kind = self.kind.clone();
+
+            return self.hide_icon();
+        }
+
+        let texture: Option<Gd<CompressedTexture2D>> = (&self.kind)
             .try_into()
             .expect("Provided invalid TreasureKind to Treasure.ready()");
 
@@ -211,32 +225,10 @@ impl Treasure {
             sprite.set_texture(&texture);
         }
 
-        self.kind = Some(kind);
-    }
-}
+        self.sprite_kind = self.kind.clone();
 
-#[godot_api]
-impl INode2D for Treasure {
-    fn ready(&mut self) {
-        if self.kind.is_none() {
-            return;
+        if !sprite.is_visible() {
+            self.show_icon();
         }
-
-        let parse_result = TreasureKind::try_from(&self.initial_treasure);
-
-        if parse_result.is_err() {
-            let error = parse_result
-                .as_ref()
-                .expect_err("Expected parse result to be an error.");
-            godot_error!("{error}",);
-        }
-
-        let parsed_kind = parse_result.ok();
-
-        if parsed_kind.is_none() {
-            return;
-        }
-
-        self.set_kind(parsed_kind.unwrap_or(TreasureKind::None));
     }
 }

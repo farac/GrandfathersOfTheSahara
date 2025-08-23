@@ -192,3 +192,24 @@ impl IArea2D for CollisionOutline {
         outline.set_visible(self.outline_visible);
     }
 }
+
+fn no_op() {}
+
+#[derive(Debug, GodotClass)]
+#[class(init, base=Area2D)]
+pub struct ActionCollisionSquare {
+    base: Base<Area2D>,
+
+    #[init(val = no_op)]
+    pub on_enter: fn() -> (),
+    #[init(val = no_op)]
+    pub on_leave: fn() -> (),
+}
+
+#[godot_api]
+impl IArea2D for ActionCollisionSquare {
+    fn ready(&mut self) {
+        self.base().signals().mouse_entered().connect(self.on_enter);
+        self.base().signals().mouse_exited().connect(self.on_leave);
+    }
+}

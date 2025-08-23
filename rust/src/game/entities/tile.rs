@@ -219,7 +219,7 @@ impl Tile {
                     self.show_desert_icon_if_not_cross(false);
                 }
 
-                treasure.set_kind(treasure_kind);
+                treasure.kind = treasure_kind;
             }
         }
 

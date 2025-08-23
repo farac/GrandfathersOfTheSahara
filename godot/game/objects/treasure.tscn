@@ -1,10 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://bu0klrch6r5ly"]
+[gd_scene load_steps=5 format=3 uid="uid://bu0klrch6r5ly"]
 
+[ext_resource type="PackedScene" uid="uid://c4iou7ehk7os7" path="res://game/objects/action_collision.tscn" id="1_n2vrl"]
 [ext_resource type="Texture2D" uid="uid://uhx33nqd6r8y" path="res://assets/icons/tile/oasis.png" id="1_v0etb"]
 [ext_resource type="Texture2D" uid="uid://cunbjigx6lebm" path="res://assets/icons/treasure/water.png" id="1_ydyyq"]
+[ext_resource type="StyleBox" uid="uid://gc5qundmq1lb" path="res://styles/box_container.tres" id="4_2jcum"]
 
 [node name="Treasure" type="Treasure"]
-visible = false
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -19,6 +20,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="OasisBackground" type="ColorRect" parent="Control"]
 layout_mode = 1
@@ -29,6 +31,7 @@ offset_left = -40.0
 offset_right = 40.0
 offset_bottom = 80.0
 grow_horizontal = 2
+mouse_filter = 1
 color = Color(0, 0.439155, 0.297465, 1)
 
 [node name="TreeContainer" type="CenterContainer" parent="Control"]
@@ -117,3 +120,18 @@ size_flags_vertical = 2
 position = Vector2(24, 24)
 scale = Vector2(0.05, 0.05)
 texture = ExtResource("1_ydyyq")
+
+[node name="ActionCollision" parent="." instance=ExtResource("1_n2vrl")]
+
+[node name="TreasureHover" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 125.0
+offset_bottom = 125.0
+
+[node name="Panel" type="Panel" parent="TreasureHover"]
+layout_mode = 0
+offset_right = 125.0
+offset_bottom = 125.0
+theme_override_styles/panel = ExtResource("4_2jcum")
