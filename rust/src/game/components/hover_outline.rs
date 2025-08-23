@@ -144,6 +144,7 @@ impl CollisionOutline {
         self.outline_visible = true;
     }
     fn hide_outline(&mut self) {
+        self.outline_allowed = false;
         self.outline_visible = false;
     }
     pub fn enable_collision(&mut self) {
@@ -179,11 +180,6 @@ impl IArea2D for CollisionOutline {
         self.base()
             .signals()
             .mouse_exited()
-            .connect_other(&*self, |this| this.allow_outline());
-
-        self.base()
-            .signals()
-            .mouse_exited()
             .connect_other(&*self, |this| this.cancel_collision());
     }
     fn process(&mut self, _dt: f64) {
@@ -193,23 +189,8 @@ impl IArea2D for CollisionOutline {
     }
 }
 
-fn no_op() {}
-
-#[derive(Debug, GodotClass)]
+#[derive(GodotClass)]
 #[class(init, base=Area2D)]
 pub struct ActionCollisionSquare {
     base: Base<Area2D>,
-
-    #[init(val = no_op)]
-    pub on_enter: fn() -> (),
-    #[init(val = no_op)]
-    pub on_leave: fn() -> (),
-}
-
-#[godot_api]
-impl IArea2D for ActionCollisionSquare {
-    fn ready(&mut self) {
-        self.base().signals().mouse_entered().connect(self.on_enter);
-        self.base().signals().mouse_exited().connect(self.on_leave);
-    }
 }

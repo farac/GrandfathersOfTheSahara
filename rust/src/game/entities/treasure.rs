@@ -1,7 +1,9 @@
-use godot::classes::{CompressedTexture2D, Sprite2D};
+use godot::classes::{CompressedTexture2D, Control, Label, Sprite2D};
 use godot::prelude::*;
 
 use thiserror::Error;
+
+use crate::game::components::hover_outline::ActionCollisionSquare;
 
 const MAX_TREASURE_SUBSTRINGS: u8 = 2;
 
@@ -45,6 +47,24 @@ pub enum TreasureKind {
     Camels,
     Rumors,
     None,
+}
+
+impl TreasureKind {
+    pub fn get_label_text(&self) -> &'static str {
+        match self {
+            TreasureKind::Water => "Water",
+            TreasureKind::DoubleWater => "Water x2",
+            TreasureKind::Camels => "Camels",
+            TreasureKind::Rumors => "Rumors",
+            TreasureKind::Goods(good) => match good {
+                Good::Incense => "Incense",
+                Good::Myrrh => "Myrrh",
+                Good::Salt => "Salt",
+                Good::Gems => "Gems",
+            },
+            TreasureKind::None => "No treasure",
+        }
+    }
 }
 
 impl From<&TreasureKind> for &str {
@@ -181,21 +201,45 @@ pub struct Treasure {
 
     #[init(val = TreasureKind::None)]
     pub kind: TreasureKind,
-
     #[init(val = TreasureKind::None)]
     sprite_kind: TreasureKind,
+
+    tooltip_visible: bool,
 }
 
 impl Treasure {
-    pub fn get_sprite(&self) -> Gd<Sprite2D> {
+    pub fn get_hover_collision(&self) -> Gd<ActionCollisionSquare> {
+        self.base().get_node_as("./ActionCollision")
+    }
+    pub fn get_sprites(&self) -> [Gd<Sprite2D>; 2] {
+        [
+            self.to_gd()
+                .get_node_as::<Sprite2D>("./Control/SpriteContainer/TreasureSprite"),
+            self.to_gd().get_node_as::<Sprite2D>(
+                "./Tooltip/Panel/VBoxContainer/SpriteContainer/TreasureSprite",
+            ),
+        ]
+    }
+    pub fn get_label(&self) -> Gd<Label> {
         self.to_gd()
-            .get_node_as::<Sprite2D>("./Control/SpriteContainer/TreasureSprite")
+            .get_node_as::<Label>("./Tooltip/Panel/VBoxContainer/Panel/MarginContainer/Label")
     }
     fn hide_icon(&self) {
-        self.get_sprite().set_visible(false);
+        self.get_sprites()[0].set_visible(false);
     }
     fn show_icon(&self) {
-        self.get_sprite().set_visible(true);
+        self.get_sprites()[0].set_visible(true);
+    }
+    fn get_tooltip(&self) -> Gd<Control> {
+        self.base().get_node_as("./Tooltip")
+    }
+    fn change_tooltip_visibility(&mut self, visible: bool) {
+        if self.kind == TreasureKind::None {
+            return;
+        }
+
+        let mut tooltip = self.get_tooltip();
+        tooltip.set_visible(visible);
     }
 }
 
@@ -203,13 +247,34 @@ impl Treasure {
 impl INode2D for Treasure {
     fn ready(&mut self) {
         self.hide_icon();
+        let gd_self = self.to_gd();
+
+        let hover_collision = self.get_hover_collision();
+
+        hover_collision
+            .bind()
+            .base()
+            .signals()
+            .mouse_entered()
+            .connect_other(&gd_self, |this| this.tooltip_visible = true);
+
+        hover_collision
+            .bind()
+            .base()
+            .signals()
+            .mouse_exited()
+            .connect_other(&gd_self, |this| this.tooltip_visible = false);
     }
     fn process(&mut self, _dt: f64) {
+        let is_tooltip_visible = self.get_tooltip().is_visible();
+
+        if self.tooltip_visible != is_tooltip_visible {
+            self.change_tooltip_visibility(self.tooltip_visible);
+        }
+
         if self.sprite_kind == self.kind {
             return;
         }
-
-        let mut sprite = self.get_sprite();
 
         if self.kind == TreasureKind::None {
             self.sprite_kind = self.kind.clone();
@@ -217,17 +282,25 @@ impl INode2D for Treasure {
             return self.hide_icon();
         }
 
+        let mut sprites = self.get_sprites();
+
         let texture: Option<Gd<CompressedTexture2D>> = (&self.kind)
             .try_into()
             .expect("Provided invalid TreasureKind to Treasure.ready()");
 
         if let Some(texture) = texture {
-            sprite.set_texture(&texture);
+            sprites[0].set_texture(&texture);
+            sprites[1].set_texture(&texture);
         }
+
+        let label = self.kind.get_label_text();
+        let mut gd_label = self.get_label();
+
+        gd_label.set_text(label);
 
         self.sprite_kind = self.kind.clone();
 
-        if !sprite.is_visible() {
+        if !sprites[0].is_visible() {
             self.show_icon();
         }
     }

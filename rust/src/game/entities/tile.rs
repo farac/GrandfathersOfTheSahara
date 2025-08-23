@@ -213,7 +213,7 @@ impl Tile {
                 let mut treasure = gd_treasure.bind_mut();
 
                 if treasure_kind != TreasureKind::None {
-                    let mut sprite = treasure.get_sprite();
+                    let sprite = &mut treasure.get_sprites()[0];
                     sprite.set_visible(true);
 
                     self.show_desert_icon_if_not_cross(false);
