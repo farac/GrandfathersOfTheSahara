@@ -6,7 +6,7 @@ use godot::obj::Gd;
 use godot::prelude::GodotClass;
 use godot::{builtin::Array, obj::Base, prelude::godot_api};
 
-use crate::game::entities::tile::OasisLayoutFlags;
+use crate::util::flags::OasisLayoutFlags;
 use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader};
 
 #[derive(Derivative, Debug, Clone)]

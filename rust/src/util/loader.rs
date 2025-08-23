@@ -12,7 +12,8 @@ use toml::de::Error as TomlError;
 use toml::{Table, Value};
 
 use crate::game::components::tile_component::TileComponent;
-use crate::game::entities::tile::{CardinalDirectionFlags, OasisLayoutFlags, Tile};
+use crate::game::entities::tile::Tile;
+use crate::util::flags::{CardinalDirectionFlags, OasisLayoutFlags};
 
 const GAME_CONFIGS_ROOT: &str = "res://config/";
 const GAME_OBJECTS_ROOT: &str = "res://game/objects/";
