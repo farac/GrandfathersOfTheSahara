@@ -407,23 +407,50 @@ treasure_w = "goods:incense"
 [[decks]]
 # 1
 [[decks.deck]]
-is_desert = true
-oasis = []
+is_desert = false
+oasis = ["N | E", "S"]
 treasure_n = "none"
-treasure_e = "none"
+treasure_e = "goods:gems"
 treasure_s = "none"
 treasure_w = "none"
 
 # 2
 [[decks.deck]]
 is_desert = false
-oasis = ["E"]
+oasis = ["S | E"]
 treasure_n = "none"
+treasure_e = "none"
+treasure_s = "goods:myrrh"
+treasure_w = "none"
+
+# 3
+[[decks.deck]]
+is_desert = false
+oasis = ["N | S"]
+treasure_n = "goods:incense"
+treasure_e = "none"
+treasure_s = "rumors"
+treasure_w = "none"
+
+# 4
+[[decks.deck]]
+is_desert = false
+oasis = ["N | W"]
+treasure_n = "rumors"
 treasure_e = "none"
 treasure_s = "none"
 treasure_w = "none"
 
-# 3
+# 5
+[[decks.deck]]
+is_desert = false
+oasis = ["N | E | S"]
+treasure_n = "goods:gems"
+treasure_e = "none"
+treasure_s = "goods:salt"
+treasure_w = "none"
+
+# 6
 [[decks.deck]]
 is_desert = false
 oasis = ["S"]
@@ -432,36 +459,9 @@ treasure_e = "none"
 treasure_s = "rumors"
 treasure_w = "none"
 
-# 4
-[[decks.deck]]
-is_desert = false
-oasis = []
-treasure_n = "none"
-treasure_e = "none"
-treasure_s = "none"
-treasure_w = "none"
-
-# 5
-[[decks.deck]]
-is_desert = false
-oasis = []
-treasure_n = "none"
-treasure_e = "none"
-treasure_s = "none"
-treasure_w = "none"
-
-# 6
-[[decks.deck]]
-is_desert = false
-oasis = []
-treasure_n = "none"
-treasure_e = "none"
-treasure_s = "none"
-treasure_w = "none"
-
 # 7
 [[decks.deck]]
-is_desert = false
+is_desert = true
 oasis = []
 treasure_n = "none"
 treasure_e = "none"
@@ -471,7 +471,7 @@ treasure_w = "none"
 # 8
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["N"]
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -480,7 +480,7 @@ treasure_w = "none"
 # 9
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["E"]
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -489,33 +489,33 @@ treasure_w = "none"
 # 10
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
-treasure_e = "none"
+oasis = ["N | W"]
+treasure_n = "camels"
+treasure_e = "goods:incense"
 treasure_s = "none"
 treasure_w = "none"
 
 # 11
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "water"
 treasure_w = "none"
 
 # 12
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["W | S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
-treasure_w = "none"
+treasure_s = "camels"
+treasure_w = "double_water"
 
 # 13
 [[decks.deck]]
-is_desert = false
+is_desert = true
 oasis = []
 treasure_n = "none"
 treasure_e = "none"
@@ -525,26 +525,26 @@ treasure_w = "none"
 # 14
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["W", "E"]
 treasure_n = "none"
-treasure_e = "none"
+treasure_e = "water"
 treasure_s = "none"
 treasure_w = "none"
 
 # 15
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | W", "S | E"]
+treasure_n = "rumors"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "double_water"
 treasure_w = "none"
 
 # 16
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | S"]
+treasure_n = "goods:salt"
 treasure_e = "none"
 treasure_s = "none"
 treasure_w = "none"
@@ -552,10 +552,10 @@ treasure_w = "none"
 # 17
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | E | S"]
+treasure_n = "goods:myrrh"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "camels"
 treasure_w = "none"
 
 
@@ -564,15 +564,15 @@ treasure_w = "none"
 # 1
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | W", "E"]
+treasure_n = "goods:myrrh"
 treasure_e = "none"
 treasure_s = "none"
 treasure_w = "none"
 
 # 2
 [[decks.deck]]
-is_desert = false
+is_desert = true
 oasis = []
 treasure_n = "none"
 treasure_e = "none"
@@ -582,8 +582,8 @@ treasure_w = "none"
 # 3
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | W"]
+treasure_n = "goods:incense"
 treasure_e = "none"
 treasure_s = "none"
 treasure_w = "none"
@@ -591,43 +591,43 @@ treasure_w = "none"
 # 4
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["S | W"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "goods:myrrh"
 treasure_w = "none"
 
 # 5
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["W | S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "goods:gems"
 treasure_w = "none"
 
 # 6
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "rumors"
 treasure_w = "none"
 
 # 7
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["E"]
 treasure_n = "none"
-treasure_e = "none"
+treasure_e = "water"
 treasure_s = "none"
 treasure_w = "none"
 
 # 8
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["N"]
 treasure_n = "none"
 treasure_e = "none"
 treasure_s = "none"
@@ -636,17 +636,17 @@ treasure_w = "none"
 # 9
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | E | S | W"]
+treasure_n = "camels"
 treasure_e = "none"
-treasure_s = "none"
-treasure_w = "none"
+treasure_s = "goods:salt"
+treasure_w = "double_water"
 
 # 10
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | S"]
+treasure_n = "rumors"
 treasure_e = "none"
 treasure_s = "none"
 treasure_w = "none"
@@ -654,15 +654,15 @@ treasure_w = "none"
 # 11
 [[decks.deck]]
 is_desert = false
-oasis = []
-treasure_n = "none"
+oasis = ["N | W | S"]
+treasure_n = "goods:salt"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "goods:gems"
 treasure_w = "none"
 
 # 12
 [[decks.deck]]
-is_desert = false
+is_desert = true
 oasis = []
 treasure_n = "none"
 treasure_e = "none"
@@ -672,15 +672,15 @@ treasure_w = "none"
 # 13
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["E | S"]
 treasure_n = "none"
-treasure_e = "none"
+treasure_e = "goods:incense"
 treasure_s = "none"
 treasure_w = "none"
 
 # 14
 [[decks.deck]]
-is_desert = false
+is_desert = true
 oasis = []
 treasure_n = "none"
 treasure_e = "none"
@@ -690,28 +690,28 @@ treasure_w = "none"
 # 15
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["N | S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "water"
 treasure_w = "none"
 
 # 16
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["N | S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "water"
 treasure_w = "none"
 
 # 17
 [[decks.deck]]
 is_desert = false
-oasis = []
+oasis = ["S"]
 treasure_n = "none"
 treasure_e = "none"
-treasure_s = "none"
+treasure_s = "water"
 treasure_w = "none"
 
 
