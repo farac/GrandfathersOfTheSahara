@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use std::num::TryFromIntError;
 
-use godot::{global::godot_print, obj::WithBaseField, prelude::godot_api};
+use godot::{obj::WithBaseField, prelude::godot_api};
 use thiserror::Error;
 
-use crate::game::entities::tile::Tile;
+use crate::{game::entities::tile::Tile, util::Logger};
 use godot::{
     classes::Node,
     obj::{Base, Gd, InstanceId},
@@ -52,10 +52,10 @@ impl EntityManager {
             EntityScope::Global => todo!(),
             EntityScope::Running => {
                 self.running.push(Some(instance_id));
-                godot_print!(
+                Logger::debug(format!(
                     "Registered instance id {instance_id:?} with entity id {}",
                     self.running.len()
-                );
+                ));
                 self.running.len() as u64
             }
         }
@@ -64,10 +64,10 @@ impl EntityManager {
         match scope {
             EntityScope::Global => todo!(),
             EntityScope::Running => {
-                godot_print!(
+                Logger::debug(format!(
                     "Got instance id {:?} for entity id {id}",
                     self.running[(id - 1) as usize],
-                );
+                ));
 
                 self.running[(id - 1) as usize]
             }
@@ -169,7 +169,7 @@ impl BoardComponent {
         self.placed_tiles[x as usize][y as usize] = id;
         self.tile_coordinates.insert(id, (x as usize, y as usize));
 
-        godot_print!("Placed tile {id} at {x}, {y}");
+        Logger::debug(format!("Placed tile {id} at {x}, {y}"));
 
         Ok(())
     }

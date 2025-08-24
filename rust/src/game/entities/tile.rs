@@ -1,34 +1,16 @@
-use crate::game::components::hover_outline::CollisionOutline;
-use crate::game::components::tile_component::TileComponent;
-use crate::game::components::tile_component::TileData;
-use crate::game::entities::treasure::Treasure;
-use crate::game::entities::treasure::TreasureKind;
-use crate::game::entities::BoardComponent;
-use crate::game::entities::Entity;
-use crate::game::entities::EntityManager;
-use crate::game::entities::EntityScope;
-use crate::util::flags::CardinalDirection;
-use crate::util::flags::CardinalDirectionFlags;
-use crate::util::flags::DIRECTIONS;
+use crate::game::components::{
+    hover_outline::CollisionOutline, tile_component::TileComponent, tile_component::TileData,
+};
+use crate::game::entities::treasure::{Treasure, TreasureKind};
+use crate::game::entities::{BoardComponent, Entity, EntityManager, EntityScope};
+use crate::util::flags::{CardinalDirection, CardinalDirectionFlags, DIRECTIONS};
 use crate::util::input::InputActions;
-use crate::util::loader::GameConfig;
-use crate::util::loader::TileConfig;
-use crate::util::loader::TilesetConfig;
-use crate::util::loader::TomlLoader;
-use crate::util::loader::CROSS_IDS;
-use godot::builtin::Array;
-use godot::builtin::Color;
-use godot::builtin::GString;
-use godot::builtin::Vector2;
-use godot::classes::INode2D;
+use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader, CROSS_IDS};
+use godot::builtin::{Array, Color, GString, Vector2};
 
-use godot::classes::Input;
-use godot::classes::Line2D;
-use godot::classes::Node2D;
+use godot::classes::{INode2D, Input, Line2D, Node2D};
 use godot::global::godot_error;
-use godot::obj::Gd;
-use godot::obj::InstanceId;
-use godot::obj::WithBaseField;
+use godot::obj::{Gd, InstanceId, WithBaseField};
 use godot::{
     classes::Sprite2D,
     obj::Base,
