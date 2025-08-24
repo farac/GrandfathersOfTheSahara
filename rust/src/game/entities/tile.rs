@@ -6,6 +6,7 @@ use crate::game::entities::{BoardComponent, Entity, EntityManager, EntityScope};
 use crate::util::flags::{CardinalDirection, CardinalDirectionFlags, DIRECTIONS};
 use crate::util::input::InputActions;
 use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader, CROSS_IDS};
+use crate::util::Logger;
 use godot::builtin::{Array, Color, GString, Vector2};
 
 use godot::classes::{INode2D, Input, Line2D, Node2D};
@@ -133,6 +134,7 @@ impl Tile {
     }
     pub fn set_active(&mut self) {
         self.is_active = true;
+        self.disable_all_collisions();
     }
     pub fn place_at(
         &mut self,
@@ -140,7 +142,7 @@ impl Tile {
         position: Vector2,
         coordinates: (u8, u8),
     ) -> Vector2 {
-        // TODO: A low of hacks here with enabling and disabling collisions instead of just setting
+        // TODO: A lot of hacks here with enabling and disabling collisions instead of just setting
         // a sensible default state and flipping only the ones we need. Just prototyping
         self.enable_all_collisions();
 
@@ -451,36 +453,13 @@ impl INode2D for Tile {
             let collision_side: Vec<CardinalDirection> =
                 CardinalDirectionFlags::from_bits_truncate(collision.bind().side).into();
 
-            let placement_is_legal;
+            let mut placement_is_legal = None;
             let mut placement_coordinates: (i32, i32) = (0, 0);
 
-            {
+            'placement_calculation: {
                 let mut collision = collision.bind_mut();
                 let gd_collided_tile = collision.get_tile();
                 let collided_tile = gd_collided_tile.bind();
-                let collided_tile_component = collided_tile.get_tile_component();
-
-                let gd_tile_component = self.get_tile_component();
-                let tile_component = gd_tile_component.bind();
-
-                let oasis_connection_sides: CardinalDirectionFlags =
-                    collided_tile_component.bind().oasis_layout.clone().into();
-                let tile_connection_sides: CardinalDirectionFlags =
-                    tile_component.oasis_layout.clone().into();
-
-                let connection_side = CardinalDirectionFlags::from(collision_side[0].clone());
-                let tile_connection_side =
-                    CardinalDirectionFlags::from(collision_side[0].clone().invert());
-                let connection_is_oasis = oasis_connection_sides.contains(connection_side);
-                let tile_connection_is_oasis = tile_connection_sides.contains(tile_connection_side);
-
-                placement_is_legal = connection_is_oasis == tile_connection_is_oasis;
-
-                if !placement_is_legal {
-                    collision.forbid_outline();
-                } else {
-                    collision.allow_outline();
-                }
 
                 let gd_board_component = BoardComponent::get(&self.base());
                 let board_component = gd_board_component.bind();
@@ -498,12 +477,124 @@ impl INode2D for Tile {
                         placement_coordinates = (x + direction_offset.0, y + direction_offset.1);
                     }
                     Err(error) => {
-                        godot_error!("{error:?}");
+                        Logger::error(&format!("{error:?}"));
                     }
+                }
+
+                if placement_coordinates.0 > 10
+                    || placement_coordinates.1 > 10
+                    || placement_coordinates.0 < 0
+                    || placement_coordinates.1 < 0
+                {
+                    placement_is_legal = Some(false);
+
+                    break 'placement_calculation;
+                }
+
+                let mut adjacent_tiles: Vec<Option<Gd<Tile>>> = vec![];
+
+                let mut coordinate_offset = CardinalDirection::N.get_coordinate_offset();
+                let mut adjacent_coordinates = (
+                    (placement_coordinates.0 + coordinate_offset.0) as u8,
+                    (placement_coordinates.1 + coordinate_offset.1) as u8,
+                );
+
+                if let Ok(t) =
+                    board_component.get_tile_at(adjacent_coordinates.0, adjacent_coordinates.1)
+                {
+                    adjacent_tiles.push(Some(t))
+                } else {
+                    adjacent_tiles.push(None)
+                }
+
+                coordinate_offset = CardinalDirection::E.get_coordinate_offset();
+                adjacent_coordinates = (
+                    (placement_coordinates.0 + coordinate_offset.0) as u8,
+                    (placement_coordinates.1 + coordinate_offset.1) as u8,
+                );
+
+                if let Ok(t) =
+                    board_component.get_tile_at(adjacent_coordinates.0, adjacent_coordinates.1)
+                {
+                    adjacent_tiles.push(Some(t))
+                } else {
+                    adjacent_tiles.push(None)
+                }
+
+                coordinate_offset = CardinalDirection::S.get_coordinate_offset();
+                adjacent_coordinates = (
+                    (placement_coordinates.0 + coordinate_offset.0) as u8,
+                    (placement_coordinates.1 + coordinate_offset.1) as u8,
+                );
+
+                if let Ok(t) =
+                    board_component.get_tile_at(adjacent_coordinates.0, adjacent_coordinates.1)
+                {
+                    adjacent_tiles.push(Some(t))
+                } else {
+                    adjacent_tiles.push(None)
+                }
+
+                coordinate_offset = CardinalDirection::W.get_coordinate_offset();
+                adjacent_coordinates = (
+                    (placement_coordinates.0 + coordinate_offset.0) as u8,
+                    (placement_coordinates.1 + coordinate_offset.1) as u8,
+                );
+
+                if let Ok(t) =
+                    board_component.get_tile_at(adjacent_coordinates.0, adjacent_coordinates.1)
+                {
+                    adjacent_tiles.push(Some(t))
+                } else {
+                    adjacent_tiles.push(None)
+                }
+
+                let gd_tile_component = self.get_tile_component();
+                let this_tile_component = gd_tile_component.bind();
+                let this_oasis_directions: Vec<CardinalDirection> =
+                    CardinalDirectionFlags::from(this_tile_component.oasis_layout.clone()).into();
+
+                for (idx, adjacent_tile) in adjacent_tiles.iter().enumerate() {
+                    let direction = CardinalDirection::from(idx).invert();
+
+                    let is_oasis = if let Some(adjacent_tile) = adjacent_tile {
+                        let gd_adjacent_tile_component = adjacent_tile.bind().get_tile_component();
+                        let adjacent_tile_component = gd_adjacent_tile_component.bind();
+
+                        let adjacent_oasis_directions: Vec<CardinalDirection> =
+                            CardinalDirectionFlags::from(
+                                adjacent_tile_component.oasis_layout.clone(),
+                            )
+                            .into();
+
+                        adjacent_oasis_directions.contains(&direction)
+                    } else {
+                        placement_is_legal = Some(placement_is_legal.unwrap_or(true));
+
+                        continue;
+                    };
+
+                    placement_is_legal = Some(
+                        placement_is_legal.unwrap_or(true)
+                            && if is_oasis {
+                                this_oasis_directions.contains(&direction.invert())
+                            } else {
+                                !this_oasis_directions.contains(&direction.invert())
+                            },
+                    )
+                }
+
+                if !placement_is_legal.unwrap_or(true) {
+                    collision.forbid_outline();
+                } else {
+                    collision.allow_outline();
                 }
             }
 
-            if placement_is_legal && pressed {
+            if placement_is_legal.unwrap_or(true) && pressed {
+                let placement_coordinates =
+                    (placement_coordinates.0 as u8, placement_coordinates.1 as u8);
+
                 if self.active_collisions.len() != 1 {
                     godot_error!("Must have exactly 1 collision to place tile");
                 } else {
@@ -512,9 +603,6 @@ impl INode2D for Tile {
                     let position = collision.get_global_position();
 
                     collision.signals().submitted_at().emit();
-
-                    let placement_coordinates =
-                        (placement_coordinates.0 as u8, placement_coordinates.1 as u8);
 
                     target_position = Some(self.place_at(
                         collision_side[0].clone(),

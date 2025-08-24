@@ -58,6 +58,30 @@ pub enum CardinalDirection {
     W,
 }
 
+impl CardinalDirection {
+    pub fn get_coordinate_offset(&self) -> (i32, i32) {
+        match self {
+            CardinalDirection::N => (0, 1),
+            CardinalDirection::E => (1, 0),
+            CardinalDirection::S => (0, -1),
+            CardinalDirection::W => (-1, 0),
+        }
+    }
+}
+
+impl From<usize> for CardinalDirection {
+    fn from(value: usize) -> Self {
+        match value % 4 {
+            0 => CardinalDirection::N,
+            1 => CardinalDirection::E,
+            2 => CardinalDirection::S,
+            3 => CardinalDirection::W,
+            // It makes no sense to have any other number if we're using mod 4
+            _ => panic!(),
+        }
+    }
+}
+
 impl From<OasisLayoutFlags> for CardinalDirectionFlags {
     fn from(value: OasisLayoutFlags) -> CardinalDirectionFlags {
         let mut acc = CardinalDirectionFlags::empty();

@@ -54,6 +54,11 @@ impl IArea2D for HoverableOutline {
             .signals()
             .mouse_exited()
             .connect_other(&*self, |this| this.hide_outline());
+
+        self.base()
+            .signals()
+            .mouse_exited()
+            .connect_other(&*self, |this| this.enable_collision());
     }
 }
 

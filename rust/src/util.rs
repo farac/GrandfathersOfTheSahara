@@ -47,7 +47,7 @@ pub struct Logger;
 
 impl Logger {
     /// Use `format!()` macro to construct a formatted `output` parameter
-    fn print(level: LogLevel, output: String) {
+    fn print(level: LogLevel, output: &str) {
         let debug = Os::singleton()
             .get_environment("DEBUG")
             .to_string()
@@ -65,13 +65,13 @@ impl Logger {
             LogLevel::Error => godot_error!("{}", output),
         }
     }
-    pub fn debug(message: String) {
+    pub fn debug(message: &str) {
         Self::print(LogLevel::Debug, message)
     }
-    pub fn warn(message: String) {
+    pub fn warn(message: &str) {
         Self::print(LogLevel::Warn, message)
     }
-    pub fn error(message: String) {
+    pub fn error(message: &str) {
         Self::print(LogLevel::Error, message)
     }
 }

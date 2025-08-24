@@ -52,7 +52,7 @@ impl EntityManager {
             EntityScope::Global => todo!(),
             EntityScope::Running => {
                 self.running.push(Some(instance_id));
-                Logger::debug(format!(
+                Logger::debug(&format!(
                     "Registered instance id {instance_id:?} with entity id {}",
                     self.running.len()
                 ));
@@ -64,7 +64,7 @@ impl EntityManager {
         match scope {
             EntityScope::Global => todo!(),
             EntityScope::Running => {
-                Logger::debug(format!(
+                Logger::debug(&format!(
                     "Got instance id {:?} for entity id {id}",
                     self.running[(id - 1) as usize],
                 ));
@@ -125,6 +125,8 @@ pub enum TileAddError {
 
 #[derive(Error, Debug)]
 pub enum TileGetError {
+    #[error("Requested coordinate is out of bounds")]
+    TileCoordinateOutOfBoundsError,
     #[error("Tile does not exist at requested position - x:{0}, y:{1}")]
     TileCoordinateNotFoundError(u8, u8),
     #[error("Tile does not exist with requested id: {0}")]
@@ -169,11 +171,15 @@ impl BoardComponent {
         self.placed_tiles[x as usize][y as usize] = id;
         self.tile_coordinates.insert(id, (x as usize, y as usize));
 
-        Logger::debug(format!("Placed tile {id} at {x}, {y}"));
+        Logger::debug(&format!("Placed tile {id} at {x}, {y}"));
 
         Ok(())
     }
     pub fn get_tile_at(&self, x: u8, y: u8) -> Result<Gd<Tile>, TileGetError> {
+        if x > 10 || y > 10 {
+            return Err(TileGetError::TileCoordinateOutOfBoundsError);
+        }
+
         let id = self.placed_tiles[x as usize][y as usize];
 
         if id == 0 {
