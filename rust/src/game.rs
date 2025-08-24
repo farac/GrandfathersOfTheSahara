@@ -4,6 +4,8 @@ use godot::{
     prelude::GodotClass,
 };
 
+use crate::util::RootWindow;
+
 pub mod components;
 pub mod entities;
 
@@ -15,12 +17,8 @@ pub struct RunningGameScene {
 
 impl RunningGameScene {
     fn get_running_game(node: &Node) -> Gd<RunningGameScene> {
-        let tree = node
-            .get_tree()
-            .expect("Expected node to be part of a tree")
-            .get_root()
-            .expect("Expected tree to have root node");
+        let root = node.get_tree_root();
 
-        tree.get_node_as("./Running")
+        root.get_node_as("./Running")
     }
 }

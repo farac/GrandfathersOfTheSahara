@@ -5,7 +5,7 @@ use godot::{
     prelude::{godot_api, GodotClass},
 };
 
-use crate::game::components::tile_component::TileComponent;
+use crate::game::entities::tile::Tile;
 
 #[derive(Debug, GodotClass)]
 #[class(init, base=Area2D)]
@@ -106,9 +106,13 @@ impl CollisionOutline {
 }
 
 impl CollisionOutline {
-    pub fn get_tile_component(&self) -> Gd<TileComponent> {
+    pub fn get_tile(&self) -> Gd<Tile> {
         self.base()
-            .get_node_as::<TileComponent>("../../TileComponent")
+            .get_parent()
+            .expect("Expected CollisionOutline to have parent")
+            .get_parent()
+            .expect("Expected Collision to have parent")
+            .cast()
     }
     pub fn allow_outline(&mut self) {
         if self.outline_allowed {

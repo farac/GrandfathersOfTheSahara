@@ -14,6 +14,7 @@ use toml::{Table, Value};
 use crate::game::components::tile_component::TileComponent;
 use crate::game::entities::tile::Tile;
 use crate::util::flags::{CardinalDirectionFlags, OasisLayoutFlags};
+use crate::util::RootWindow;
 
 const GAME_CONFIGS_ROOT: &str = "res://config/";
 const GAME_OBJECTS_ROOT: &str = "res://game/objects/";
@@ -443,10 +444,7 @@ pub struct TomlLoader {
 
 impl TomlLoader {
     pub fn get(node: &Node, config: GameConfig) -> Option<Map<String, Value>> {
-        let tree = node
-            .get_tree()
-            .expect("Expected node to be part of a scene tree");
-        let root = tree.get_root().expect("Expected scene tree to have a root");
+        let root = node.get_tree_root();
 
         {
             let gd_loader = root.get_node_as::<TomlLoader>("./GlobalTomlLoader");
@@ -491,10 +489,7 @@ pub struct SceneLoader {
 
 impl SceneLoader {
     pub fn get(node: &Node) -> Gd<SceneLoader> {
-        let tree = node
-            .get_tree()
-            .expect("Expected node to be part of a scene tree");
-        let root = tree.get_root().expect("Expected scene tree to have a root");
+        let root = node.get_tree_root();
 
         root.get_node_as::<SceneLoader>("./GlobalSceneLoader")
     }

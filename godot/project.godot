@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GlobalTomlLoader="*res://config/toml_loader.tscn"
 GlobalSceneLoader="*res://game/scene_loader.tscn"
 GlobalBoardComponent="*res://game/board_component.tscn"
+GlobalEntityManager="*res://game/entity_manager.tscn"
 
 [display]
 

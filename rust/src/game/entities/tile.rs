@@ -1,9 +1,12 @@
-use crate::game::components::board_component::BoardComponent;
 use crate::game::components::hover_outline::CollisionOutline;
 use crate::game::components::tile_component::TileComponent;
 use crate::game::components::tile_component::TileData;
 use crate::game::entities::treasure::Treasure;
 use crate::game::entities::treasure::TreasureKind;
+use crate::game::entities::BoardComponent;
+use crate::game::entities::Entity;
+use crate::game::entities::EntityManager;
+use crate::game::entities::EntityScope;
 use crate::util::flags::CardinalDirection;
 use crate::util::flags::CardinalDirectionFlags;
 use crate::util::flags::DIRECTIONS;
@@ -69,6 +72,9 @@ impl TileCollisionAreas {
 pub struct Tile {
     base: Base<Node2D>,
 
+    #[init(val = 0)]
+    id: u64,
+
     #[init(val = false)]
     is_active: bool,
 
@@ -81,9 +87,9 @@ pub struct Tile {
     #[init(val = 0)]
     outside_connections: u8,
 
+    #[init(val = vec![])]
     // TODO: Replace this with a global manager implemented in code
     active_collisions: Vec<InstanceId>,
-
     #[init(val = 0.)]
     throttle_wheel: f64,
 }
@@ -159,11 +165,7 @@ impl Tile {
         let mut gd_board_component = BoardComponent::get(&self.base());
         let mut board_component = gd_board_component.bind_mut();
 
-        if let Err(error) = board_component.add_tile_at(
-            self.get_tile_component().instance_id(),
-            coordinates.0,
-            coordinates.1,
-        ) {
+        if let Err(error) = board_component.add_tile_at(self.id, coordinates.0, coordinates.1) {
             godot_error!("{error:?}");
         };
 
@@ -272,6 +274,20 @@ impl Tile {
     }
 }
 
+impl Entity for Tile {
+    fn register(&mut self) {
+        let gd_base = self.base();
+        let instance_id = gd_base.instance_id();
+        let mut entity_manager = EntityManager::get_manager(&gd_base);
+
+        let id = entity_manager
+            .bind_mut()
+            .register(instance_id, EntityScope::Running);
+
+        self.id = id;
+    }
+}
+
 #[godot_api]
 impl Tile {
     // TODO: Replace this with a global manager implemented in code
@@ -293,6 +309,8 @@ impl Tile {
 #[godot_api]
 impl INode2D for Tile {
     fn ready(&mut self) {
+        self.register();
+
         let is_cross_tile: bool;
 
         {
@@ -404,9 +422,7 @@ impl INode2D for Tile {
 
             let mut board_component = board_component.bind_mut();
 
-            if let Err(error) =
-                board_component.add_tile_at(self.get_tile_component().instance_id(), x, y)
-            {
+            if let Err(error) = board_component.add_tile_at(self.id, x, y) {
                 godot_error!("{error:?}");
             }
         }
@@ -458,7 +474,9 @@ impl INode2D for Tile {
 
             {
                 let mut collision = collision.bind_mut();
-                let collided_tile_component = collision.get_tile_component();
+                let gd_collided_tile = collision.get_tile();
+                let collided_tile = gd_collided_tile.bind();
+                let collided_tile_component = collided_tile.get_tile_component();
 
                 let gd_tile_component = self.get_tile_component();
                 let tile_component = gd_tile_component.bind();
@@ -482,7 +500,6 @@ impl INode2D for Tile {
                     collision.allow_outline();
                 }
 
-                let collided_instance_id = collided_tile_component.instance_id();
                 let gd_board_component = BoardComponent::get(&self.base());
                 let board_component = gd_board_component.bind();
                 let direction_offset = match collision_side[0] {
@@ -492,7 +509,7 @@ impl INode2D for Tile {
                     CardinalDirection::W => (-1, 0),
                 };
 
-                match board_component.get_tile_coordinates(collided_instance_id) {
+                match board_component.get_tile_coordinates(collided_tile.id) {
                     Ok((x, y)) => {
                         let x = x as i32;
                         let y = y as i32;
