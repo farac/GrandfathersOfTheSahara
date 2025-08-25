@@ -33,12 +33,16 @@ impl HoverableOutline {
     pub fn enable_collision(&mut self) {
         let mut collision_shape: Gd<CollisionShape2D> = self.get_collision_shape();
 
-        collision_shape.set_disabled(false);
+        if collision_shape.is_disabled() {
+            collision_shape.set_disabled(false);
+        }
     }
     pub fn disable_collision(&mut self) {
         let mut collision_shape: Gd<CollisionShape2D> = self.get_collision_shape();
 
-        collision_shape.set_disabled(true);
+        if !collision_shape.is_disabled() {
+            collision_shape.set_disabled(true);
+        }
     }
 }
 
