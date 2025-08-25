@@ -146,12 +146,8 @@ pub struct BoardComponent {
     placed_tiles: [[u64; 11]; 11],
     #[init(val=HashMap::new())]
     tile_coordinates: HashMap<u64, (usize, usize)>,
+    active_tile_deck: u8,
 }
-
-// #[godot_api]
-// impl INode for BoardComponent {
-//     fn process(&mut self, _dt: f64) {}
-// }
 
 #[godot_api]
 impl BoardComponent {

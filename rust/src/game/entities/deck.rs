@@ -8,6 +8,7 @@ use crate::game::components::tile_component::{
     NextTileData, NextTileDataRemaining, TileComponent, TileDeckComponent,
 };
 use crate::game::entities::tile::Tile;
+use crate::game::entities::BoardComponent;
 use crate::game::RunningGameScene;
 use crate::util::loader::SceneLoader;
 
@@ -63,6 +64,12 @@ impl TileDeck {
 impl TileDeck {
     #[func]
     fn get_next_tile(&mut self) {
+        let /* mut */ board_component = BoardComponent::get(&self.to_gd());
+
+        if board_component.bind().active_tile_deck != self.deck_index {
+            return;
+        }
+
         let mut gd_tile_deck_component = self.get_tile_deck_component();
         let next_tile: Option<NextTileDataRemaining>;
 
