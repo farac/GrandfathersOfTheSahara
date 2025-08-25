@@ -64,7 +64,7 @@ impl TileDeck {
 impl TileDeck {
     #[func]
     fn get_next_tile(&mut self) {
-        let /* mut */ board_component = BoardComponent::get(&self.to_gd());
+        let mut board_component = BoardComponent::get(&self.to_gd());
 
         if board_component.bind().active_tile_deck != self.deck_index {
             return;
@@ -79,6 +79,8 @@ impl TileDeck {
 
         if let Some(tile) = next_tile.map(|nt| TileComponent::from_tile_data(nt.0)) {
             self.spawn_new_tile(tile)
+        } else {
+            board_component.bind_mut().active_tile_deck += 1;
         }
     }
     fn get_tile_deck_component(&self) -> Gd<TileDeckComponent> {
