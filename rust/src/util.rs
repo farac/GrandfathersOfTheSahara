@@ -58,11 +58,11 @@ impl Logger {
         match level {
             LogLevel::Debug => {
                 if debug {
-                    godot_print!("{}", output)
+                    godot_print!("[DEBUG]: {}", output)
                 }
             }
-            LogLevel::Warn => godot_warn!("{}", output),
-            LogLevel::Error => godot_error!("{}", output),
+            LogLevel::Warn => godot_warn!("[WARN]: {}", output),
+            LogLevel::Error => godot_error!("[ERROR]: {}", output),
         }
     }
     pub fn debug(message: &str) {

@@ -28,18 +28,21 @@ bitflags! {
         const E1 = CardinalDirectionFlags::E.bits() as u16;
         const S1 = CardinalDirectionFlags::S.bits() as u16;
         const W1 = CardinalDirectionFlags::W.bits() as u16;
+
         const N2 = (CardinalDirectionFlags::N.bits() as u16) << 4;
         const E2 = (CardinalDirectionFlags::E.bits() as u16) << 4;
         const S2 = (CardinalDirectionFlags::S.bits() as u16) << 4;
         const W2 = (CardinalDirectionFlags::W.bits() as u16) << 4;
-        const N3 = (CardinalDirectionFlags::N.bits() as u16) << 8;
-        const E3 = (CardinalDirectionFlags::E.bits() as u16) << 8;
-        const S3 = (CardinalDirectionFlags::S.bits() as u16) << 8;
-        const W3 = (CardinalDirectionFlags::W.bits() as u16) << 8;
-        const N4 = (CardinalDirectionFlags::N.bits() as u16) << 12;
-        const E4 = (CardinalDirectionFlags::E.bits() as u16) << 12;
-        const S4 = (CardinalDirectionFlags::S.bits() as u16) << 12;
-        const W4 = (CardinalDirectionFlags::W.bits() as u16) << 12;
+
+        const N3 = (CardinalDirectionFlags::N.bits() as u16) << (2 * 4);
+        const E3 = (CardinalDirectionFlags::E.bits() as u16) << (2 * 4);
+        const S3 = (CardinalDirectionFlags::S.bits() as u16) << (2 * 4);
+        const W3 = (CardinalDirectionFlags::W.bits() as u16) << (2 * 4);
+
+        const N4 = (CardinalDirectionFlags::N.bits() as u16) << (3 * 4);
+        const E4 = (CardinalDirectionFlags::E.bits() as u16) << (3 * 4);
+        const S4 = (CardinalDirectionFlags::S.bits() as u16) << (3 * 4);
+        const W4 = (CardinalDirectionFlags::W.bits() as u16) << (3 * 4);
     }
 }
 
@@ -154,5 +157,32 @@ impl From<&CardinalDirection> for CardinalDirectionFlags {
             CardinalDirection::S => CardinalDirectionFlags::S,
             CardinalDirection::W => CardinalDirectionFlags::W,
         }
+    }
+}
+
+pub const OASIS_CONNECTION_LABELS: [&str; 6] =
+    ["N | W", "N | E", "S | W", "S | E", "E | W", "N | S"];
+const OASIS_CONNECTION_FLAGS: [CardinalDirectionFlags; 6] = [
+    CardinalDirectionFlags::N.union(CardinalDirectionFlags::W),
+    CardinalDirectionFlags::N.union(CardinalDirectionFlags::E),
+    CardinalDirectionFlags::S.union(CardinalDirectionFlags::W),
+    CardinalDirectionFlags::S.union(CardinalDirectionFlags::E),
+    CardinalDirectionFlags::E.union(CardinalDirectionFlags::W),
+    CardinalDirectionFlags::N.union(CardinalDirectionFlags::S),
+];
+
+impl From<CardinalDirectionFlags> for Vec<&str> {
+    fn from(value: CardinalDirectionFlags) -> Self {
+        OASIS_CONNECTION_FLAGS
+            .into_iter()
+            .enumerate()
+            .flat_map(|(idx, connection)| {
+                if value.contains(connection) {
+                    Some(OASIS_CONNECTION_LABELS[idx])
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }

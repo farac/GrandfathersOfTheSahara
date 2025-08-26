@@ -3,7 +3,9 @@ use crate::game::components::{
 };
 use crate::game::entities::treasure::{Treasure, TreasureKind};
 use crate::game::entities::{BoardComponent, Entity, EntityManager, EntityScope};
-use crate::util::flags::{CardinalDirection, CardinalDirectionFlags, DIRECTIONS};
+use crate::util::flags::{
+    CardinalDirection, CardinalDirectionFlags, DIRECTIONS, OASIS_CONNECTION_LABELS,
+};
 use crate::util::input::InputActions;
 use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader, CROSS_IDS};
 use crate::util::Logger;
@@ -78,6 +80,17 @@ pub struct Tile {
 }
 
 impl Tile {
+    fn hide_all_connections(&self) {
+        for connection in OASIS_CONNECTION_LABELS {
+            let mut connection = self.get_connection_at(connection);
+
+            connection.set_visible(false);
+        }
+    }
+    fn get_connection_at(&self, id: &str) -> Gd<Node2D> {
+        self.base()
+            .get_node_as::<Node2D>(&format!("./Connections/{}", id))
+    }
     fn get_tile_component(&self) -> Gd<TileComponent> {
         self.base().get_node_as::<TileComponent>("./TileComponent")
     }
@@ -185,17 +198,25 @@ impl Tile {
             .bind()
             .get_collision_area_at_direction(direction)
     }
-    pub fn refresh_state(&mut self) {
+    pub fn refresh_display_state(&mut self) {
         let gd_tile_components = self.get_tile_component();
         let tile_components = gd_tile_components.bind();
 
         let mut enable_oasis: CardinalDirectionFlags = CardinalDirectionFlags::empty();
 
+        let mut connections: Vec<&str> = vec![];
+
         for oasis_idx in 0..4 {
             let flag = (tile_components.oasis_layout.bits() >> (oasis_idx * 4)) as u8;
+            let direction_flags = CardinalDirectionFlags::from_bits_truncate(flag);
 
-            let directions: Vec<CardinalDirection> =
-                CardinalDirectionFlags::from_bits_truncate(flag).into();
+            let directions: Vec<CardinalDirection> = direction_flags.clone().into();
+
+            let oasis_connections: Vec<&str> = direction_flags.into();
+
+            for connection in oasis_connections {
+                connections.push(connection);
+            }
 
             for (direction_idx, direction) in DIRECTIONS.iter().enumerate() {
                 if directions.contains(direction) {
@@ -224,6 +245,16 @@ impl Tile {
 
                 treasure.kind = treasure_kind;
             }
+        }
+
+        self.hide_all_connections();
+
+        Logger::debug(&format!("{:?}", &connections));
+
+        for connection in connections {
+            let mut connection = self.get_connection_at(connection);
+
+            connection.set_visible(true);
         }
 
         let disable_oasis: CardinalDirectionFlags = enable_oasis.clone().complement();
@@ -374,7 +405,7 @@ impl INode2D for Tile {
 
         self.show_desert_icon_if_not_cross(true);
 
-        self.refresh_state();
+        self.refresh_display_state();
 
         let collision_areas = self.get_collision_areas();
 
@@ -437,7 +468,7 @@ impl INode2D for Tile {
                 }
             }
 
-            self.refresh_state();
+            self.refresh_display_state();
         } else if self.throttle_wheel >= 256. {
             self.throttle_wheel = 0.;
         } else if self.throttle_wheel > 0. {
@@ -614,7 +645,7 @@ impl INode2D for Tile {
                     base.set_scale(Vector2::from_tuple((0.2, 0.2)))
                 }
 
-                self.refresh_state();
+                self.refresh_display_state();
             }
         }
 

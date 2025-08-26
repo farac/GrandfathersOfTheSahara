@@ -35,6 +35,133 @@ position = Vector2(0, 250)
 side = 8
 rotation = 1.5708
 
+[node name="Connections" type="Node2D" parent="."]
+
+[node name="N | W" type="Node2D" parent="Connections"]
+visible = false
+position = Vector2(65, 75)
+rotation = 0.785398
+scale = Vector2(1.25, 2.5)
+
+[node name="OasisBackground" type="ColorRect" parent="Connections/N | W"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="N | E" type="Node2D" parent="Connections"]
+visible = false
+position = Vector2(185, 75)
+rotation = -0.785398
+scale = Vector2(1.25, 2.5)
+
+[node name="OasisBackground" type="ColorRect" parent="Connections/N | E"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="S | W" type="Node2D" parent="Connections"]
+visible = false
+position = Vector2(65, 175)
+rotation = -0.785398
+scale = Vector2(1.25, 2.5)
+
+[node name="OasisBackground" type="ColorRect" parent="Connections/S | W"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="S | E" type="Node2D" parent="Connections"]
+visible = false
+position = Vector2(185, 175)
+rotation = 0.785398
+scale = Vector2(1.25, 2.5)
+
+[node name="OasisBackground" type="ColorRect" parent="Connections/S | E"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="E | W" type="Node2D" parent="Connections"]
+visible = false
+position = Vector2(125, 125)
+rotation = 1.5708
+scale = Vector2(1.25, 2.5)
+
+[node name="OasisBackground" type="ColorRect" parent="Connections/E | W"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="N | S" type="Node2D" parent="Connections"]
+visible = false
+position = Vector2(125, 125)
+scale = Vector2(1.25, 2.5)
+
+[node name="OasisBackground" type="ColorRect" parent="Connections/N | S"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
 [node name="Layout" type="VBoxContainer" parent="."]
 offset_right = 250.0
 offset_bottom = 250.0
