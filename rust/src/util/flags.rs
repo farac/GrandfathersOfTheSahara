@@ -10,6 +10,21 @@ bitflags! {
     }
 }
 
+impl CardinalDirectionFlags {
+    fn rotate_left(&self, amount: u32) -> CardinalDirectionFlags {
+        let rotated_u8 = self.bits().rotate_left(amount);
+        let upper_half = rotated_u8 >> 4;
+
+        CardinalDirectionFlags::from_bits_truncate(upper_half + rotated_u8)
+    }
+    fn rotate_right(&self, amount: u32) -> CardinalDirectionFlags {
+        let rotated_u8 = self.bits().rotate_right(amount);
+        let upper_half = rotated_u8 >> 4;
+
+        CardinalDirectionFlags::from_bits_truncate(upper_half + rotated_u8)
+    }
+}
+
 impl From<CardinalDirection> for CardinalDirectionFlags {
     fn from(value: CardinalDirection) -> Self {
         match value {
@@ -50,6 +65,42 @@ impl OasisLayoutFlags {
     pub fn from_cardinal_direction_flags(f: &CardinalDirectionFlags, idx: u8) -> Self {
         let bits = (f.bits() as u16) << (4 * idx);
         OasisLayoutFlags::from_bits_truncate(bits)
+    }
+    fn to_chunks(&self) -> Vec<CardinalDirectionFlags> {
+        let mut flags = self.bits();
+        let mut vec_flags = vec![];
+        let mut idx = 0;
+
+        while flags > 0 {
+            flags >>= 4 * idx;
+
+            vec_flags.push(CardinalDirectionFlags::from_bits_truncate(flags as u8));
+            idx += 1;
+        }
+
+        vec_flags
+    }
+    pub fn rotate_right(&self, amount: u32) -> Self {
+        let chunks: Vec<CardinalDirectionFlags> = self.to_chunks();
+
+        OasisLayoutFlags::from_bits_truncate(
+            chunks
+                .iter()
+                .enumerate()
+                .map(|(idx, f)| f.rotate_right(amount).bits().wrapping_shl(4 * idx as u32))
+                .fold(0, |acc, f| acc + (f as u16)),
+        )
+    }
+    pub fn rotate_left(&self, amount: u32) -> Self {
+        let chunks: Vec<CardinalDirectionFlags> = self.to_chunks();
+
+        OasisLayoutFlags::from_bits_truncate(
+            chunks
+                .iter()
+                .enumerate()
+                .map(|(idx, f)| f.rotate_left(amount).bits().wrapping_shl(4 * idx as u32))
+                .fold(0, |acc, f| acc + (f as u16)),
+        )
     }
 }
 

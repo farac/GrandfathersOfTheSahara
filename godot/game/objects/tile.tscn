@@ -38,10 +38,7 @@ rotation = 1.5708
 [node name="Connections" type="Node2D" parent="."]
 
 [node name="N | W" type="Node2D" parent="Connections"]
-visible = false
-position = Vector2(65, 75)
-rotation = 0.785398
-scale = Vector2(1.25, 2.5)
+position = Vector2(70, 75)
 
 [node name="OasisBackground" type="ColorRect" parent="Connections/N | W"]
 anchors_preset = 8
@@ -49,20 +46,35 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -25.0
-offset_top = -25.0
-offset_right = 25.0
-offset_bottom = 25.0
+offset_left = 25.0
+offset_top = -75.0
+offset_right = 75.0
+offset_bottom = 5.0
 grow_horizontal = 2
 grow_vertical = 2
+rotation = 0.610865
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="OasisBackground2" type="ColorRect" parent="Connections/N | W"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -22.0
+offset_right = 42.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.959931
 mouse_filter = 2
 color = Color(0, 0.439155, 0.297465, 1)
 
 [node name="N | E" type="Node2D" parent="Connections"]
-visible = false
-position = Vector2(185, 75)
-rotation = -0.785398
-scale = Vector2(1.25, 2.5)
+position = Vector2(180, 70)
+rotation = 1.5708
 
 [node name="OasisBackground" type="ColorRect" parent="Connections/N | E"]
 anchors_preset = 8
@@ -70,20 +82,35 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -25.0
-offset_top = -25.0
-offset_right = 25.0
-offset_bottom = 25.0
+offset_left = 24.0
+offset_top = -69.0
+offset_right = 71.0
+offset_bottom = 5.0
 grow_horizontal = 2
 grow_vertical = 2
+rotation = 0.610865
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="OasisBackground2" type="ColorRect" parent="Connections/N | E"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -22.0
+offset_right = 42.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.959931
 mouse_filter = 2
 color = Color(0, 0.439155, 0.297465, 1)
 
 [node name="S | W" type="Node2D" parent="Connections"]
-visible = false
-position = Vector2(65, 175)
-rotation = -0.785398
-scale = Vector2(1.25, 2.5)
+position = Vector2(75, 180)
+rotation = -1.5708
 
 [node name="OasisBackground" type="ColorRect" parent="Connections/S | W"]
 anchors_preset = 8
@@ -91,20 +118,36 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -25.0
-offset_top = -25.0
-offset_right = 25.0
-offset_bottom = 25.0
+offset_left = 25.0
+offset_top = -75.0
+offset_right = 75.0
+offset_bottom = 5.0
 grow_horizontal = 2
 grow_vertical = 2
+rotation = 0.610865
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="OasisBackground2" type="ColorRect" parent="Connections/S | W"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -22.0
+offset_right = 42.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.959931
 mouse_filter = 2
 color = Color(0, 0.439155, 0.297465, 1)
 
 [node name="S | E" type="Node2D" parent="Connections"]
-visible = false
 position = Vector2(185, 175)
-rotation = 0.785398
-scale = Vector2(1.25, 2.5)
+rotation = 3.14159
+scale = Vector2(1, 1)
 
 [node name="OasisBackground" type="ColorRect" parent="Connections/S | E"]
 anchors_preset = 8
@@ -112,17 +155,33 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -25.0
-offset_top = -25.0
-offset_right = 25.0
-offset_bottom = 25.0
+offset_left = 25.0
+offset_top = -75.0
+offset_right = 75.0
+offset_bottom = 5.0
 grow_horizontal = 2
 grow_vertical = 2
+rotation = 0.610865
+mouse_filter = 2
+color = Color(0, 0.439155, 0.297465, 1)
+
+[node name="OasisBackground2" type="ColorRect" parent="Connections/S | E"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -22.0
+offset_right = 42.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 0.959931
 mouse_filter = 2
 color = Color(0, 0.439155, 0.297465, 1)
 
 [node name="E | W" type="Node2D" parent="Connections"]
-visible = false
 position = Vector2(125, 125)
 rotation = 1.5708
 scale = Vector2(1.25, 2.5)
@@ -141,9 +200,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0.439155, 0.297465, 1)
+metadata/_edit_use_anchors_ = true
 
 [node name="N | S" type="Node2D" parent="Connections"]
-visible = false
 position = Vector2(125, 125)
 scale = Vector2(1.25, 2.5)
 
@@ -163,8 +222,10 @@ mouse_filter = 2
 color = Color(0, 0.439155, 0.297465, 1)
 
 [node name="Layout" type="VBoxContainer" parent="."]
-offset_right = 250.0
-offset_bottom = 250.0
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 255.0
+offset_bottom = 255.0
 
 [node name="N" type="CenterContainer" parent="Layout"]
 layout_mode = 2
@@ -172,7 +233,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 2
 
 [node name="Treasure" parent="Layout/N" instance=ExtResource("1_55kvv")]
-position = Vector2(0, 40)
+position = Vector2(0, 35)
 
 [node name="W" type="CenterContainer" parent="Layout"]
 layout_mode = 2
@@ -180,7 +241,7 @@ size_flags_horizontal = 2
 size_flags_vertical = 4
 
 [node name="Treasure" parent="Layout/W" instance=ExtResource("1_55kvv")]
-position = Vector2(40, 0)
+position = Vector2(35, 0)
 
 [node name="C" type="CenterContainer" parent="Layout"]
 layout_mode = 2
@@ -197,7 +258,7 @@ size_flags_horizontal = 10
 size_flags_vertical = 4
 
 [node name="Treasure" parent="Layout/E" instance=ExtResource("1_55kvv")]
-position = Vector2(-40, 0)
+position = Vector2(-35, 0)
 
 [node name="S" type="CenterContainer" parent="Layout"]
 layout_mode = 2
@@ -205,7 +266,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 10
 
 [node name="Treasure" parent="Layout/S" instance=ExtResource("1_55kvv")]
-position = Vector2(0, -40)
+position = Vector2(0, -35)
 
 [node name="Paths" type="Control" parent="."]
 layout_mode = 3

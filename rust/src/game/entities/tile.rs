@@ -26,6 +26,15 @@ pub struct TileCollisionAreas {
     base: Base<Node2D>,
 }
 
+fn calculate_direction_offset_for_side(direction: &CardinalDirection) -> (i32, i32) {
+    match direction {
+        CardinalDirection::N => (0, 1),
+        CardinalDirection::E => (1, 0),
+        CardinalDirection::S => (0, -1),
+        CardinalDirection::W => (-1, 0),
+    }
+}
+
 impl TileCollisionAreas {
     fn get_collision_outlines(&self) -> [Gd<CollisionOutline>; 4] {
         let base = self.base();
@@ -154,6 +163,7 @@ impl Tile {
         direction: CardinalDirection,
         position: Vector2,
         coordinates: (u8, u8),
+        adjacent_tiles: Vec<Option<Gd<Tile>>>,
     ) -> Vector2 {
         // TODO: A lot of hacks here with enabling and disabling collisions instead of just setting
         // a sensible default state and flipping only the ones we need. Just prototyping
@@ -180,6 +190,9 @@ impl Tile {
         let mut collision_area = gd_collision_area.bind_mut();
 
         collision_area.disable_collision();
+
+        // TODO: Disable collisions on adjacent tiles
+        for _tile in adjacent_tiles {}
 
         self.is_active = false;
 
@@ -248,8 +261,6 @@ impl Tile {
         }
 
         self.hide_all_connections();
-
-        Logger::debug(&format!("{:?}", &connections));
 
         for connection in connections {
             let mut connection = self.get_connection_at(connection);
@@ -487,6 +498,9 @@ impl INode2D for Tile {
             let mut placement_is_legal = None;
             let mut placement_coordinates: (i32, i32) = (0, 0);
 
+            let mut adjacent_tiles: Vec<Option<Gd<Tile>>> = vec![];
+            let adjacent_direction_offset = calculate_direction_offset_for_side(&collision_side[0]);
+
             'placement_calculation: {
                 let mut collision = collision.bind_mut();
                 let gd_collided_tile = collision.get_tile();
@@ -494,18 +508,15 @@ impl INode2D for Tile {
 
                 let gd_board_component = BoardComponent::get(&self.base());
                 let board_component = gd_board_component.bind();
-                let direction_offset = match collision_side[0] {
-                    CardinalDirection::N => (0, 1),
-                    CardinalDirection::E => (1, 0),
-                    CardinalDirection::S => (0, -1),
-                    CardinalDirection::W => (-1, 0),
-                };
 
                 match board_component.get_tile_coordinates(collided_tile.id) {
                     Ok((x, y)) => {
                         let x = x as i32;
                         let y = y as i32;
-                        placement_coordinates = (x + direction_offset.0, y + direction_offset.1);
+                        placement_coordinates = (
+                            x + adjacent_direction_offset.0,
+                            y + adjacent_direction_offset.1,
+                        );
                     }
                     Err(error) => {
                         Logger::error(&format!("{error:?}"));
@@ -521,8 +532,6 @@ impl INode2D for Tile {
 
                     break 'placement_calculation;
                 }
-
-                let mut adjacent_tiles: Vec<Option<Gd<Tile>>> = vec![];
 
                 let mut coordinate_offset = CardinalDirection::N.get_coordinate_offset();
                 let mut adjacent_coordinates = (
@@ -639,6 +648,7 @@ impl INode2D for Tile {
                         collision_side[0].clone(),
                         position,
                         placement_coordinates,
+                        adjacent_tiles,
                     ));
 
                     let mut base = self.base_mut();

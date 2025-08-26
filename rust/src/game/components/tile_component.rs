@@ -67,8 +67,7 @@ impl INode for TileComponent {
 #[godot_api]
 impl TileComponent {
     pub fn rotate_cw(&mut self) {
-        self.oasis_layout =
-            OasisLayoutFlags::from_bits_truncate(self.oasis_layout.bits().rotate_left(1));
+        self.oasis_layout = self.oasis_layout.rotate_left(1);
 
         let treasure_layout: Vec<String> = self
             .treasure_layout
@@ -85,8 +84,7 @@ impl TileComponent {
         self.treasure_layout = Array::from(&treasure_array);
     }
     pub fn rotate_ccw(&mut self) {
-        self.oasis_layout =
-            OasisLayoutFlags::from_bits_truncate(self.oasis_layout.bits().rotate_right(1));
+        self.oasis_layout = self.oasis_layout.rotate_right(1);
 
         let treasure_layout: Vec<String> = self
             .treasure_layout
