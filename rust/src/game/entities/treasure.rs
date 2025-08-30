@@ -272,6 +272,17 @@ impl INode2D for Treasure {
             self.change_tooltip_visibility(self.tooltip_visible);
         }
 
+        if self.tooltip_visible {
+            let mut tooltip = self.get_tooltip();
+            let mouse_position = self
+                .base()
+                .get_viewport()
+                .expect("Expected node to have a viewport")
+                .get_mouse_position();
+
+            tooltip.set_global_position(mouse_position);
+        }
+
         if self.sprite_kind == self.kind {
             return;
         }

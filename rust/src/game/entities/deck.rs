@@ -11,6 +11,7 @@ use crate::game::components::tile_component::{
 use crate::game::entities::tile::Tile;
 use crate::game::entities::BoardComponent;
 use crate::game::RunningGameScene;
+use crate::ui::LabelTooltip;
 use crate::util::loader::SceneLoader;
 use crate::util::Logger;
 
@@ -50,6 +51,9 @@ impl TileDeck {
 
         let mut gd_deck_rect = self.get_disable_rect();
         gd_deck_rect.set_visible(true);
+
+        let mut gd_tooltip = self.get_tooltip();
+        gd_tooltip.set_visible(false);
     }
     fn enable_collision(&self) {
         let mut gd_hover_outline = self.get_hover_outline();
@@ -62,6 +66,9 @@ impl TileDeck {
 
         let mut gd_deck_rect = self.get_disable_rect();
         gd_deck_rect.set_visible(false);
+
+        let mut gd_tooltip = self.get_tooltip();
+        gd_tooltip.set_visible(true);
     }
     fn spawn_new_tile(&self, tile_component: Gd<TileComponent>) {
         let gd_scene_loader = SceneLoader::get(&self.base());
@@ -132,23 +139,26 @@ impl TileDeck {
         }
     }
     fn get_tile_deck_component(&self) -> Gd<TileDeckComponent> {
-        self.to_gd()
+        self.base()
             .get_node_as::<TileDeckComponent>("./TileDeckComponent")
     }
     fn get_idx_label(&self) -> Gd<Label> {
-        self.to_gd()
+        self.base()
             .get_node_as::<Label>("./Control/VBoxContainer/CenterContainer/Label")
     }
     fn get_remaining_label(&self) -> Gd<Label> {
-        self.to_gd()
+        self.base()
             .get_node_as::<Label>("./Control/VBoxContainer/CenterContainer2/Remaining")
+    }
+    fn get_tooltip(&self) -> Gd<LabelTooltip> {
+        self.base().get_node_as::<LabelTooltip>("./LabelTooltip")
     }
 }
 
 #[godot_api]
 impl INode2D for TileDeck {
     fn ready(&mut self) {
-        let board_component = BoardComponent::get(&self.to_gd());
+        let board_component = BoardComponent::get(&self.base());
 
         if board_component.bind().active_tile_deck != self.deck_index {
             self.disable_outline();
@@ -181,7 +191,7 @@ impl INode2D for TileDeck {
         );
     }
     fn process(&mut self, _dt: f64) {
-        let active_index = BoardComponent::get(&self.to_gd()).bind().active_tile_deck;
+        let active_index = BoardComponent::get(&self.base()).bind().active_tile_deck;
 
         if active_index == self.deck_index {
             self.enable_collision();

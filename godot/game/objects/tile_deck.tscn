@@ -1,8 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://li3xpkusnj24"]
+[gd_scene load_steps=5 format=3 uid="uid://li3xpkusnj24"]
 
 [ext_resource type="PackedScene" uid="uid://c1uwyqxhau1ha" path="res://game/objects/hover_outline.tscn" id="1_38osu"]
+[ext_resource type="PackedScene" uid="uid://bh6yeo87votd0" path="res://game/ui/tooltip.tscn" id="2_8gk41"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_38osu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8gk41"]
+size = Vector2(88, 88)
 
 [node name="TileDeck" type="TileDeck"]
 
@@ -81,13 +85,22 @@ text = "17
 horizontal_alignment = 1
 vertical_alignment = 2
 
+[node name="LabelTooltip" parent="." instance=ExtResource("2_8gk41")]
+label = "Click to draw tile"
+scale = Vector2(3, 3)
+
+[node name="CollisionShape2D" parent="LabelTooltip" index="0"]
+position = Vector2(-0.333332, 1.90735e-06)
+shape = SubResource("RectangleShape2D_8gk41")
+
 [node name="DisableColorRect" type="ColorRect" parent="."]
 offset_left = -125.0
 offset_top = -124.0
 offset_right = 125.0
 offset_bottom = 126.0
 size_flags_horizontal = 3
-mouse_filter = 2
 color = Color(0.15, 0.15, 0.15, 0.392157)
 
 [connection signal="pressed" from="Control/MarginContainer/OnClickButton" to="." method="get_next_tile"]
+
+[editable path="LabelTooltip"]

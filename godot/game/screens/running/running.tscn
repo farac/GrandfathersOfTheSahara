@@ -14,6 +14,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
+mouse_filter = 2
 
 [node name="CenterContainer" type="CenterContainer" parent="Control2"]
 layout_mode = 1
@@ -174,7 +175,12 @@ offset_bottom = 387.778
 scale = Vector2(0.8, 0.8)
 
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck"]
+[editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck/LabelTooltip"]
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer/TileDeck"]
+[editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer/TileDeck/LabelTooltip"]
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3/CenterContainer/TileDeck"]
+[editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3/CenterContainer/TileDeck/LabelTooltip"]
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer/TileDeck"]
+[editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer/TileDeck/LabelTooltip"]
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5/CenterContainer/TileDeck"]
+[editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5/CenterContainer/TileDeck/LabelTooltip"]

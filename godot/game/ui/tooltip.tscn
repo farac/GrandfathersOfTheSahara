@@ -1,0 +1,75 @@
+[gd_scene load_steps=3 format=3 uid="uid://bh6yeo87votd0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0kpd0"]
+size = Vector2(275, 276)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kpd0"]
+bg_color = Color(0.791999, 0.791999, 0.791999, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="LabelTooltip" type="LabelTooltip"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_0kpd0")
+
+[node name="Panel" type="MarginContainer" parent="."]
+visible = false
+offset_left = 1.0
+offset_top = 2.0
+offset_right = 109.0
+offset_bottom = 58.0
+scale = Vector2(0.5, 0.5)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 8
+
+[node name="Outline" type="PanelContainer" parent="Panel"]
+z_index = 1
+z_as_relative = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+size_flags_stretch_ratio = 0.5
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0kpd0")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/Outline"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/Outline/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="Label" type="Label" parent="Panel/Outline/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "Tooltip"
+
+[node name="Highlight" type="Label" parent="Panel/Outline/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 20
+text = "Tooltip"
