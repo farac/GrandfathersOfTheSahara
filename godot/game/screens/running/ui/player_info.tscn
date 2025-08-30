@@ -1,0 +1,235 @@
+[gd_scene load_steps=3 format=3 uid="uid://bk3xts8n2k1x0"]
+
+[ext_resource type="StyleBox" uid="uid://gc5qundmq1lb" path="res://styles/box_container.tres" id="1_yegs4"]
+[ext_resource type="Texture2D" uid="uid://cunbjigx6lebm" path="res://assets/icons/treasure/water.png" id="2_e7bqc"]
+
+[node name="PlayerInfo" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 250.0
+theme_override_styles/panel = ExtResource("1_yegs4")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("1_yegs4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Leader"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TODO_ Art" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel/VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Cost
+1x"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResourceCost" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("2_e7bqc")
+expand_mode = 5
+
+[node name="Description" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Take one
+more move"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("1_yegs4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer2/Panel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer2/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Camel"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TODO_ Art" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer2/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("1_yegs4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Cameleer"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TODO_ Art" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel/VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Cost
+1x"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResourceCost" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("2_e7bqc")
+expand_mode = 5
+
+[node name="Description" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer3/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Cross several
+white lines"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("1_yegs4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer4/Panel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer4/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Camel"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TODO_ Art" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer4/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer5" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5"]
+layout_mode = 2
+size_flags_horizontal = 7
+size_flags_vertical = 3
+theme_override_styles/panel = ExtResource("1_yegs4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Scout"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TODO_ Art" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel/VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Cost
+1x"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResourceCost" type="TextureRect" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture = ExtResource("2_e7bqc")
+expand_mode = 5
+
+[node name="Description" type="Label" parent="Panel/MarginContainer/HBoxContainer/VBoxContainer5/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Place another
+player's tile"
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://0j5s46m15uqh" path="res://game/screens/running/ui/rumor_board.tscn" id="2_asxfy"]
 [ext_resource type="PackedScene" uid="uid://li3xpkusnj24" path="res://game/objects/tile_deck.tscn" id="3_wgd6x"]
 [ext_resource type="StyleBox" uid="uid://gc5qundmq1lb" path="res://styles/box_container.tres" id="3_wirfl"]
-[ext_resource type="PackedScene" uid="uid://bk3xts8n2k1x0" path="res://game/screens/running/ui/controls.tscn" id="5_ki5ko"]
+[ext_resource type="PackedScene" uid="uid://bk3xts8n2k1x0" path="res://game/screens/running/ui/player_info.tscn" id="5_ki5ko"]
 
 [node name="Running" type="RunningGameScene"]
 
@@ -32,8 +32,8 @@ layout_mode = 2
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 308.0
-offset_right = 348.0
+offset_left = 234.0
+offset_right = 274.0
 offset_bottom = 40.0
 scale = Vector2(0.9, 0.9)
 mouse_filter = 2
@@ -45,9 +45,9 @@ metadata/_edit_group_ = true
 [node name="RumorBoard" parent="Control" instance=ExtResource("2_asxfy")]
 layout_mode = 1
 offset_left = -252.222
-offset_top = 173.333
+offset_top = 7.77741
 offset_right = -252.222
-offset_bottom = 173.333
+offset_bottom = 7.77741
 mouse_filter = 1
 
 [node name="TileDeckBoard" type="PanelContainer" parent="Control"]
@@ -168,9 +168,10 @@ theme_override_colors/font_color = Color(0.788235, 0.490196, 0.705882, 1)
 
 [node name="PlayerInfo" parent="Control" instance=ExtResource("5_ki5ko")]
 offset_left = 597.778
-offset_top = 172.222
+offset_top = 387.778
 offset_right = 597.778
-offset_bottom = 172.222
+offset_bottom = 387.778
+scale = Vector2(0.8, 0.8)
 
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck"]
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer/TileDeck"]
