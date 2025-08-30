@@ -1,5 +1,5 @@
-use godot::builtin::{Color, GString, Vector2};
-use godot::classes::{INode2D, Label, Node2D};
+use godot::builtin::{Color, Vector2};
+use godot::classes::{ColorRect, INode2D, Label, Node2D};
 use godot::obj::{Base, Gd, WithBaseField};
 use godot::prelude::{godot_api, GodotClass};
 use phf::{phf_map, Map};
@@ -12,6 +12,7 @@ use crate::game::entities::tile::Tile;
 use crate::game::entities::BoardComponent;
 use crate::game::RunningGameScene;
 use crate::util::loader::SceneLoader;
+use crate::util::Logger;
 
 // TODO: Move this color information to the mapping in config/tileset.toml
 const TILE_COLOR_MAP: Map<&'static str, &'static str> = phf_map! {
@@ -36,6 +37,9 @@ impl TileDeck {
         self.base()
             .get_node_as::<HoverableOutline>("./HoverOutline")
     }
+    fn get_disable_rect(&self) -> Gd<ColorRect> {
+        self.base().get_node_as::<ColorRect>("./DisableColorRect")
+    }
     fn disable_outline(&self) {
         let mut gd_hover_outline = self.get_hover_outline();
         gd_hover_outline.set_visible(false);
@@ -43,6 +47,9 @@ impl TileDeck {
         let mut hover_outline = gd_hover_outline.bind_mut();
 
         hover_outline.disable_collision();
+
+        let mut gd_deck_rect = self.get_disable_rect();
+        gd_deck_rect.set_visible(true);
     }
     fn enable_collision(&self) {
         let mut gd_hover_outline = self.get_hover_outline();
@@ -52,6 +59,9 @@ impl TileDeck {
         let mut hover_outline = gd_hover_outline.bind_mut();
 
         hover_outline.enable_collision();
+
+        let mut gd_deck_rect = self.get_disable_rect();
+        gd_deck_rect.set_visible(false);
     }
     fn spawn_new_tile(&self, tile_component: Gd<TileComponent>) {
         let gd_scene_loader = SceneLoader::get(&self.base());
@@ -113,8 +123,10 @@ impl TileDeck {
 
             if new_remaining == 0 {
                 self.disable_outline();
+                board_component.bind_mut().active_tile_deck += 1;
             }
         } else {
+            Logger::error("Attempted to spawn tile from exhausted deck");
             board_component.bind_mut().active_tile_deck += 1;
             self.disable_outline();
         }
