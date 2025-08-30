@@ -1,6 +1,34 @@
-[gd_scene load_steps=2 format=3 uid="uid://0j5s46m15uqh"]
+[gd_scene load_steps=8 format=3 uid="uid://0j5s46m15uqh"]
 
 [ext_resource type="StyleBox" uid="uid://gc5qundmq1lb" path="res://styles/box_container.tres" id="1_2q12g"]
+[ext_resource type="Texture2D" uid="uid://duqp0de53vn8b" path="res://assets/icons/treasure/goods/salt.png" id="2_kqe1c"]
+[ext_resource type="Texture2D" uid="uid://clcj1cu818pa3" path="res://assets/icons/treasure/goods/myrrh.png" id="3_xcanx"]
+[ext_resource type="Texture2D" uid="uid://plxlblq4f027" path="res://assets/icons/treasure/goods/incense.png" id="4_xcanx"]
+[ext_resource type="Texture2D" uid="uid://dv8nsduafhfpi" path="res://assets/icons/treasure/goods/gems.png" id="5_qxxy5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qxxy5"]
+bg_color = Color(0.359069, 0.359069, 0.359069, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aoo8w"]
+bg_color = Color(0.720467, 0.720468, 0.720467, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="RumorBoard" type="Control"]
 layout_mode = 3
@@ -33,7 +61,12 @@ size_flags_vertical = 3
 [node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_qxxy5")
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/Panel"]
+layout_mode = 2
+texture = ExtResource("2_kqe1c")
+expand_mode = 1
 
 [node name="Panel2" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -48,7 +81,16 @@ theme_override_styles/panel = ExtResource("1_2q12g")
 [node name="Panel4" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_aoo8w")
+
+[node name="SaltValue" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer/Panel4"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -57,7 +99,12 @@ size_flags_vertical = 3
 [node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_qxxy5")
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2/Panel"]
+layout_mode = 2
+texture = ExtResource("3_xcanx")
+expand_mode = 1
 
 [node name="Panel2" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
@@ -72,7 +119,16 @@ theme_override_styles/panel = ExtResource("1_2q12g")
 [node name="Panel4" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_aoo8w")
+
+[node name="MyrrhValue" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer2/Panel4"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -81,7 +137,12 @@ size_flags_vertical = 3
 [node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer3"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_qxxy5")
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer3/Panel"]
+layout_mode = 2
+texture = ExtResource("4_xcanx")
+expand_mode = 1
 
 [node name="Panel2" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer3"]
 layout_mode = 2
@@ -96,7 +157,16 @@ theme_override_styles/panel = ExtResource("1_2q12g")
 [node name="Panel4" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer3"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_aoo8w")
+
+[node name="IncenseValue" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer3/Panel4"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -105,7 +175,12 @@ size_flags_vertical = 3
 [node name="Panel" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_qxxy5")
+
+[node name="TextureRect" type="TextureRect" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer4/Panel"]
+layout_mode = 2
+texture = ExtResource("5_qxxy5")
+expand_mode = 1
 
 [node name="Panel2" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer4"]
 layout_mode = 2
@@ -120,4 +195,13 @@ theme_override_styles/panel = ExtResource("1_2q12g")
 [node name="Panel4" type="PanelContainer" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("1_2q12g")
+theme_override_styles/panel = SubResource("StyleBoxFlat_aoo8w")
+
+[node name="GemsValue" type="Label" parent="Panel/MarginContainer/VBoxContainer/HBoxContainer4/Panel4"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
