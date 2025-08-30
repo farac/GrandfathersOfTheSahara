@@ -177,11 +177,11 @@ impl Tile {
         };
 
         let (offset_x, offset_y) = match direction {
-            // Tiles are 250px. Their default scale is 0.2. Therefore, the offset is 50px
-            CardinalDirection::N => (-50, -51),
-            CardinalDirection::E => (1, -50),
+            // Tiles are 250px. Their default scale is 0.2 * 0.9. Therefore, the offset is 45px
+            CardinalDirection::N => (-45, -46),
+            CardinalDirection::E => (1, -45),
             CardinalDirection::S => (0, 1),
-            CardinalDirection::W => (-51, 0),
+            CardinalDirection::W => (-46, 0),
         };
 
         let outside_connection = direction.invert();
@@ -652,7 +652,7 @@ impl INode2D for Tile {
                     ));
 
                     let mut base = self.base_mut();
-                    base.set_scale(Vector2::from_tuple((0.2, 0.2)))
+                    base.set_scale(Vector2::from_tuple((0.2 * 0.9, 0.2 * 0.9)))
                 }
 
                 self.refresh_display_state();

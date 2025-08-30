@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://dasqqpex5d2no"]
+
+[ext_resource type="Texture2D" uid="uid://c1wij0o058hn5" path="res://assets/images/background.jpg" id="1_8khw4"]
+
+[node name="Background" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -324.0
+offset_right = 576.0
+offset_bottom = 324.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="CenterContainer"]
+position = Vector2(576, 324)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("1_8khw4")
