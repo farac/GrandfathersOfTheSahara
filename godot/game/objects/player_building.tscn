@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bob1o02t8lbn5"]
+
+[node name="PlayerBuilding" type="PlayerBuilding"]
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_right = 48.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 0
+rotation = 3.14159
+size_flags_vertical = 8

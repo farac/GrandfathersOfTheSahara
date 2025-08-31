@@ -4,7 +4,13 @@ use std::num::TryFromIntError;
 use godot::{obj::WithBaseField, prelude::godot_api};
 use thiserror::Error;
 
-use crate::{game::entities::tile::Tile, util::Logger};
+use crate::{
+    game::{
+        entities::{player::PlayerName, tile::Tile},
+        RunningGameScene,
+    },
+    util::Logger,
+};
 use godot::{
     classes::Node,
     obj::{Base, Gd, InstanceId},
@@ -14,6 +20,7 @@ use godot::{
 use crate::util::RootWindow;
 
 pub mod deck;
+pub mod player;
 pub mod tile;
 pub mod treasure;
 
@@ -147,17 +154,18 @@ pub struct BoardComponent {
     #[init(val=HashMap::new())]
     tile_coordinates: HashMap<u64, (usize, usize)>,
     active_tile_deck: u8,
+
+    #[init(val = 4)]
+    player_count: u8,
+    active_player: PlayerName,
 }
 
 #[godot_api]
 impl BoardComponent {
     pub fn get(node: &Node) -> Gd<BoardComponent> {
-        let tree = node
-            .get_tree()
-            .expect("Expected node to be part of a scene tree");
-        let root = tree.get_root().expect("Expected scene tree to have a root");
+        let running_scene = RunningGameScene::get_running_game(node);
 
-        root.get_node_as::<BoardComponent>("./GlobalBoardComponent")
+        running_scene.get_node_as::<BoardComponent>("./BoardComponent")
     }
     pub fn add_tile_at(&mut self, id: u64, x: u8, y: u8) -> Result<(), TileAddError> {
         if self.placed_tiles[x as usize][y as usize] != 0 {

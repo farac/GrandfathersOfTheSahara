@@ -1,0 +1,97 @@
+[gd_scene load_steps=4 format=3 uid="uid://rlbrkoe0l7y7"]
+
+[ext_resource type="StyleBox" uid="uid://gc5qundmq1lb" path="res://styles/box_container.tres" id="1_0buep"]
+[ext_resource type="PackedScene" uid="uid://bob1o02t8lbn5" path="res://game/objects/player_building.tscn" id="2_g55ig"]
+[ext_resource type="PackedScene" uid="uid://duid51dxxm3em" path="res://game/objects/player_token.tscn" id="3_6xvt7"]
+
+[node name="PlayerFigures" type="PlayerFigures"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 408.0
+offset_bottom = 160.0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("1_0buep")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MarginContainer1" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/margin_bottom = 25
+
+[node name="CenterContainer1" type="CenterContainer" parent="Panel/HBoxContainer/MarginContainer1"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="PlayerBuilding1" parent="Panel/HBoxContainer/MarginContainer1/CenterContainer1" instance=ExtResource("2_g55ig")]
+
+[node name="MarginContainer2" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/margin_bottom = 25
+
+[node name="CenterContainer2" type="CenterContainer" parent="Panel/HBoxContainer/MarginContainer2"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="PlayerBuilding2" parent="Panel/HBoxContainer/MarginContainer2/CenterContainer2" instance=ExtResource("2_g55ig")]
+position = Vector2(-4, 0)
+
+[node name="MarginContainer3" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/margin_bottom = 25
+
+[node name="CenterContainer3" type="CenterContainer" parent="Panel/HBoxContainer/MarginContainer3"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="PlayerBuilding3" parent="Panel/HBoxContainer/MarginContainer3/CenterContainer3" instance=ExtResource("2_g55ig")]
+position = Vector2(-4, 0)
+
+[node name="MarginContainer4" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/margin_bottom = 25
+
+[node name="CenterContainer4" type="CenterContainer" parent="Panel/HBoxContainer/MarginContainer4"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="PlayerBuilding4" parent="Panel/HBoxContainer/MarginContainer4/CenterContainer4" instance=ExtResource("2_g55ig")]
+position = Vector2(-4, 0)
+
+[node name="MarginContainer5" type="MarginContainer" parent="Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_constants/margin_bottom = 50
+
+[node name="CenterContainer5" type="CenterContainer" parent="Panel/HBoxContainer/MarginContainer5"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 8
+mouse_filter = 2
+
+[node name="PlayerToken" parent="Panel/HBoxContainer/MarginContainer5/CenterContainer5" instance=ExtResource("3_6xvt7")]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dsgvefwbo3x75"]
+[gd_scene load_steps=8 format=3 uid="uid://dsgvefwbo3x75"]
 
 [ext_resource type="PackedScene" uid="uid://dasqqpex5d2no" path="res://menus/background.tscn" id="1_q8f7b"]
 [ext_resource type="PackedScene" uid="uid://c3rygwqgs4mp4" path="res://game/objects/board.tscn" id="1_rcqg7"]
@@ -6,8 +6,11 @@
 [ext_resource type="PackedScene" uid="uid://li3xpkusnj24" path="res://game/objects/tile_deck.tscn" id="3_wgd6x"]
 [ext_resource type="StyleBox" uid="uid://gc5qundmq1lb" path="res://styles/box_container.tres" id="3_wirfl"]
 [ext_resource type="PackedScene" uid="uid://bk3xts8n2k1x0" path="res://game/screens/running/ui/player_info.tscn" id="5_ki5ko"]
+[ext_resource type="PackedScene" uid="uid://rlbrkoe0l7y7" path="res://game/screens/running/ui/player_figures.tscn" id="7_slg66"]
 
 [node name="Running" type="RunningGameScene"]
+
+[node name="BoardComponent" type="BoardComponent" parent="."]
 
 [node name="Control2" type="Control" parent="."]
 layout_mode = 3
@@ -169,10 +172,44 @@ theme_override_colors/font_color = Color(0.788235, 0.490196, 0.705882, 1)
 
 [node name="PlayerInfo" parent="Control" instance=ExtResource("5_ki5ko")]
 offset_left = 597.778
-offset_top = 387.778
+offset_top = 313.334
 offset_right = 597.778
-offset_bottom = 387.778
+offset_bottom = 313.334
 scale = Vector2(0.8, 0.8)
+
+[node name="PlayerFigures" parent="Control" instance=ExtResource("7_slg66")]
+layout_mode = 1
+offset_left = 597.778
+offset_top = 147.778
+offset_right = 597.778
+offset_bottom = 147.778
+
+[node name="PlayerFigures2" parent="Control" instance=ExtResource("7_slg66")]
+player_number = 1
+layout_mode = 1
+offset_left = -252.222
+offset_top = 488.889
+offset_right = -252.222
+offset_bottom = 488.889
+scale = Vector2(0.61, 0.61)
+
+[node name="PlayerFigures3" parent="Control" instance=ExtResource("7_slg66")]
+player_number = 2
+layout_mode = 1
+offset_left = -252.222
+offset_top = 380.0
+offset_right = -252.222
+offset_bottom = 380.0
+scale = Vector2(0.61, 0.61)
+
+[node name="PlayerFigures4" parent="Control" instance=ExtResource("7_slg66")]
+player_number = 3
+layout_mode = 1
+offset_left = -252.222
+offset_top = 271.111
+offset_right = -252.222
+offset_bottom = 271.111
+scale = Vector2(0.61, 0.61)
 
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck"]
 [editable path="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck/LabelTooltip"]

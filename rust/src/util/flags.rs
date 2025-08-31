@@ -130,8 +130,7 @@ impl From<usize> for CardinalDirection {
             1 => CardinalDirection::E,
             2 => CardinalDirection::S,
             3 => CardinalDirection::W,
-            // It makes no sense to have any other number if we're using mod 4
-            _ => panic!(),
+            _ => unreachable!(),
         }
     }
 }

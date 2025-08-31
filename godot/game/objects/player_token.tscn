@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://duid51dxxm3em"]
+
+[ext_resource type="Texture2D" uid="uid://ntxpk7ut4jj5" path="res://assets/icons/treasure/camels.png" id="1_d1hj3"]
+
+[node name="PlayerToken" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("1_d1hj3")
