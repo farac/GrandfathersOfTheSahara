@@ -1,24 +1,41 @@
-use crate::game::components::{
-    hover_outline::CollisionOutline, tile_component::TileComponent, tile_component::TileData,
-};
-use crate::game::entities::treasure::{Treasure, TreasureKind};
-use crate::game::entities::{BoardComponent, Entity, EntityManager, EntityScope};
-use crate::util::flags::{
-    CardinalDirection, CardinalDirectionFlags, DIRECTIONS, OASIS_CONNECTION_LABELS,
-};
+use crate::game::components::hover_outline::CollisionOutline;
+use crate::game::components::tile_component::TileComponent;
+use crate::game::components::tile_component::TileData;
+use crate::game::entities::treasure::Treasure;
+use crate::game::entities::treasure::TreasureKind;
+use crate::game::entities::BoardComponent;
+use crate::game::entities::Entity;
+use crate::game::entities::EntityManager;
+use crate::game::entities::EntityScope;
+use crate::util::flags::CardinalDirection;
+use crate::util::flags::CardinalDirectionFlags;
+use crate::util::flags::DIRECTIONS;
+use crate::util::flags::OASIS_CONNECTION_LABELS;
 use crate::util::input::InputActions;
-use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader, CROSS_IDS};
+use crate::util::loader::GameConfig;
+use crate::util::loader::TileConfig;
+use crate::util::loader::TilesetConfig;
+use crate::util::loader::TomlLoader;
+use crate::util::loader::CROSS_IDS;
 use crate::util::Logger;
-use godot::builtin::{Array, Color, GString, Vector2};
+use godot::builtin::Array;
+use godot::builtin::Color;
+use godot::builtin::GString;
+use godot::builtin::Vector2;
 
-use godot::classes::{INode2D, Input, Line2D, Node2D};
+use godot::classes::INode2D;
+use godot::classes::Input;
+use godot::classes::Line2D;
+use godot::classes::Node2D;
+use godot::classes::Sprite2D;
 use godot::global::godot_error;
-use godot::obj::{Gd, InstanceId, WithBaseField};
-use godot::{
-    classes::Sprite2D,
-    obj::Base,
-    prelude::{godot_api, GodotClass},
-};
+use godot::obj::Base;
+use godot::obj::Gd;
+use godot::obj::InstanceId;
+use godot::obj::Singleton;
+use godot::obj::WithBaseField;
+use godot::prelude::godot_api;
+use godot::prelude::GodotClass;
 
 #[derive(GodotClass, Debug)]
 #[class(init, base=Node2D)]
@@ -489,7 +506,8 @@ impl INode2D for Tile {
         let collision_id = self.active_collisions.first();
 
         if let Some(collision_id) = collision_id {
-            // TODO: This isn't safe, but we can potentially make it safe(r) _by implementing a manager_
+            // TODO: This isn't safe, but we can potentially make it safe(r) _by implementing a
+            // manager_
             let mut collision: Gd<CollisionOutline> = Gd::from_instance_id(*collision_id);
 
             let collision_side: Vec<CardinalDirection> =

@@ -1,9 +1,15 @@
-use godot::{
-    classes::{INode, Node, Os, Window},
-    global::{godot_error, godot_print, godot_warn},
-    obj::{Base, Gd},
-    prelude::{godot_api, GodotClass},
-};
+use godot::classes::INode;
+use godot::classes::Node;
+use godot::classes::Os;
+use godot::classes::Window;
+use godot::global::godot_error;
+use godot::global::godot_print;
+use godot::global::godot_warn;
+use godot::obj::Base;
+use godot::obj::Gd;
+use godot::obj::Singleton;
+use godot::prelude::godot_api;
+use godot::prelude::GodotClass;
 
 pub mod debug;
 pub mod flags;

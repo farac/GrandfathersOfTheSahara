@@ -1,13 +1,19 @@
 use derivative::Derivative;
 use godot::builtin::GString;
 
-use godot::classes::{INode, Node};
+use godot::builtin::Array;
+use godot::classes::INode;
+use godot::classes::Node;
+use godot::obj::Base;
 use godot::obj::Gd;
+use godot::prelude::godot_api;
 use godot::prelude::GodotClass;
-use godot::{builtin::Array, obj::Base, prelude::godot_api};
 
 use crate::util::flags::OasisLayoutFlags;
-use crate::util::loader::{GameConfig, TileConfig, TilesetConfig, TomlLoader};
+use crate::util::loader::GameConfig;
+use crate::util::loader::TileConfig;
+use crate::util::loader::TilesetConfig;
+use crate::util::loader::TomlLoader;
 
 #[derive(Derivative, Debug, Clone)]
 #[derivative(Default)]
@@ -79,7 +85,7 @@ impl TileComponent {
 
         treasure_slice.rotate_right(1);
 
-        let treasure_array = treasure_slice.map(|s| GString::from(s.to_string()));
+        let treasure_array = treasure_slice.map(|s| GString::from(s));
 
         self.treasure_layout = Array::from(&treasure_array);
     }
@@ -96,7 +102,7 @@ impl TileComponent {
 
         treasure_slice.rotate_left(1);
 
-        let treasure_array = treasure_slice.map(|s| GString::from(s.to_string()));
+        let treasure_array = treasure_slice.map(GString::from);
 
         self.treasure_layout = Array::from(&treasure_array);
     }
@@ -105,7 +111,7 @@ impl TileComponent {
         let treasure_layout = tile_data
             .treasure_layout
             .into_iter()
-            .map(|s| GString::from(s.to_owned()))
+            .map(|s| GString::from(&s))
             .collect();
 
         Gd::from_init_fn(|base| Self {
