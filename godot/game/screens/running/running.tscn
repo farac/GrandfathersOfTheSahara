@@ -95,6 +95,13 @@ size_flags_vertical = 4
 [node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer" instance=ExtResource("3_wgd6x")]
 scale = Vector2(0.3, 0.3)
 
+[node name="MarginContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck/Control" index="0"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 254.0
+offset_bottom = 254.0
+
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.996078, 0.882353, 0.486275, 1)
 
@@ -112,6 +119,13 @@ size_flags_vertical = 4
 [node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer" instance=ExtResource("3_wgd6x")]
 deck_index = 1
 scale = Vector2(0.3, 0.3)
+
+[node name="MarginContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer/TileDeck/Control" index="0"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 254.0
+offset_bottom = 254.0
 
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.701961, 0.843137, 0.929412, 1)
@@ -131,6 +145,13 @@ size_flags_vertical = 4
 deck_index = 2
 scale = Vector2(0.3, 0.3)
 
+[node name="MarginContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3/CenterContainer/TileDeck/Control" index="0"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 254.0
+offset_bottom = 254.0
+
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.6, 0.843137, 0.380392, 1)
 
@@ -148,6 +169,13 @@ size_flags_vertical = 4
 [node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer" instance=ExtResource("3_wgd6x")]
 deck_index = 3
 scale = Vector2(0.3, 0.3)
+
+[node name="MarginContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer/TileDeck/Control" index="0"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 254.0
+offset_bottom = 254.0
 
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.972549, 0.607843, 0.286275, 1)
@@ -167,10 +195,18 @@ size_flags_vertical = 4
 deck_index = 4
 scale = Vector2(0.3, 0.3)
 
+[node name="MarginContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5/CenterContainer/TileDeck/Control" index="0"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 254.0
+offset_bottom = 254.0
+
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.788235, 0.490196, 0.705882, 1)
 
 [node name="PlayerInfo" parent="Control" instance=ExtResource("5_ki5ko")]
+layout_mode = 0
 offset_left = 597.778
 offset_top = 313.334
 offset_right = 597.778

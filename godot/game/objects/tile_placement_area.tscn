@@ -45,4 +45,4 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_wy3lv")
 
 [node name="CollisionShape2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(0, 0, 250, 0, 125, 125)
+polygon = PackedVector2Array(-2.5, 2.5, 0, 0, 250, 0, 252.5, 2.5, 125, 130)
