@@ -195,10 +195,10 @@ impl Tile {
 
         let (offset_x, offset_y) = match direction {
             // Tiles are 250px. Their default scale is 0.2 * 0.9. Therefore, the offset is 45px
-            CardinalDirection::N => (-45, -46),
-            CardinalDirection::E => (1, -45),
-            CardinalDirection::S => (0, 1),
-            CardinalDirection::W => (-46, 0),
+            CardinalDirection::N => (-45., -45.9),
+            CardinalDirection::E => (0.9, -45.),
+            CardinalDirection::S => (0., 0.9),
+            CardinalDirection::W => (-45.9, 0.),
         };
 
         let outside_connection = direction.invert();
