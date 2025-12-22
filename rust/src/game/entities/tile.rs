@@ -34,6 +34,7 @@ use godot::obj::Gd;
 use godot::obj::InstanceId;
 use godot::obj::Singleton;
 use godot::obj::WithBaseField;
+use godot::obj::WithUserSignals;
 use godot::prelude::godot_api;
 use godot::prelude::GodotClass;
 
@@ -212,6 +213,8 @@ impl Tile {
         for _tile in adjacent_tiles {}
 
         self.is_active = false;
+
+        board_component.signals().tile_placed().emit();
 
         position + Vector2::from_tuple((offset_x as f32, offset_y as f32))
     }

@@ -1,21 +1,21 @@
 use std::collections::HashMap;
 use std::num::TryFromIntError;
 
-use godot::{obj::WithBaseField, prelude::godot_api};
+use godot::classes::INode;
+use godot::obj::WithBaseField;
+use godot::obj::WithUserSignals;
+use godot::prelude::godot_api;
 use thiserror::Error;
 
-use crate::{
-    game::{
-        entities::{player::PlayerName, tile::Tile},
-        RunningGameScene,
-    },
-    util::Logger,
-};
-use godot::{
-    classes::Node,
-    obj::{Base, Gd, InstanceId},
-    prelude::GodotClass,
-};
+use crate::game::entities::player::PlayerName;
+use crate::game::entities::tile::Tile;
+use crate::game::RunningGameScene;
+use crate::util::Logger;
+use godot::classes::Node;
+use godot::obj::Base;
+use godot::obj::Gd;
+use godot::obj::InstanceId;
+use godot::prelude::GodotClass;
 
 use crate::util::RootWindow;
 
@@ -42,8 +42,9 @@ pub struct EntityManager {
     base: Base<Node>,
 
     // Lists are scoped to enable freeing when the lifetime of a scope is over
-    // #[init(val=vec![])]
-    // global: Vec<u64>,
+    // E.g. on game exit/reset, the "running" scope can be cleared without worry
+    #[init(val=vec![])]
+    _global: Vec<u64>,
     #[init(val=vec![])]
     running: Vec<Option<InstanceId>>,
 }
@@ -67,7 +68,7 @@ impl EntityManager {
             }
         }
     }
-    fn get(&self, id: u64, scope: EntityScope) -> Option<InstanceId> {
+    fn _get(&self, id: u64, scope: EntityScope) -> Option<InstanceId> {
         match scope {
             EntityScope::Global => todo!(),
             EntityScope::Running => {
@@ -91,7 +92,7 @@ impl EntityManager {
 
         Gd::try_from_instance_id(instance_id).ok()
     }
-    fn remove(&mut self, id: u64, scope: EntityScope) -> Result<(), &'static str> {
+    fn _remove(&mut self, id: u64, scope: EntityScope) -> Result<(), &'static str> {
         match scope {
             EntityScope::Global => todo!(),
             EntityScope::Running => {
@@ -105,17 +106,17 @@ impl EntityManager {
             }
         }
     }
-    fn clear(&mut self, scope: EntityScope) {
+    fn _clear_scope(&mut self, scope: EntityScope) {
         match scope {
             EntityScope::Global => todo!(),
             EntityScope::Running => self.running.clear(),
         }
     }
-    fn free(&mut self, scope: EntityScope) {
+    fn _free(&mut self, scope: EntityScope) {
         match scope {
             EntityScope::Global => todo!(),
             EntityScope::Running => {
-                self.clear(EntityScope::Running);
+                self._clear_scope(EntityScope::Running);
                 self.running.shrink_to_fit()
             }
         }
@@ -144,6 +145,13 @@ pub enum TileGetError {
     IntegerConversionError(#[from] TryFromIntError),
 }
 
+// #[derive(Debug, Clone, Copy, Eq, PartialEq)]
+// pub enum GameState {
+//     Pre,
+//     Running,
+//     Post,
+// }
+
 #[derive(GodotClass, Debug)]
 #[class(init,base=Node)]
 pub struct BoardComponent {
@@ -158,6 +166,15 @@ pub struct BoardComponent {
     #[init(val = 4)]
     player_count: u8,
     active_player: PlayerName,
+}
+
+#[godot_api]
+impl INode for BoardComponent {
+    fn ready(&mut self) {
+        self.signals()
+            .tile_placed()
+            .connect_self(Self::on_tile_placed);
+    }
 }
 
 #[godot_api]
@@ -203,4 +220,20 @@ impl BoardComponent {
 
         Ok(((*x).try_into()?, (*y).try_into()?))
     }
+    pub fn cycle_player(&mut self) -> PlayerName {
+        Logger::debug(&format!(
+            "Cycling player from {:?} to {:?}",
+            self.active_player,
+            self.active_player.cycle()
+        ));
+
+        self.active_player = self.active_player.cycle();
+
+        self.active_player
+    }
+    fn on_tile_placed(&mut self) {
+        self.cycle_player();
+    }
+    #[signal]
+    fn tile_placed();
 }

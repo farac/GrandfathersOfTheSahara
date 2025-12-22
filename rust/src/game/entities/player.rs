@@ -1,11 +1,21 @@
-use godot::{
-    builtin::Color,
-    classes::{ColorRect, Control, IControl, INode2D, Node2D},
-    obj::{Gd, WithBaseField},
-    prelude::{godot_api, Base, GodotClass},
-};
+use godot::builtin::Color;
+use godot::classes::ColorRect;
+use godot::classes::Control;
+use godot::classes::IControl;
+use godot::classes::INode2D;
+use godot::classes::Node2D;
+use godot::classes::Panel;
+use godot::classes::PanelContainer;
+use godot::obj::Gd;
+use godot::obj::WithBaseField;
+use godot::prelude::godot_api;
+use godot::prelude::Base;
+use godot::prelude::GodotClass;
 
-#[derive(Default, Clone, Copy, Debug)]
+use crate::game::entities::BoardComponent;
+use crate::util::Logger;
+
+#[derive(Default, Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PlayerName {
     #[default]
     White,
@@ -15,8 +25,8 @@ pub enum PlayerName {
 }
 
 impl PlayerName {
-    pub fn cycle(player: &Self) -> Self {
-        match player {
+    pub fn cycle(&self) -> Self {
+        match self {
             Self::White => Self::Orange,
             Self::Orange => Self::Red,
             Self::Red => Self::Blue,
@@ -158,6 +168,17 @@ impl PlayerFigures {
             building, building, building
         ))
     }
+
+    fn get_outline(&self) -> Gd<PanelContainer> {
+        let base = self.base();
+
+        base.get_node_as("./Panel/ActiveOutline")
+    }
+    fn set_active(&mut self, active: bool) {
+        let mut outline = self.get_outline();
+
+        outline.set_visible(active);
+    }
 }
 
 const BUILDINGS: [BuildingType; 4] = [
@@ -176,5 +197,11 @@ impl IControl for PlayerFigures {
 
             building.set_height(*b, PlayerName::from(self.player_number));
         })
+    }
+    fn process(&mut self, _dt: f64) {
+        let gd_board_component = BoardComponent::get(&self.to_gd());
+        let board_component = gd_board_component.bind();
+
+        self.set_active(board_component.active_player == PlayerName::from(self.player_number));
     }
 }

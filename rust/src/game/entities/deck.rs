@@ -1,13 +1,22 @@
-use godot::builtin::{Color, Vector2};
-use godot::classes::{ColorRect, INode2D, Label, Node2D};
-use godot::obj::{Base, Gd, WithBaseField};
-use godot::prelude::{godot_api, GodotClass};
-use phf::{phf_map, Map};
+use godot::builtin::Color;
+use godot::builtin::Vector2;
+use godot::classes::ColorRect;
+use godot::classes::INode2D;
+use godot::classes::Label;
+use godot::classes::Node2D;
+use godot::obj::Base;
+use godot::obj::Gd;
+use godot::obj::WithBaseField;
+use godot::prelude::godot_api;
+use godot::prelude::GodotClass;
+use phf::phf_map;
+use phf::Map;
 
 use crate::game::components::hover_outline::HoverableOutline;
-use crate::game::components::tile_component::{
-    NextTileData, NextTileDataRemaining, TileComponent, TileDeckComponent,
-};
+use crate::game::components::tile_component::NextTileData;
+use crate::game::components::tile_component::NextTileDataRemaining;
+use crate::game::components::tile_component::TileComponent;
+use crate::game::components::tile_component::TileDeckComponent;
 use crate::game::entities::tile::Tile;
 use crate::game::entities::BoardComponent;
 use crate::game::RunningGameScene;
