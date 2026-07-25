@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dsgvefwbo3x75"]
+[gd_scene format=3 uid="uid://dsgvefwbo3x75"]
 
 [ext_resource type="PackedScene" uid="uid://dasqqpex5d2no" path="res://menus/background.tscn" id="1_q8f7b"]
 [ext_resource type="PackedScene" uid="uid://c3rygwqgs4mp4" path="res://game/objects/board.tscn" id="1_rcqg7"]
@@ -8,18 +8,18 @@
 [ext_resource type="PackedScene" uid="uid://bk3xts8n2k1x0" path="res://game/screens/running/ui/player_info.tscn" id="5_ki5ko"]
 [ext_resource type="PackedScene" uid="uid://rlbrkoe0l7y7" path="res://game/screens/running/ui/player_figures.tscn" id="7_slg66"]
 
-[node name="Running" type="RunningGameScene"]
+[node name="Running" type="RunningGameScene" unique_id=614252280]
 
-[node name="BoardComponent" type="BoardComponent" parent="."]
+[node name="BoardComponent" type="BoardComponent" parent="." unique_id=38782097]
 
-[node name="Control2" type="Control" parent="."]
+[node name="Control2" type="Control" parent="." unique_id=570943946]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 1152.0
 offset_bottom = 648.0
 mouse_filter = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="Control2"]
+[node name="CenterContainer" type="CenterContainer" parent="Control2" unique_id=1902141338]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -30,10 +30,10 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Background" parent="Control2/CenterContainer" instance=ExtResource("1_q8f7b")]
+[node name="Background" parent="Control2/CenterContainer" unique_id=1500662233 instance=ExtResource("1_q8f7b")]
 layout_mode = 2
 
-[node name="Control" type="Control" parent="."]
+[node name="Control" type="Control" parent="." unique_id=457957539]
 layout_mode = 3
 anchors_preset = 0
 offset_left = 234.0
@@ -42,11 +42,11 @@ offset_bottom = 40.0
 scale = Vector2(0.9, 0.9)
 mouse_filter = 2
 
-[node name="Board" parent="Control" instance=ExtResource("1_rcqg7")]
+[node name="Board" parent="Control" unique_id=1942390388 instance=ExtResource("1_rcqg7")]
 position = Vector2(-27, -32)
 metadata/_edit_group_ = true
 
-[node name="RumorBoard" parent="Control" instance=ExtResource("2_asxfy")]
+[node name="RumorBoard" parent="Control" unique_id=1274175594 instance=ExtResource("2_asxfy")]
 layout_mode = 1
 offset_left = -252.222
 offset_top = 7.77741
@@ -54,7 +54,7 @@ offset_right = -252.222
 offset_bottom = 7.77741
 mouse_filter = 1
 
-[node name="TileDeckBoard" type="PanelContainer" parent="Control"]
+[node name="TileDeckBoard" type="PanelContainer" parent="Control" unique_id=869101944]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -70,29 +70,29 @@ grow_vertical = 2
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("3_wirfl")
 
-[node name="MarginContainer" type="MarginContainer" parent="Control/TileDeckBoard"]
+[node name="MarginContainer" type="MarginContainer" parent="Control/TileDeckBoard" unique_id=811945950]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Control/TileDeckBoard/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/TileDeckBoard/MarginContainer" unique_id=1524524720]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Panel" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer"]
+[node name="Panel" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer" unique_id=1808664810]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("3_wirfl")
 
-[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel"]
+[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel" unique_id=185579721]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer" instance=ExtResource("3_wgd6x")]
+[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer" unique_id=1589441506 instance=ExtResource("3_wgd6x")]
 scale = Vector2(0.3, 0.3)
 
 [node name="MarginContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck/Control" index="0"]
@@ -105,18 +105,18 @@ offset_bottom = 254.0
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.996078, 0.882353, 0.486275, 1)
 
-[node name="Panel2" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer"]
+[node name="Panel2" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer" unique_id=265126182]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("3_wirfl")
 
-[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2"]
+[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2" unique_id=1651288308]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer" instance=ExtResource("3_wgd6x")]
+[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer" unique_id=1109355183 instance=ExtResource("3_wgd6x")]
 deck_index = 1
 scale = Vector2(0.3, 0.3)
 
@@ -130,18 +130,18 @@ offset_bottom = 254.0
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel2/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.701961, 0.843137, 0.929412, 1)
 
-[node name="Panel3" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer"]
+[node name="Panel3" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer" unique_id=2095578234]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("3_wirfl")
 
-[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3"]
+[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3" unique_id=1644716041]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3/CenterContainer" instance=ExtResource("3_wgd6x")]
+[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3/CenterContainer" unique_id=2074772107 instance=ExtResource("3_wgd6x")]
 deck_index = 2
 scale = Vector2(0.3, 0.3)
 
@@ -155,18 +155,18 @@ offset_bottom = 254.0
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel3/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.6, 0.843137, 0.380392, 1)
 
-[node name="Panel4" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer"]
+[node name="Panel4" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer" unique_id=2126878408]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("3_wirfl")
 
-[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4"]
+[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4" unique_id=1265445769]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer" instance=ExtResource("3_wgd6x")]
+[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer" unique_id=40500668 instance=ExtResource("3_wgd6x")]
 deck_index = 3
 scale = Vector2(0.3, 0.3)
 
@@ -180,18 +180,18 @@ offset_bottom = 254.0
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel4/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.972549, 0.607843, 0.286275, 1)
 
-[node name="Panel5" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer"]
+[node name="Panel5" type="PanelContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer" unique_id=1548338561]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("3_wirfl")
 
-[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5"]
+[node name="CenterContainer" type="CenterContainer" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5" unique_id=1869051614]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5/CenterContainer" instance=ExtResource("3_wgd6x")]
+[node name="TileDeck" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5/CenterContainer" unique_id=973874623 instance=ExtResource("3_wgd6x")]
 deck_index = 4
 scale = Vector2(0.3, 0.3)
 
@@ -205,7 +205,7 @@ offset_bottom = 254.0
 [node name="Label" parent="Control/TileDeckBoard/MarginContainer/HBoxContainer/Panel5/CenterContainer/TileDeck/Control/VBoxContainer/CenterContainer" index="0"]
 theme_override_colors/font_color = Color(0.788235, 0.490196, 0.705882, 1)
 
-[node name="PlayerInfo" parent="Control" instance=ExtResource("5_ki5ko")]
+[node name="PlayerInfo" parent="Control" unique_id=1216002777 instance=ExtResource("5_ki5ko")]
 layout_mode = 0
 offset_left = 597.778
 offset_top = 313.334
@@ -213,14 +213,14 @@ offset_right = 597.778
 offset_bottom = 313.334
 scale = Vector2(0.8, 0.8)
 
-[node name="PlayerFigures" parent="Control" instance=ExtResource("7_slg66")]
+[node name="PlayerFigures" parent="Control" unique_id=1865575139 instance=ExtResource("7_slg66")]
 layout_mode = 1
 offset_left = 597.778
 offset_top = 147.778
 offset_right = 597.778
 offset_bottom = 147.778
 
-[node name="PlayerFigures2" parent="Control" instance=ExtResource("7_slg66")]
+[node name="PlayerFigures2" parent="Control" unique_id=252529747 instance=ExtResource("7_slg66")]
 player_number = 1
 layout_mode = 1
 offset_left = -252.222
@@ -229,7 +229,7 @@ offset_right = -252.222
 offset_bottom = 488.889
 scale = Vector2(0.61, 0.61)
 
-[node name="PlayerFigures3" parent="Control" instance=ExtResource("7_slg66")]
+[node name="PlayerFigures3" parent="Control" unique_id=1456470983 instance=ExtResource("7_slg66")]
 player_number = 2
 layout_mode = 1
 offset_left = -252.222
@@ -238,7 +238,7 @@ offset_right = -252.222
 offset_bottom = 380.0
 scale = Vector2(0.61, 0.61)
 
-[node name="PlayerFigures4" parent="Control" instance=ExtResource("7_slg66")]
+[node name="PlayerFigures4" parent="Control" unique_id=1676050144 instance=ExtResource("7_slg66")]
 player_number = 3
 layout_mode = 1
 offset_left = -252.222
