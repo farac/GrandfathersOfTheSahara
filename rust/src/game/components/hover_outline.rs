@@ -1,9 +1,14 @@
-use godot::{
-    builtin::Variant,
-    classes::{Area2D, CollisionPolygon2D, CollisionShape2D, IArea2D, PanelContainer},
-    obj::{Base, Gd, WithBaseField},
-    prelude::{godot_api, GodotClass},
-};
+use godot::builtin::Variant;
+use godot::classes::Area2D;
+use godot::classes::CollisionPolygon2D;
+use godot::classes::CollisionShape2D;
+use godot::classes::IArea2D;
+use godot::classes::PanelContainer;
+use godot::obj::Base;
+use godot::obj::Gd;
+use godot::obj::WithBaseField;
+use godot::prelude::godot_api;
+use godot::prelude::GodotClass;
 
 use crate::game::entities::tile::Tile;
 
@@ -82,10 +87,7 @@ pub struct CollisionOutline {
 impl CollisionOutline {
     #[func]
     fn emit_active_collision(&self) {
-        let mut scene_tree = self
-            .base()
-            .get_tree()
-            .expect("Expected CollisionOutline node to be part of a scene tree");
+        let mut scene_tree = self.base().get_tree();
 
         // TODO: Replace this with a global manager implemented in code
         scene_tree.call_group(
@@ -97,10 +99,7 @@ impl CollisionOutline {
 
     #[func]
     fn cancel_collision(&self) {
-        let mut scene_tree = self
-            .base()
-            .get_tree()
-            .expect("Expected CollisionOutline node to be part of a scene tree");
+        let mut scene_tree = self.base().get_tree();
 
         // TODO: Replace this with a global manager implemented in code
         scene_tree.call_group(

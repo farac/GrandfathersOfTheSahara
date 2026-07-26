@@ -1,7 +1,11 @@
-use godot::{
-    classes::{Area2D, Button, CollisionShape2D, IArea2D, IButton, Label, MarginContainer},
-    prelude::*,
-};
+use godot::classes::Area2D;
+use godot::classes::Button;
+use godot::classes::CollisionShape2D;
+use godot::classes::IArea2D;
+use godot::classes::IButton;
+use godot::classes::Label;
+use godot::classes::MarginContainer;
+use godot::prelude::*;
 
 use crate::scenes::GameScene;
 
@@ -17,21 +21,17 @@ pub struct SceneChangeButton {
 #[godot_api]
 impl IButton for SceneChangeButton {
     fn pressed(&mut self) {
-        let scene_tree = self.base().get_tree();
+        let mut scene_tree = self.base().get_tree();
 
-        if let Some(mut scene_tree) = scene_tree {
-            let on_click_string = self.scene_on_click.to_string();
+        let on_click_string = self.scene_on_click.to_string();
 
-            let target_scene: GameScene = on_click_string.as_str().try_into().expect(
-                "Provided invalid scene name as `scene_on_click` to `SceneChangeButton.pressed()`",
-            );
+        let target_scene: GameScene = on_click_string.as_str().try_into().expect(
+            "Provided invalid scene name as `scene_on_click` to `SceneChangeButton.pressed()`",
+        );
 
-            let target_scene_path = target_scene.to_path();
+        let target_scene_path = target_scene.to_path();
 
-            scene_tree.change_scene_to_file(target_scene_path);
-        } else {
-            godot_error!("Scene tree should exist.");
-        }
+        scene_tree.change_scene_to_file(target_scene_path);
     }
 }
 

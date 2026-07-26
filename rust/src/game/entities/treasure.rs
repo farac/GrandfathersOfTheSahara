@@ -1,4 +1,8 @@
-use godot::classes::{CompressedTexture2D, Control, Label, Sprite2D};
+use godot::classes::CompressedTexture2D;
+use godot::classes::Control;
+use godot::classes::Label;
+use godot::classes::Sprite2D;
+use godot::meta::error::IoError;
 use godot::prelude::*;
 
 use thiserror::Error;

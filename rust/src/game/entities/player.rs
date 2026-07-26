@@ -4,7 +4,6 @@ use godot::classes::Control;
 use godot::classes::IControl;
 use godot::classes::INode2D;
 use godot::classes::Node2D;
-use godot::classes::Panel;
 use godot::classes::PanelContainer;
 use godot::obj::Gd;
 use godot::obj::WithBaseField;
@@ -12,10 +11,10 @@ use godot::prelude::godot_api;
 use godot::prelude::Base;
 use godot::prelude::GodotClass;
 
+use crate::game::entities::player_token::PlayerToken;
 use crate::game::entities::BoardComponent;
-use crate::util::Logger;
 
-#[derive(Default, Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Default, Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum PlayerName {
     #[default]
     White,
@@ -35,10 +34,10 @@ impl PlayerName {
     }
     pub fn color(&self) -> Color {
         match self {
-            PlayerName::White => Color::from_rgb(255., 255., 255.),
-            PlayerName::Orange => Color::from_rgb(255., 128., 0.),
-            PlayerName::Red => Color::from_rgb(255., 0., 0.),
-            PlayerName::Blue => Color::from_rgb(0., 0., 255.),
+            PlayerName::White => Color::from_rgba8(255, 255, 255, 255),
+            PlayerName::Orange => Color::from_rgba8(255, 128, 0, 255),
+            PlayerName::Red => Color::from_rgba8(255, 0, 0, 255),
+            PlayerName::Blue => Color::from_rgba8(0, 0, 255, 255),
         }
     }
 }
@@ -169,6 +168,10 @@ impl PlayerFigures {
         ))
     }
 
+    fn get_player_token(&self) -> Gd<PlayerToken> {
+        self.base()
+            .get_node_as("./Panel/HBoxContainer/MarginContainer5/CenterContainer5/PlayerToken")
+    }
     fn get_outline(&self) -> Gd<PanelContainer> {
         let base = self.base();
 
@@ -191,17 +194,23 @@ const BUILDINGS: [BuildingType; 4] = [
 #[godot_api]
 impl IControl for PlayerFigures {
     fn ready(&mut self) {
+        let player = PlayerName::from(self.player_number);
+
         BUILDINGS.iter().for_each(|b| {
             let mut gd_building = self.get_building(*b);
             let mut building = gd_building.bind_mut();
 
-            building.set_height(*b, PlayerName::from(self.player_number));
-        })
+            building.set_height(*b, player);
+        });
+
+        self.get_player_token()
+            .bind_mut()
+            .assign_token_to_player(player);
     }
     fn process(&mut self, _dt: f64) {
         let gd_board_component = BoardComponent::get(&self.to_gd());
         let board_component = gd_board_component.bind();
 
-        self.set_active(board_component.active_player == PlayerName::from(self.player_number));
+        self.set_active(board_component.active_player() == PlayerName::from(self.player_number));
     }
 }

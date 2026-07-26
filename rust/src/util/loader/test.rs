@@ -3,10 +3,9 @@ mod tests {
     use assert_matches::assert_matches;
     use toml::Table;
 
-    use crate::util::{
-        flags::OasisLayoutFlags,
-        loader::{CrossConfig, TilesetConfig},
-    };
+    use crate::util::flags::OasisLayoutFlags;
+    use crate::util::loader::CrossConfig;
+    use crate::util::loader::TilesetConfig;
 
     #[test]
     fn test_parse_tileset_config() {

@@ -31,14 +31,15 @@ impl RootWindow for Node {
     /// Panics if the result of `get_tree()` or `get_root()` is None
     fn get_tree_root(&self) -> Gd<Window> {
         self.get_tree()
-            .expect("Expected node to be part of a tree")
             .get_root()
             .expect("Expected tree to have root node")
     }
 }
 
+#[derive(PartialEq, PartialOrd)]
 enum LogLevel {
     Debug,
+    Info,
     Warn,
     Error,
 }
@@ -52,27 +53,41 @@ struct Env {
 pub struct Logger;
 
 impl Logger {
-    /// Use `format!()` macro to construct a formatted `output` parameter
-    fn print(level: LogLevel, output: &str) {
-        let debug = Os::singleton()
+    /// Lowest severity that prints. `Error` in release, `Info` in debug
+    /// builds, or `Debug` when the `DEBUG` environment flag is set.
+    fn threshold() -> LogLevel {
+        let debug_flag = Os::singleton()
             .get_environment("DEBUG")
             .to_string()
-            .as_str()
             .parse()
             .unwrap_or(false);
 
+        if debug_flag {
+            LogLevel::Debug
+        } else if cfg!(debug_assertions) {
+            LogLevel::Info
+        } else {
+            LogLevel::Error
+        }
+    }
+    /// Use `format!()` macro to construct a formatted `output` parameter
+    fn print(level: LogLevel, output: &str) {
+        if level < Self::threshold() {
+            return;
+        }
+
         match level {
-            LogLevel::Debug => {
-                if debug {
-                    godot_print!("[DEBUG]: {}", output)
-                }
-            }
+            LogLevel::Debug => godot_print!("[DEBUG]: {}", output),
+            LogLevel::Info => godot_print!("[INFO]: {}", output),
             LogLevel::Warn => godot_warn!("[WARN]: {}", output),
             LogLevel::Error => godot_error!("[ERROR]: {}", output),
         }
     }
     pub fn debug(message: &str) {
         Self::print(LogLevel::Debug, message)
+    }
+    pub fn info(message: &str) {
+        Self::print(LogLevel::Info, message)
     }
     pub fn warn(message: &str) {
         Self::print(LogLevel::Warn, message)
@@ -85,11 +100,6 @@ impl Logger {
 #[godot_api]
 impl INode for Env {
     fn init(base: Base<Node>) -> Self {
-        #[cfg(debug_assertions)]
-        {
-            Os::singleton().set_environment("DEBUG", "true");
-        }
-
         Self { base }
     }
 }

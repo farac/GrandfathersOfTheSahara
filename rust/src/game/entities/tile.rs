@@ -23,10 +23,14 @@ use godot::builtin::Color;
 use godot::builtin::GString;
 use godot::builtin::Vector2;
 
+use godot::classes::Area2D;
+use godot::classes::CollisionShape2D;
+use godot::classes::ColorRect;
 use godot::classes::INode2D;
 use godot::classes::Input;
 use godot::classes::Line2D;
 use godot::classes::Node2D;
+use godot::classes::PanelContainer;
 use godot::classes::Sprite2D;
 use godot::global::godot_error;
 use godot::obj::Base;
@@ -104,6 +108,11 @@ pub struct Tile {
     active_collisions: Vec<InstanceId>,
     #[init(val = 0.)]
     throttle_wheel: f64,
+
+    #[init(val = false)]
+    is_move_destination: bool,
+    #[init(val = false)]
+    move_hovered: bool,
 }
 
 impl Tile {
@@ -176,6 +185,109 @@ impl Tile {
         self.is_active = true;
         self.disable_all_collisions();
     }
+    fn get_move_area(&self) -> Gd<Area2D> {
+        self.base().get_node_as("./MoveArea")
+    }
+    fn get_move_collision(&self) -> Gd<CollisionShape2D> {
+        self.base().get_node_as("./MoveArea/CollisionShape2D")
+    }
+    fn get_move_highlight(&self) -> Gd<PanelContainer> {
+        self.base().get_node_as("./MoveArea/Highlight")
+    }
+    /// Marks this tile as a legal move destination for the active caravan, or
+    /// clears that mark.
+    pub fn set_move_destination(&mut self, enabled: bool) {
+        self.is_move_destination = enabled;
+
+        if !enabled {
+            self.move_hovered = false;
+        }
+
+        self.get_move_collision().set_disabled(!enabled);
+        self.get_move_highlight().set_visible(enabled);
+        self.refresh_move_highlight();
+    }
+    fn get_placement_highlight(&self, direction: &CardinalDirection) -> Gd<ColorRect> {
+        let direction: &str = direction.into();
+
+        self.base()
+            .get_node_as(&format!("./PlacementHighlights/{}", direction))
+    }
+    /// Shows a green outline marking this tile as the active player's caravan,
+    /// or clears it, so it is clear whose turn it is.
+    pub fn set_active_caravan(&mut self, active: bool) {
+        self.base()
+            .get_node_as::<PanelContainer>("./ActiveCaravanOutline")
+            .set_visible(active);
+    }
+    /// The tile under the cursor is paler than the rest so it reads as the
+    /// current destination.
+    fn refresh_move_highlight(&self) {
+        let color = if self.move_hovered {
+            Color {
+                r: 0.8,
+                g: 0.97,
+                b: 1.0,
+                a: 1.0,
+            }
+        } else {
+            Color {
+                r: 0.1,
+                g: 0.7,
+                b: 1.0,
+                a: 1.0,
+            }
+        };
+
+        self.get_move_highlight().set_modulate(color);
+    }
+    /// Global position of this tile's central field. The tile is 250px wide,
+    /// so its center is at local (125, 125).
+    pub fn center(&self) -> Vector2 {
+        self.base().to_global(Vector2::new(125.0, 125.0))
+    }
+    /// Oasis-adjacent sides, drawn as white connector lines (desert sides are
+    /// brown).
+    pub fn oasis_directions(&self) -> CardinalDirectionFlags {
+        let gd_tile_component = self.get_tile_component();
+        let tile_component = gd_tile_component.bind();
+
+        CardinalDirectionFlags::from(tile_component.oasis_layout.clone())
+    }
+    /// Confines exploration to `open`: a drawn tile may only be dropped on
+    /// these sides of this tile. The open sides also glow cyan to show where
+    /// placement is possible.
+    pub fn set_explorable_edges(&mut self, open: CardinalDirectionFlags) {
+        for direction in DIRECTIONS {
+            let is_open = open.contains(CardinalDirectionFlags::from(&direction));
+
+            if is_open {
+                self.enable_collision_at_direction(&direction);
+            } else {
+                self.disable_collision_at_direction(&direction);
+            }
+
+            self.get_placement_highlight(&direction)
+                .set_visible(is_open);
+        }
+    }
+    /// Queues this tile as the active caravan's destination and defers the
+    /// move to [`BoardComponent::apply_pending_move`].
+    fn try_move_here(&mut self) {
+        let coordinates = BoardComponent::get(&self.base())
+            .bind()
+            .get_tile_coordinates(self.id);
+
+        match coordinates {
+            Ok(coordinates) => {
+                let mut gd_board_component = BoardComponent::get(&self.base());
+
+                gd_board_component.bind_mut().queue_move(coordinates);
+                gd_board_component.call_deferred("apply_pending_move", &[]);
+            }
+            Err(error) => Logger::error(&format!("{error:?}")),
+        }
+    }
     pub fn place_at(
         &mut self,
         direction: CardinalDirection,
@@ -187,12 +299,18 @@ impl Tile {
         // a sensible default state and flipping only the ones we need. Just prototyping
         self.enable_all_collisions();
 
+        // A tile with no oasis on any side is pure desert, which grants the
+        // exploring player an immediate extra move + explore.
+        let is_desert_tile = self.oasis_directions().is_empty();
+
         let mut gd_board_component = BoardComponent::get(&self.base());
         let mut board_component = gd_board_component.bind_mut();
 
         if let Err(error) = board_component.add_tile_at(self.id, coordinates.0, coordinates.1) {
             godot_error!("{error:?}");
         };
+
+        board_component.queue_placement(coordinates, is_desert_tile);
 
         let (offset_x, offset_y) = match direction {
             // Tiles are 250px. Their default scale is 0.2 * 0.9. Therefore, the offset is 45px
@@ -451,6 +569,22 @@ impl INode2D for Tile {
                 });
             });
 
+        let move_area = self.get_move_area();
+        move_area
+            .signals()
+            .mouse_entered()
+            .connect_other(self, |tile| {
+                tile.move_hovered = true;
+                tile.refresh_move_highlight();
+            });
+        move_area
+            .signals()
+            .mouse_exited()
+            .connect_other(self, |tile| {
+                tile.move_hovered = false;
+                tile.refresh_move_highlight();
+            });
+
         if is_cross_tile {
             let mut board_component = BoardComponent::get(&self.base());
 
@@ -474,6 +608,16 @@ impl INode2D for Tile {
         }
     }
     fn process(&mut self, dt: f64) {
+        if self.is_move_destination && self.move_hovered {
+            let input = Input::singleton();
+
+            if input.is_action_just_pressed(&String::from(InputActions::Primary)) {
+                self.try_move_here();
+            }
+
+            return;
+        }
+
         if !self.is_active {
             return;
         }

@@ -4,16 +4,23 @@ use toml::map::Map;
 
 use const_format::concatcp;
 use godot::classes::file_access::ModeFlags;
-use godot::classes::{FileAccess, INode, Node, PackedScene};
-use godot::obj::{Base, Gd};
+use godot::classes::FileAccess;
+use godot::classes::INode;
+use godot::classes::Node;
+use godot::classes::PackedScene;
+use godot::obj::Base;
+use godot::obj::Gd;
+use godot::prelude::godot_api;
 use godot::prelude::load;
-use godot::prelude::{godot_api, GodotClass};
+use godot::prelude::GodotClass;
 use toml::de::Error as TomlError;
-use toml::{Table, Value};
+use toml::Table;
+use toml::Value;
 
 use crate::game::components::tile_component::TileComponent;
 use crate::game::entities::tile::Tile;
-use crate::util::flags::{CardinalDirectionFlags, OasisLayoutFlags};
+use crate::util::flags::CardinalDirectionFlags;
+use crate::util::flags::OasisLayoutFlags;
 use crate::util::RootWindow;
 
 const GAME_CONFIGS_ROOT: &str = "res://config/";

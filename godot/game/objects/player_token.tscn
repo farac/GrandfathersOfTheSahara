@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://ntxpk7ut4jj5" path="res://assets/icons/treasure/camels.png" id="1_d1hj3"]
 
-[node name="PlayerToken" type="Node2D"]
+[node name="PlayerToken" type="PlayerToken"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.15, 0.15)

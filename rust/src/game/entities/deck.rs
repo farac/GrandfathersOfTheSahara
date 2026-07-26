@@ -105,6 +105,8 @@ impl TileDeck {
             .get_mouse_position();
         new_tile.set_position(mouse_position);
         new_tile.set_scale(Vector2::from_tuple((0.3, 0.3)));
+        // Draw above the board's move and placement highlights while dragging.
+        new_tile.set_z_index(10);
     }
 }
 
@@ -126,6 +128,7 @@ impl TileDeck {
         }
 
         if let Some(tile) = next_tile.map(|nt| TileComponent::from_tile_data(nt.0)) {
+            board_component.bind_mut().begin_exploration();
             self.spawn_new_tile(tile);
 
             let mut rem_label = self.get_remaining_label();

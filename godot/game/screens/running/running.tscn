@@ -12,6 +12,9 @@
 
 [node name="BoardComponent" type="BoardComponent" parent="." unique_id=38782097]
 
+[node name="PlayerTokens" type="Node2D" parent="." unique_id=38782098]
+z_index = 50
+
 [node name="Control2" type="Control" parent="." unique_id=570943946]
 layout_mode = 3
 anchors_preset = 0
